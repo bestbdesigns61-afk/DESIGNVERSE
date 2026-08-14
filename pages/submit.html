@@ -1,0 +1,3748 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <!-- =====================================================
+         DESIGNVERSE
+         Upload Studio
+         ===================================================== -->
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#050508"
+    >
+
+    <meta
+        name="description"
+        content="Upload and publish your creative work on DESIGNVERSE."
+    >
+
+    <title>Upload Design — DESIGNVERSE</title>
+
+
+    <!-- =====================================================
+         FONTS
+         ===================================================== -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         ICONS
+         ===================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+
+    <!-- =====================================================
+         DESIGNVERSE CSS
+         ===================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/components.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/animations.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/responsive.css"
+    >
+
+
+    <!-- =====================================================
+         PAGE STYLES
+         ===================================================== -->
+
+    <style>
+
+        :root {
+            --submit-sidebar-width: 250px;
+        }
+
+
+        body {
+            margin: 0;
+        }
+
+
+        /* =================================================
+           PAGE
+           ================================================= */
+
+        .submit-page {
+            min-height: 100vh;
+
+            padding-top: 82px;
+        }
+
+
+        /* =================================================
+           SIDEBAR
+           ================================================= */
+
+        .dashboard-sidebar {
+
+            position: fixed;
+
+            top: 82px;
+            left: 0;
+            bottom: 0;
+
+            width:
+                var(--submit-sidebar-width);
+
+            padding:
+                22px 16px;
+
+            overflow-y: auto;
+
+            border-right:
+                1px solid
+                var(--border);
+
+            background:
+                rgba(5,5,8,0.86);
+
+            backdrop-filter:
+                blur(22px);
+
+            -webkit-backdrop-filter:
+                blur(22px);
+
+            z-index: 900;
+
+            transition:
+                transform 300ms ease;
+        }
+
+
+        .dashboard-sidebar-title {
+
+            padding:
+                0 12px 10px;
+
+            color:
+                var(--text-muted);
+
+            font-size: 9px;
+
+            font-weight: 800;
+
+            letter-spacing:
+                0.15em;
+
+            text-transform:
+                uppercase;
+        }
+
+
+        .dashboard-nav {
+
+            display: flex;
+
+            flex-direction:
+                column;
+
+            gap: 5px;
+        }
+
+
+        .dashboard-nav a {
+
+            min-height: 44px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 11px;
+
+            padding:
+                0 12px;
+
+            border-radius: 11px;
+
+            color:
+                var(--text-muted);
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            transition:
+                background 180ms ease,
+                color 180ms ease,
+                transform 180ms ease;
+        }
+
+
+        .dashboard-nav a i {
+
+            width: 18px;
+
+            text-align: center;
+
+            font-size: 13px;
+        }
+
+
+        .dashboard-nav a:hover {
+
+            color: white;
+
+            background:
+                rgba(255,255,255,0.05);
+
+            transform:
+                translateX(2px);
+        }
+
+
+        .dashboard-nav a.active {
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(124,58,237,0.18),
+                    rgba(37,99,235,0.09)
+                );
+
+            border:
+                1px solid
+                rgba(124,58,237,0.22);
+        }
+
+
+        .dashboard-sidebar-divider {
+
+            height: 1px;
+
+            margin:
+                20px 8px;
+
+            background:
+                var(--border);
+        }
+
+
+        .dashboard-logout {
+
+            color:
+                #fca5a5 !important;
+        }
+
+
+        .dashboard-logout:hover {
+
+            background:
+                rgba(239,68,68,0.08)
+                !important;
+        }
+
+
+        /* =================================================
+           MAIN
+           ================================================= */
+
+        .submit-main {
+
+            width:
+                calc(
+                    100% -
+                    var(--submit-sidebar-width)
+                );
+
+            margin-left:
+                var(--submit-sidebar-width);
+
+            padding:
+                34px;
+        }
+
+
+        .submit-container {
+
+            width:
+                min(100%, 1250px);
+
+            margin-inline: auto;
+        }
+
+
+        /* =================================================
+           HEADER
+           ================================================= */
+
+        .submit-header {
+
+            margin-bottom: 25px;
+        }
+
+
+        .submit-eyebrow {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            margin-bottom: 9px;
+
+            color:
+                #c4b5fd;
+
+            font-size: 9px;
+
+            font-weight: 800;
+
+            letter-spacing:
+                0.15em;
+
+            text-transform:
+                uppercase;
+        }
+
+
+        .submit-eyebrow i {
+
+            color:
+                #a855f7;
+        }
+
+
+        .submit-header h1 {
+
+            margin:
+                0 0 8px;
+
+            font-size:
+                clamp(
+                    30px,
+                    4vw,
+                    48px
+                );
+
+            letter-spacing:
+                -0.06em;
+        }
+
+
+        .submit-header p {
+
+            max-width:
+                680px;
+
+            margin: 0;
+
+            color:
+                var(--text-muted);
+
+            font-size: 12px;
+
+            line-height:
+                1.7;
+        }
+
+
+        /* =================================================
+           LAYOUT
+           ================================================= */
+
+        .submit-layout {
+
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1.1fr)
+                minmax(320px, 0.9fr);
+
+            gap: 20px;
+
+            align-items:
+                start;
+        }
+
+
+        /* =================================================
+           CARDS
+           ================================================= */
+
+        .submit-card {
+
+            padding:
+                24px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:
+                var(--radius-xl);
+
+            background:
+                rgba(255,255,255,0.035);
+
+            box-shadow:
+                0 20px 60px
+                rgba(0,0,0,0.18);
+        }
+
+
+        .submit-card + .submit-card {
+
+            margin-top:
+                20px;
+        }
+
+
+        .submit-card-header {
+
+            display: flex;
+
+            align-items:
+                flex-start;
+
+            justify-content:
+                space-between;
+
+            gap: 15px;
+
+            margin-bottom: 20px;
+        }
+
+
+        .submit-card-header h2 {
+
+            margin: 0 0 5px;
+
+            font-size: 18px;
+        }
+
+
+        .submit-card-header p {
+
+            margin: 0;
+
+            color:
+                var(--text-muted);
+
+            font-size: 10px;
+
+            line-height:
+                1.6;
+        }
+
+
+        .step-number {
+
+            width: 32px;
+
+            height: 32px;
+
+            display: grid;
+
+            place-items: center;
+
+            flex-shrink: 0;
+
+            border-radius: 10px;
+
+            background:
+                rgba(124,58,237,0.12);
+
+            border:
+                1px solid
+                rgba(168,85,247,0.18);
+
+            color:
+                #c4b5fd;
+
+            font-family:
+                "Space Grotesk",
+                sans-serif;
+
+            font-size: 12px;
+
+            font-weight: 700;
+        }
+
+
+        /* =================================================
+           UPLOAD AREA
+           ================================================= */
+
+        .upload-zone {
+
+            position: relative;
+
+            min-height:
+                340px;
+
+            display: flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            padding:
+                25px;
+
+            overflow: hidden;
+
+            border:
+                1px dashed
+                rgba(168,85,247,0.35);
+
+            border-radius:
+                18px;
+
+            background:
+                radial-gradient(
+                    circle at 50% 10%,
+                    rgba(124,58,237,0.10),
+                    transparent 45%
+                ),
+                rgba(255,255,255,0.025);
+
+            cursor: pointer;
+
+            transition:
+                border-color 200ms ease,
+                background 200ms ease,
+                transform 200ms ease;
+        }
+
+
+        .upload-zone:hover {
+
+            border-color:
+                rgba(168,85,247,0.65);
+
+            background:
+                radial-gradient(
+                    circle at 50% 10%,
+                    rgba(124,58,237,0.16),
+                    transparent 45%
+                ),
+                rgba(255,255,255,0.035);
+        }
+
+
+        .upload-zone.dragover {
+
+            border-color:
+                #a78bfa;
+
+            background:
+                rgba(124,58,237,0.10);
+
+            transform:
+                scale(1.01);
+        }
+
+
+        .upload-zone-content {
+
+            display: flex;
+
+            flex-direction:
+                column;
+
+            align-items:
+                center;
+
+            text-align: center;
+
+            pointer-events:
+                none;
+        }
+
+
+        .upload-icon {
+
+            width: 72px;
+
+            height: 72px;
+
+            display: grid;
+
+            place-items: center;
+
+            margin-bottom:
+                17px;
+
+            border:
+                1px solid
+                rgba(168,85,247,0.20);
+
+            border-radius:
+                20px;
+
+            background:
+                rgba(124,58,237,0.10);
+
+            color:
+                #c4b5fd;
+
+            font-size:
+                25px;
+        }
+
+
+        .upload-zone h3 {
+
+            margin:
+                0 0 7px;
+
+            font-size:
+                17px;
+        }
+
+
+        .upload-zone p {
+
+            max-width:
+                390px;
+
+            margin:
+                0 0 12px;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                10px;
+
+            line-height:
+                1.6;
+        }
+
+
+        .upload-browse {
+
+            display: inline-flex;
+
+            align-items:
+                center;
+
+            gap: 7px;
+
+            padding:
+                9px 13px;
+
+            border-radius:
+                10px;
+
+            background:
+                rgba(124,58,237,0.12);
+
+            border:
+                1px solid
+                rgba(168,85,247,0.18);
+
+            color:
+                #c4b5fd;
+
+            font-size:
+                10px;
+
+            font-weight:
+                700;
+        }
+
+
+        .upload-requirements {
+
+            margin-top:
+                13px;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                8px;
+        }
+
+
+        #designImageInput {
+
+            position: absolute;
+
+            inset: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            opacity: 0;
+
+            cursor: pointer;
+        }
+
+
+        /* =================================================
+           IMAGE PREVIEW
+           ================================================= */
+
+        .upload-preview {
+
+            display: none;
+
+            position: relative;
+
+            overflow: hidden;
+
+            border-radius:
+                17px;
+
+            background:
+                #08080d;
+        }
+
+
+        .upload-preview.visible {
+
+            display: block;
+        }
+
+
+        .upload-preview-image {
+
+            width: 100%;
+
+            max-height:
+                560px;
+
+            display: block;
+
+            margin-inline: auto;
+
+            object-fit: contain;
+
+            background:
+                #08080d;
+        }
+
+
+        .preview-overlay {
+
+            position: absolute;
+
+            left: 12px;
+
+            right: 12px;
+
+            bottom: 12px;
+
+            display: flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            gap: 10px;
+
+            padding:
+                9px 10px;
+
+            border:
+                1px solid
+                rgba(255,255,255,0.10);
+
+            border-radius:
+                11px;
+
+            background:
+                rgba(5,5,8,0.75);
+
+            backdrop-filter:
+                blur(12px);
+        }
+
+
+        .preview-file-info {
+
+            min-width: 0;
+
+            display: flex;
+
+            flex-direction:
+                column;
+
+            gap: 3px;
+        }
+
+
+        .preview-file-name {
+
+            overflow: hidden;
+
+            color: white;
+
+            font-size:
+                10px;
+
+            font-weight: 600;
+
+            text-overflow:
+                ellipsis;
+
+            white-space:
+                nowrap;
+        }
+
+
+        .preview-file-size {
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                8px;
+        }
+
+
+        .preview-change {
+
+            flex-shrink: 0;
+
+            display: inline-flex;
+
+            align-items:
+                center;
+
+            gap: 6px;
+
+            padding:
+                8px 10px;
+
+            border:
+                1px solid
+                rgba(255,255,255,0.12);
+
+            border-radius:
+                9px;
+
+            background:
+                rgba(255,255,255,0.05);
+
+            color: white;
+
+            font-size:
+                9px;
+
+            cursor: pointer;
+        }
+
+
+        .preview-change:hover {
+
+            background:
+                rgba(124,58,237,0.35);
+        }
+
+
+        /* =================================================
+           FORM
+           ================================================= */
+
+        .form-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 15px;
+        }
+
+
+        .form-group {
+
+            display: flex;
+
+            flex-direction:
+                column;
+
+            gap: 7px;
+        }
+
+
+        .form-group.full {
+
+            grid-column:
+                1 / -1;
+        }
+
+
+        .form-label {
+
+            color:
+                rgba(255,255,255,0.85);
+
+            font-size:
+                10px;
+
+            font-weight:
+                700;
+        }
+
+
+        .form-label span {
+
+            color:
+                var(--text-muted);
+
+            font-weight:
+                400;
+        }
+
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+
+            width: 100%;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:
+                11px;
+
+            outline: none;
+
+            background:
+                rgba(255,255,255,0.035);
+
+            color:
+                white;
+
+            font-family:
+                "Inter",
+                sans-serif;
+
+            font-size:
+                11px;
+
+            transition:
+                border-color 180ms ease,
+                background 180ms ease,
+                box-shadow 180ms ease;
+        }
+
+
+        .form-input,
+        .form-select {
+
+            height:
+                45px;
+
+            padding:
+                0 13px;
+        }
+
+
+        .form-textarea {
+
+            min-height:
+                125px;
+
+            padding:
+                12px 13px;
+
+            resize:
+                vertical;
+
+            line-height:
+                1.6;
+        }
+
+
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+
+            color:
+                var(--text-muted);
+        }
+
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+
+            border-color:
+                rgba(168,85,247,0.55);
+
+            background:
+                rgba(255,255,255,0.05);
+
+            box-shadow:
+                0 0 0 3px
+                rgba(124,58,237,0.08);
+        }
+
+
+        .form-select option {
+
+            color: white;
+
+            background:
+                #0b0b11;
+        }
+
+
+        .character-count {
+
+            align-self:
+                flex-end;
+
+            margin-top:
+                -2px;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                8px;
+        }
+
+
+        /* =================================================
+           TAG INPUT
+           ================================================= */
+
+        .tag-input-wrapper {
+
+            display: flex;
+
+            flex-wrap:
+                wrap;
+
+            gap: 7px;
+
+            min-height:
+                45px;
+
+            padding:
+                7px 10px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:
+                11px;
+
+            background:
+                rgba(255,255,255,0.035);
+        }
+
+
+        .tag-input-wrapper:focus-within {
+
+            border-color:
+                rgba(168,85,247,0.55);
+
+            box-shadow:
+                0 0 0 3px
+                rgba(124,58,237,0.08);
+        }
+
+
+        .tag-list {
+
+            display: contents;
+        }
+
+
+        .design-tag {
+
+            display: inline-flex;
+
+            align-items:
+                center;
+
+            gap: 6px;
+
+            padding:
+                6px 8px;
+
+            border-radius:
+                8px;
+
+            background:
+                rgba(124,58,237,0.12);
+
+            border:
+                1px solid
+                rgba(168,85,247,0.18);
+
+            color:
+                #c4b5fd;
+
+            font-size:
+                8px;
+        }
+
+
+        .design-tag button {
+
+            width:
+                15px;
+
+            height:
+                15px;
+
+            display: grid;
+
+            place-items:
+                center;
+
+            padding: 0;
+
+            border: 0;
+
+            background:
+                transparent;
+
+            color:
+                inherit;
+
+            cursor: pointer;
+        }
+
+
+        #tagInput {
+
+            min-width:
+                110px;
+
+            flex: 1;
+
+            height:
+                29px;
+
+            padding: 0;
+
+            border: 0;
+
+            outline: none;
+
+            background:
+                transparent;
+
+            color: white;
+
+            font-size:
+                10px;
+        }
+
+
+        /* =================================================
+           VISIBILITY
+           ================================================= */
+
+        .visibility-options {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 10px;
+        }
+
+
+        .visibility-option {
+
+            position: relative;
+
+            display: block;
+
+            cursor: pointer;
+        }
+
+
+        .visibility-option input {
+
+            position: absolute;
+
+            opacity: 0;
+
+            pointer-events: none;
+        }
+
+
+        .visibility-content {
+
+            display: flex;
+
+            align-items:
+                center;
+
+            gap: 10px;
+
+            min-height:
+                58px;
+
+            padding:
+                10px 12px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:
+                12px;
+
+            background:
+                rgba(255,255,255,0.025);
+
+            transition:
+                border-color 180ms ease,
+                background 180ms ease;
+        }
+
+
+        .visibility-option input:checked +
+        .visibility-content {
+
+            border-color:
+                rgba(168,85,247,0.50);
+
+            background:
+                rgba(124,58,237,0.09);
+        }
+
+
+        .visibility-icon {
+
+            width:
+                33px;
+
+            height:
+                33px;
+
+            display: grid;
+
+            place-items:
+                center;
+
+            flex-shrink: 0;
+
+            border-radius:
+                9px;
+
+            background:
+                rgba(124,58,237,0.10);
+
+            color:
+                #c4b5fd;
+        }
+
+
+        .visibility-text {
+
+            display: flex;
+
+            flex-direction:
+                column;
+
+            gap: 3px;
+        }
+
+
+        .visibility-text strong {
+
+            color: white;
+
+            font-size:
+                10px;
+        }
+
+
+        .visibility-text span {
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                8px;
+
+            line-height:
+                1.45;
+        }
+
+
+        /* =================================================
+           CHALLENGE
+           ================================================= */
+
+        .challenge-box {
+
+            padding:
+                13px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:
+                12px;
+
+            background:
+                rgba(255,255,255,0.025);
+        }
+
+
+        .challenge-box-row {
+
+            display: flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            gap: 12px;
+        }
+
+
+        .challenge-box-info {
+
+            display: flex;
+
+            align-items:
+                center;
+
+            gap: 10px;
+
+            min-width:
+                0;
+        }
+
+
+        .challenge-box-icon {
+
+            width:
+                35px;
+
+            height:
+                35px;
+
+            display: grid;
+
+            place-items:
+                center;
+
+            flex-shrink: 0;
+
+            border-radius:
+                10px;
+
+            background:
+                rgba(124,58,237,0.12);
+
+            color:
+                #c4b5fd;
+        }
+
+
+        .challenge-box-info strong {
+
+            display: block;
+
+            color: white;
+
+            font-size:
+                10px;
+        }
+
+
+        .challenge-box-info span {
+
+            display: block;
+
+            margin-top:
+                3px;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                8px;
+        }
+
+
+        /* =================================================
+           SUBMIT ACTIONS
+           ================================================= */
+
+        .submit-actions {
+
+            display: flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            gap: 12px;
+
+            margin-top:
+                20px;
+
+            padding-top:
+                20px;
+
+            border-top:
+                1px solid
+                var(--border);
+        }
+
+
+        .submit-actions-note {
+
+            max-width:
+                370px;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                8px;
+
+            line-height:
+                1.55;
+        }
+
+
+        .submit-actions-buttons {
+
+            display: flex;
+
+            align-items:
+                center;
+
+            gap: 9px;
+        }
+
+
+        /* =================================================
+           VALIDATION
+           ================================================= */
+
+        .field-error {
+
+            display: none;
+
+            color:
+                #fca5a5;
+
+            font-size:
+                8px;
+        }
+
+
+        .field-error.visible {
+
+            display: block;
+        }
+
+
+        .form-input.error,
+        .form-select.error,
+        .form-textarea.error {
+
+            border-color:
+                rgba(239,68,68,0.60);
+        }
+
+
+        /* =================================================
+           TIPS CARD
+           ================================================= */
+
+        .submit-tips {
+
+            padding:
+                16px;
+
+            border:
+                1px solid
+                rgba(56,189,248,0.12);
+
+            border-radius:
+                14px;
+
+            background:
+                rgba(56,189,248,0.035);
+        }
+
+
+        .submit-tips h3 {
+
+            margin:
+                0 0 9px;
+
+            color:
+                #bae6fd;
+
+            font-size:
+                11px;
+        }
+
+
+        .submit-tips ul {
+
+            margin:
+                0;
+
+            padding-left:
+                18px;
+        }
+
+
+        .submit-tips li {
+
+            margin-bottom:
+                6px;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                8px;
+
+            line-height:
+                1.5;
+        }
+
+
+        .submit-tips li:last-child {
+
+            margin-bottom: 0;
+        }
+
+
+        /* =================================================
+           MOBILE SIDEBAR
+           ================================================= */
+
+        .dashboard-mobile-toggle {
+
+            display: none;
+
+            position: fixed;
+
+            left: 15px;
+
+            bottom: 16px;
+
+            width: 46px;
+
+            height: 46px;
+
+            place-items:
+                center;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:
+                14px;
+
+            background:
+                rgba(10,10,16,0.90);
+
+            color: white;
+
+            box-shadow:
+                0 15px 40px
+                rgba(0,0,0,0.45);
+
+            z-index: 1200;
+        }
+
+
+        /* =================================================
+           RESPONSIVE
+           ================================================= */
+
+        @media (max-width: 1050px) {
+
+            :root {
+                --submit-sidebar-width:
+                    220px;
+            }
+
+
+            .submit-main {
+
+                padding:
+                    27px;
+            }
+
+
+            .submit-layout {
+
+                grid-template-columns:
+                    1fr;
+            }
+        }
+
+
+        @media (max-width: 850px) {
+
+            .dashboard-sidebar {
+
+                transform:
+                    translateX(-105%);
+            }
+
+
+            .dashboard-sidebar.open {
+
+                transform:
+                    translateX(0);
+            }
+
+
+            .submit-main {
+
+                width: 100%;
+
+                margin-left: 0;
+
+                padding:
+                    24px 18px 80px;
+            }
+
+
+            .dashboard-mobile-toggle {
+
+                display: grid;
+            }
+        }
+
+
+        @media (max-width: 620px) {
+
+            .form-grid {
+
+                grid-template-columns:
+                    1fr;
+            }
+
+
+            .form-group.full {
+
+                grid-column:
+                    auto;
+            }
+
+
+            .visibility-options {
+
+                grid-template-columns:
+                    1fr;
+            }
+
+
+            .submit-actions {
+
+                flex-direction:
+                    column;
+
+                align-items:
+                    stretch;
+            }
+
+
+            .submit-actions-buttons {
+
+                width: 100%;
+            }
+
+
+            .submit-actions-buttons
+            .btn {
+
+                flex: 1;
+            }
+
+
+            .upload-zone {
+
+                min-height:
+                    300px;
+            }
+        }
+
+
+        @media (max-width: 450px) {
+
+            .submit-main {
+
+                padding:
+                    20px 13px 80px;
+            }
+
+
+            .submit-card {
+
+                padding:
+                    18px;
+
+                border-radius:
+                    18px;
+            }
+
+
+            .upload-zone {
+
+                min-height:
+                    260px;
+
+                padding:
+                    18px;
+            }
+
+
+            .upload-icon {
+
+                width:
+                    60px;
+
+                height:
+                    60px;
+            }
+        }
+
+
+        @media (hover: none) and (pointer: coarse) {
+
+            .upload-zone:hover {
+
+                transform: none;
+            }
+        }
+
+
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+
+                animation-duration:
+                    0.01ms !important;
+
+                animation-iteration-count:
+                    1 !important;
+
+                transition-duration:
+                    0.01ms !important;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body data-protected>
+
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <header
+        class="site-header"
+        id="site-header"
+    >
+
+        <nav class="navbar container">
+
+            <a
+                href="../index.html"
+                class="brand"
+                aria-label="DESIGNVERSE Home"
+            >
+
+                <div class="brand-icon">
+                    <span>DV</span>
+                </div>
+
+
+                <div class="brand-text">
+
+                    <span class="brand-name">
+                        DESIGNVERSE
+                    </span>
+
+                    <span class="brand-subtitle">
+                        BY BESTB DESIGNS
+                    </span>
+
+                </div>
+
+            </a>
+
+
+            <div class="desktop-nav">
+
+                <a href="explore.html">
+                    Explore
+                </a>
+
+                <a href="challenges.html">
+                    Challenges
+                </a>
+
+                <a href="leaderboard.html">
+                    Leaderboard
+                </a>
+
+                <a href="designers.html">
+                    Designers
+                </a>
+
+            </div>
+
+
+            <div class="nav-actions">
+
+                <a
+                    href="dashboard/dashboard.html"
+                    class="btn btn-secondary btn-small"
+                >
+
+                    <i
+                        class="fa-solid fa-chart-pie"
+                    ></i>
+
+                    Dashboard
+
+                </a>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+
+    <!-- =====================================================
+         PAGE
+         ===================================================== -->
+
+    <div class="submit-page">
+
+
+        <!-- =================================================
+             SIDEBAR
+             ================================================= -->
+
+        <aside
+            class="dashboard-sidebar"
+            id="dashboardSidebar"
+            aria-label="Dashboard navigation"
+        >
+
+            <div
+                class="dashboard-sidebar-title"
+            >
+                Workspace
+            </div>
+
+
+            <nav class="dashboard-nav">
+
+                <a
+                    href="dashboard/dashboard.html"
+                >
+
+                    <i
+                        class="fa-solid fa-chart-pie"
+                    ></i>
+
+                    Dashboard
+
+                </a>
+
+
+                <a
+                    href="dashboard/my-designs.html"
+                >
+
+                    <i
+                        class="fa-solid fa-palette"
+                    ></i>
+
+                    My Designs
+
+                </a>
+
+
+                <a
+                    href="dashboard/my-challenges.html"
+                >
+
+                    <i
+                        class="fa-solid fa-fire"
+                    ></i>
+
+                    My Challenges
+
+                </a>
+
+
+                <a
+                    href="submit.html"
+                    class="active"
+                >
+
+                    <i
+                        class="fa-solid fa-cloud-arrow-up"
+                    ></i>
+
+                    Submit Design
+
+                </a>
+
+            </nav>
+
+
+            <div
+                class="dashboard-sidebar-divider"
+            ></div>
+
+
+            <div
+                class="dashboard-sidebar-title"
+            >
+                Discover
+            </div>
+
+
+            <nav class="dashboard-nav">
+
+                <a href="explore.html">
+
+                    <i
+                        class="fa-solid fa-compass"
+                    ></i>
+
+                    Explore
+
+                </a>
+
+
+                <a href="challenges.html">
+
+                    <i
+                        class="fa-solid fa-bolt"
+                    ></i>
+
+                    Challenges
+
+                </a>
+
+
+                <a href="leaderboard.html">
+
+                    <i
+                        class="fa-solid fa-trophy"
+                    ></i>
+
+                    Leaderboard
+
+                </a>
+
+
+                <a href="designers.html">
+
+                    <i
+                        class="fa-solid fa-users"
+                    ></i>
+
+                    Designers
+
+                </a>
+
+            </nav>
+
+
+            <div
+                class="dashboard-sidebar-divider"
+            ></div>
+
+
+            <nav class="dashboard-nav">
+
+                <a
+                    href="dashboard/notifications.html"
+                >
+
+                    <i
+                        class="fa-regular fa-bell"
+                    ></i>
+
+                    Notifications
+
+                </a>
+
+
+                <a
+                    href="dashboard/settings.html"
+                >
+
+                    <i
+                        class="fa-solid fa-gear"
+                    ></i>
+
+                    Settings
+
+                </a>
+
+
+                <a
+                    href="#"
+                    class="dashboard-logout"
+                    data-logout
+                >
+
+                    <i
+                        class="fa-solid fa-arrow-right-from-bracket"
+                    ></i>
+
+                    Sign Out
+
+                </a>
+
+            </nav>
+
+        </aside>
+
+
+        <!-- =================================================
+             MOBILE SIDEBAR
+             ================================================= -->
+
+        <button
+            type="button"
+            class="dashboard-mobile-toggle"
+            id="dashboardMobileToggle"
+            aria-label="Open dashboard menu"
+            aria-expanded="false"
+        >
+
+            <i
+                class="fa-solid fa-bars"
+            ></i>
+
+        </button>
+
+
+        <!-- =================================================
+             MAIN
+             ================================================= -->
+
+        <main class="submit-main">
+
+            <div class="submit-container">
+
+
+                <!-- =========================================
+                     HEADER
+                     ========================================= -->
+
+                <header
+                    class="submit-header"
+                >
+
+                    <div
+                        class="submit-eyebrow"
+                    >
+
+                        <i
+                            class="fa-solid fa-wand-magic-sparkles"
+                        ></i>
+
+                        DESIGNVERSE UPLOAD STUDIO
+
+                    </div>
+
+
+                    <h1>
+                        Bring your design
+                        into the Verse.
+                    </h1>
+
+
+                    <p>
+
+                        Upload your work, tell the
+                        community what inspired it,
+                        and prepare it for your next
+                        challenge.
+
+                    </p>
+
+                </header>
+
+
+                <!-- =========================================
+                     SUBMIT FORM
+                     ========================================= -->
+
+                <form
+                    id="designSubmitForm"
+                    novalidate
+                >
+
+
+                    <div
+                        class="submit-layout"
+                    >
+
+
+                        <!-- =================================
+                             LEFT COLUMN
+                             ================================= -->
+
+                        <div>
+
+
+                            <!-- IMAGE -->
+
+                            <section
+                                class="submit-card"
+                            >
+
+                                <div
+                                    class="submit-card-header"
+                                >
+
+                                    <div>
+
+                                        <h2>
+                                            Artwork
+                                        </h2>
+
+                                        <p>
+                                            Upload the main image
+                                            for your design.
+                                        </p>
+
+                                    </div>
+
+
+                                    <span
+                                        class="step-number"
+                                    >
+                                        01
+                                    </span>
+
+                                </div>
+
+
+                                <!-- UPLOAD ZONE -->
+
+                                <div
+                                    class="upload-zone"
+                                    id="uploadZone"
+                                >
+
+                                    <input
+                                        type="file"
+                                        id="designImageInput"
+                                        name="image"
+                                        accept="image/jpeg,image/png,image/webp,image/gif"
+                                    >
+
+
+                                    <div
+                                        class="upload-zone-content"
+                                        id="uploadZoneContent"
+                                    >
+
+                                        <div
+                                            class="upload-icon"
+                                        >
+
+                                            <i
+                                                class="fa-solid fa-cloud-arrow-up"
+                                            ></i>
+
+                                        </div>
+
+
+                                        <h3>
+                                            Drop your design here
+                                        </h3>
+
+
+                                        <p>
+
+                                            Drag and drop your
+                                            artwork or tap below
+                                            to browse your device.
+
+                                        </p>
+
+
+                                        <span
+                                            class="upload-browse"
+                                        >
+
+                                            <i
+                                                class="fa-regular fa-folder-open"
+                                            ></i>
+
+                                            Choose Image
+
+                                        </span>
+
+
+                                        <span
+                                            class="upload-requirements"
+                                        >
+
+                                            JPG, PNG, WEBP or GIF
+                                            · Maximum 10 MB
+
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- PREVIEW -->
+
+                                <div
+                                    class="upload-preview"
+                                    id="uploadPreview"
+                                >
+
+                                    <img
+                                        src=""
+                                        alt="Design preview"
+                                        class="upload-preview-image"
+                                        id="designPreviewImage"
+                                    >
+
+
+                                    <div
+                                        class="preview-overlay"
+                                    >
+
+                                        <div
+                                            class="preview-file-info"
+                                        >
+
+                                            <span
+                                                class="preview-file-name"
+                                                id="previewFileName"
+                                            >
+                                                Design
+                                            </span>
+
+                                            <span
+                                                class="preview-file-size"
+                                                id="previewFileSize"
+                                            >
+                                                0 MB
+                                            </span>
+
+                                        </div>
+
+
+                                        <button
+                                            type="button"
+                                            class="preview-change"
+                                            id="changeImageButton"
+                                        >
+
+                                            <i
+                                                class="fa-solid fa-image"
+                                            ></i>
+
+                                            Change
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    class="field-error"
+                                    id="imageError"
+                                ></div>
+
+                            </section>
+
+
+                            <!-- DESIGN INFORMATION -->
+
+                            <section
+                                class="submit-card"
+                            >
+
+                                <div
+                                    class="submit-card-header"
+                                >
+
+                                    <div>
+
+                                        <h2>
+                                            Design Information
+                                        </h2>
+
+                                        <p>
+                                            Give your work a strong
+                                            identity.
+                                        </p>
+
+                                    </div>
+
+
+                                    <span
+                                        class="step-number"
+                                    >
+                                        02
+                                    </span>
+
+                                </div>
+
+
+                                <div
+                                    class="form-grid"
+                                >
+
+
+                                    <!-- TITLE -->
+
+                                    <div
+                                        class="form-group full"
+                                    >
+
+                                        <label
+                                            class="form-label"
+                                            for="designTitle"
+                                        >
+
+                                            Design title
+
+                                            <span>
+                                                Required
+                                            </span>
+
+                                        </label>
+
+
+                                        <input
+                                            type="text"
+                                            id="designTitle"
+                                            name="title"
+                                            class="form-input"
+                                            maxlength="80"
+                                            placeholder="Give your design a name..."
+                                            required
+                                        >
+
+
+                                        <span
+                                            class="field-error"
+                                            id="titleError"
+                                        ></span>
+
+                                    </div>
+
+
+                                    <!-- CATEGORY -->
+
+                                    <div
+                                        class="form-group"
+                                    >
+
+                                        <label
+                                            class="form-label"
+                                            for="designCategory"
+                                        >
+
+                                            Category
+
+                                            <span>
+                                                Required
+                                            </span>
+
+                                        </label>
+
+
+                                        <select
+                                            id="designCategory"
+                                            name="category"
+                                            class="form-select"
+                                            required
+                                        >
+
+                                            <option
+                                                value=""
+                                            >
+                                                Select category
+                                            </option>
+
+                                            <option
+                                                value="branding"
+                                            >
+                                                Branding
+                                            </option>
+
+                                            <option
+                                                value="poster"
+                                            >
+                                                Poster
+                                            </option>
+
+                                            <option
+                                                value="ui-ux"
+                                            >
+                                                UI / UX
+                                            </option>
+
+                                            <option
+                                                value="illustration"
+                                            >
+                                                Illustration
+                                            </option>
+
+                                            <option
+                                                value="logo"
+                                            >
+                                                Logo
+                                            </option>
+
+                                            <option
+                                                value="motion"
+                                            >
+                                                Motion
+                                            </option>
+
+                                            <option
+                                                value="other"
+                                            >
+                                                Other
+                                            </option>
+
+                                        </select>
+
+
+                                        <span
+                                            class="field-error"
+                                            id="categoryError"
+                                        ></span>
+
+                                    </div>
+
+
+                                    <!-- DESCRIPTION -->
+
+                                    <div
+                                        class="form-group full"
+                                    >
+
+                                        <label
+                                            class="form-label"
+                                            for="designDescription"
+                                        >
+
+                                            Description
+
+                                            <span>
+                                                Optional
+                                            </span>
+
+                                        </label>
+
+
+                                        <textarea
+                                            id="designDescription"
+                                            name="description"
+                                            class="form-textarea"
+                                            maxlength="1000"
+                                            placeholder="Tell the community about your concept, process or inspiration..."
+                                        ></textarea>
+
+
+                                        <span
+                                            class="character-count"
+                                            id="descriptionCount"
+                                        >
+                                            0 / 1000
+                                        </span>
+
+                                    </div>
+
+
+                                    <!-- TAGS -->
+
+                                    <div
+                                        class="form-group full"
+                                    >
+
+                                        <label
+                                            class="form-label"
+                                            for="tagInput"
+                                        >
+
+                                            Tags
+
+                                            <span>
+                                                Press Enter after each tag
+                                            </span>
+
+                                        </label>
+
+
+                                        <div
+                                            class="tag-input-wrapper"
+                                            id="tagInputWrapper"
+                                        >
+
+                                            <div
+                                                class="tag-list"
+                                                id="tagList"
+                                            ></div>
+
+
+                                            <input
+                                                type="text"
+                                                id="tagInput"
+                                                placeholder="e.g. futuristic"
+                                                maxlength="24"
+                                                autocomplete="off"
+                                            >
+
+                                        </div>
+
+
+                                        <input
+                                            type="hidden"
+                                            id="designTags"
+                                            name="tags"
+                                            value=""
+                                        >
+
+                                    </div>
+
+                                </div>
+
+                            </section>
+
+                        </div>
+
+
+                        <!-- =================================
+                             RIGHT COLUMN
+                             ================================= -->
+
+                        <div>
+
+
+                            <!-- VISIBILITY -->
+
+                            <section
+                                class="submit-card"
+                            >
+
+                                <div
+                                    class="submit-card-header"
+                                >
+
+                                    <div>
+
+                                        <h2>
+                                            Visibility
+                                        </h2>
+
+                                        <p>
+                                            Decide who can see your work.
+                                        </p>
+
+                                    </div>
+
+
+                                    <span
+                                        class="step-number"
+                                    >
+                                        03
+                                    </span>
+
+                                </div>
+
+
+                                <div
+                                    class="visibility-options"
+                                >
+
+
+                                    <label
+                                        class="visibility-option"
+                                    >
+
+                                        <input
+                                            type="radio"
+                                            name="visibility"
+                                            value="public"
+                                            checked
+                                        >
+
+
+                                        <span
+                                            class="visibility-content"
+                                        >
+
+                                            <span
+                                                class="visibility-icon"
+                                            >
+
+                                                <i
+                                                    class="fa-solid fa-globe"
+                                                ></i>
+
+                                            </span>
+
+
+                                            <span
+                                                class="visibility-text"
+                                            >
+
+                                                <strong>
+                                                    Public
+                                                </strong>
+
+                                                <span>
+                                                    Visible to the
+                                                    DESIGNVERSE community.
+                                                </span>
+
+                                            </span>
+
+                                        </span>
+
+                                    </label>
+
+
+                                    <label
+                                        class="visibility-option"
+                                    >
+
+                                        <input
+                                            type="radio"
+                                            name="visibility"
+                                            value="private"
+                                        >
+
+
+                                        <span
+                                            class="visibility-content"
+                                        >
+
+                                            <span
+                                                class="visibility-icon"
+                                            >
+
+                                                <i
+                                                    class="fa-solid fa-lock"
+                                                ></i>
+
+                                            </span>
+
+
+                                            <span
+                                                class="visibility-text"
+                                            >
+
+                                                <strong>
+                                                    Private
+                                                </strong>
+
+                                                <span>
+                                                    Only you can
+                                                    view it.
+                                                </span>
+
+                                            </span>
+
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+                            </section>
+
+
+                            <!-- CHALLENGE -->
+
+                            <section
+                                class="submit-card"
+                            >
+
+                                <div
+                                    class="submit-card-header"
+                                >
+
+                                    <div>
+
+                                        <h2>
+                                            Challenge
+                                        </h2>
+
+                                        <p>
+                                            Connect your work to
+                                            a DESIGNVERSE challenge.
+                                        </p>
+
+                                    </div>
+
+
+                                    <span
+                                        class="step-number"
+                                    >
+                                        04
+                                    </span>
+
+                                </div>
+
+
+                                <div
+                                    class="challenge-box"
+                                >
+
+                                    <div
+                                        class="challenge-box-row"
+                                    >
+
+                                        <div
+                                            class="challenge-box-info"
+                                        >
+
+                                            <div
+                                                class="challenge-box-icon"
+                                            >
+
+                                                <i
+                                                    class="fa-solid fa-trophy"
+                                                ></i>
+
+                                            </div>
+
+
+                                            <div>
+
+                                                <strong>
+                                                    No challenge selected
+                                                </strong>
+
+                                                <span>
+                                                    You can submit this
+                                                    design to a challenge
+                                                    later.
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <select
+                                    id="challengeSelect"
+                                    name="challenge_id"
+                                    class="form-select"
+                                    style="
+                                        margin-top:12px;
+                                    "
+                                >
+
+                                    <option
+                                        value=""
+                                    >
+                                        No challenge
+                                    </option>
+
+                                </select>
+
+                            </section>
+
+
+                            <!-- TIPS -->
+
+                            <section
+                                class="submit-card"
+                            >
+
+                                <div
+                                    class="submit-card-header"
+                                >
+
+                                    <div>
+
+                                        <h2>
+                                            Creator Tips
+                                        </h2>
+
+                                    </div>
+
+                                    <span
+                                        class="step-number"
+                                    >
+                                        ✦
+                                    </span>
+
+                                </div>
+
+
+                                <div
+                                    class="submit-tips"
+                                >
+
+                                    <h3>
+                                        Make your submission stand out.
+                                    </h3>
+
+
+                                    <ul>
+
+                                        <li>
+                                            Use a clear,
+                                            descriptive title.
+                                        </li>
+
+                                        <li>
+                                            Add relevant tags so
+                                            people can discover it.
+                                        </li>
+
+                                        <li>
+                                            Tell the story behind
+                                            the design when useful.
+                                        </li>
+
+                                        <li>
+                                            Upload your best-quality
+                                            version of the artwork.
+                                        </li>
+
+                                    </ul>
+
+                                </div>
+
+                            </section>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =========================================
+                         ACTIONS
+                         ========================================= -->
+
+                    <div
+                        class="submit-actions"
+                    >
+
+                        <p
+                            class="submit-actions-note"
+                        >
+
+                            By publishing this design,
+                            you confirm that you own the
+                            work or have permission to share it.
+
+                        </p>
+
+
+                        <div
+                            class="submit-actions-buttons"
+                        >
+
+                            <button
+                                type="button"
+                                class="btn btn-secondary"
+                                id="cancelSubmitButton"
+                            >
+
+                                Cancel
+
+                            </button>
+
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                                id="publishDesignButton"
+                            >
+
+                                <i
+                                    class="fa-solid fa-rocket"
+                                ></i>
+
+                                Publish Design
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <!-- =====================================================
+         SUPABASE + DESIGNVERSE JS
+         ===================================================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+
+    <script
+        src="../js/utils.js"
+    ></script>
+
+
+    <script
+        src="../js/supabase.js"
+    ></script>
+
+
+    <script
+        src="../js/auth.js"
+    ></script>
+
+
+    <script
+        src="../js/profile.js"
+    ></script>
+
+
+    <script
+        src="../js/designs.js"
+    ></script>
+
+
+    <script
+        src="../js/navigation.js"
+    ></script>
+
+
+    <!-- =====================================================
+         UPLOAD PAGE INTERACTIONS
+         ===================================================== -->
+
+    <script>
+
+        /* =================================================
+           MOBILE SIDEBAR
+           ================================================= */
+
+        const sidebar =
+            document.getElementById(
+                "dashboardSidebar"
+            );
+
+
+        const sidebarToggle =
+            document.getElementById(
+                "dashboardMobileToggle"
+            );
+
+
+        sidebarToggle?.addEventListener(
+            "click",
+            () => {
+
+                const open =
+                    sidebar.classList.toggle(
+                        "open"
+                    );
+
+
+                sidebarToggle.setAttribute(
+                    "aria-expanded",
+                    String(open)
+                );
+
+
+                sidebarToggle.innerHTML =
+                    open
+                        ? '<i class="fa-solid fa-xmark"></i>'
+                        : '<i class="fa-solid fa-bars"></i>';
+
+            }
+        );
+
+
+        sidebar
+            ?.querySelectorAll("a")
+            .forEach(
+                link => {
+
+                    link.addEventListener(
+                        "click",
+                        () => {
+
+                            if (
+                                window.innerWidth <=
+                                850
+                            ) {
+
+                                sidebar.classList.remove(
+                                    "open"
+                                );
+
+
+                                sidebarToggle?.setAttribute(
+                                    "aria-expanded",
+                                    "false"
+                                );
+
+
+                                if (
+                                    sidebarToggle
+                                ) {
+
+                                    sidebarToggle.innerHTML =
+                                        '<i class="fa-solid fa-bars"></i>';
+                                }
+
+                            }
+
+                        }
+                    );
+
+                }
+            );
+
+
+        /* =================================================
+           IMAGE UPLOAD PREVIEW
+           ================================================= */
+
+        const imageInput =
+            document.getElementById(
+                "designImageInput"
+            );
+
+
+        const uploadZone =
+            document.getElementById(
+                "uploadZone"
+            );
+
+
+        const uploadZoneContent =
+            document.getElementById(
+                "uploadZoneContent"
+            );
+
+
+        const uploadPreview =
+            document.getElementById(
+                "uploadPreview"
+            );
+
+
+        const previewImage =
+            document.getElementById(
+                "designPreviewImage"
+            );
+
+
+        const previewFileName =
+            document.getElementById(
+                "previewFileName"
+            );
+
+
+        const previewFileSize =
+            document.getElementById(
+                "previewFileSize"
+            );
+
+
+        const imageError =
+            document.getElementById(
+                "imageError"
+            );
+
+
+        const changeImageButton =
+            document.getElementById(
+                "changeImageButton"
+            );
+
+
+        let previewObjectUrl =
+            null;
+
+
+        function showImageError(message) {
+
+            if (!imageError) return;
+
+            imageError.textContent =
+                message;
+
+            imageError.classList.add(
+                "visible"
+            );
+        }
+
+
+        function clearImageError() {
+
+            imageError?.classList.remove(
+                "visible"
+            );
+
+            if (imageError) {
+                imageError.textContent =
+                    "";
+            }
+        }
+
+
+        function formatBytes(bytes) {
+
+            if (
+                !Number.isFinite(bytes) ||
+                bytes <= 0
+            ) {
+
+                return "0 Bytes";
+            }
+
+
+            const units = [
+                "Bytes",
+                "KB",
+                "MB",
+                "GB"
+            ];
+
+
+            const index =
+                Math.floor(
+                    Math.log(bytes) /
+                    Math.log(1024)
+                );
+
+
+            return `${(
+                bytes /
+                Math.pow(
+                    1024,
+                    index
+                )
+            ).toFixed(
+                index === 0 ? 0 : 2
+            )} ${units[index]}`;
+        }
+
+
+        function handleSelectedFile(
+            file
+        ) {
+
+            clearImageError();
+
+
+            if (!file) {
+                return;
+            }
+
+
+            const allowedTypes = [
+                "image/jpeg",
+                "image/png",
+                "image/webp",
+                "image/gif"
+            ];
+
+
+            const maxSize =
+                10 * 1024 * 1024;
+
+
+            if (
+                !allowedTypes.includes(
+                    file.type
+                )
+            ) {
+
+                showImageError(
+                    "Please upload a JPG, PNG, WEBP or GIF image."
+                );
+
+                imageInput.value =
+                    "";
+
+                return;
+            }
+
+
+            if (
+                file.size >
+                maxSize
+            ) {
+
+                showImageError(
+                    "Your image is larger than the 10 MB limit."
+                );
+
+                imageInput.value =
+                    "";
+
+                return;
+            }
+
+
+            if (
+                previewObjectUrl
+            ) {
+
+                URL.revokeObjectURL(
+                    previewObjectUrl
+                );
+            }
+
+
+            previewObjectUrl =
+                URL.createObjectURL(
+                    file
+                );
+
+
+            previewImage.src =
+                previewObjectUrl;
+
+
+            previewFileName.textContent =
+                file.name;
+
+
+            previewFileSize.textContent =
+                formatBytes(
+                    file.size
+                );
+
+
+            uploadZone.style.display =
+                "none";
+
+
+            uploadPreview.classList.add(
+                "visible"
+            );
+        }
+
+
+        imageInput?.addEventListener(
+            "change",
+            event => {
+
+                const file =
+                    event.target.files?.[0];
+
+                handleSelectedFile(
+                    file
+                );
+
+            }
+        );
+
+
+        changeImageButton?.addEventListener(
+            "click",
+            () => {
+
+                imageInput?.click();
+
+            }
+        );
+
+
+        /* =================================================
+           DRAG & DROP
+           ================================================= */
+
+        [
+            "dragenter",
+            "dragover"
+        ].forEach(
+            eventName => {
+
+                uploadZone?.addEventListener(
+                    eventName,
+                    event => {
+
+                        event.preventDefault();
+
+                        uploadZone.classList.add(
+                            "dragover"
+                        );
+
+                    }
+                );
+            }
+        );
+
+
+        [
+            "dragleave",
+            "drop"
+        ].forEach(
+            eventName => {
+
+                uploadZone?.addEventListener(
+                    eventName,
+                    event => {
+
+                        event.preventDefault();
+
+                        uploadZone.classList.remove(
+                            "dragover"
+                        );
+
+                    }
+                );
+            }
+        );
+
+
+        uploadZone?.addEventListener(
+            "drop",
+            event => {
+
+                const file =
+                    event.dataTransfer
+                        ?.files?.[0];
+
+
+                if (!file) {
+                    return;
+                }
+
+
+                try {
+
+                    const dataTransfer =
+                        new DataTransfer();
+
+
+                    dataTransfer.items.add(
+                        file
+                    );
+
+
+                    imageInput.files =
+                        dataTransfer.files;
+
+
+                } catch {
+                    /*
+                     * Preview still works even if
+                     * the browser prevents assigning
+                     * the FileList.
+                     */
+                }
+
+
+                handleSelectedFile(
+                    file
+                );
+
+            }
+        );
+
+
+        /* =================================================
+           DESCRIPTION COUNTER
+           ================================================= */
+
+        const description =
+            document.getElementById(
+                "designDescription"
+            );
+
+
+        const descriptionCount =
+            document.getElementById(
+                "descriptionCount"
+            );
+
+
+        description?.addEventListener(
+            "input",
+            () => {
+
+                const length =
+                    description.value.length;
+
+
+                descriptionCount.textContent =
+                    `${length} / 1000`;
+            }
+        );
+
+
+        /* =================================================
+           TAG SYSTEM
+           ================================================= */
+
+        const tagInput =
+            document.getElementById(
+                "tagInput"
+            );
+
+
+        const tagList =
+            document.getElementById(
+                "tagList"
+            );
+
+
+        const hiddenTags =
+            document.getElementById(
+                "designTags"
+            );
+
+
+        const tags = [];
+
+
+        function updateTagInput() {
+
+            hiddenTags.value =
+                JSON.stringify(
+                    tags
+                );
+        }
+
+
+        function renderTags() {
+
+            tagList.innerHTML =
+                "";
+
+
+            tags.forEach(
+                (
+                    tag,
+                    index
+                ) => {
+
+                    const element =
+                        document.createElement(
+                            "span"
+                        );
+
+
+                    element.className =
+                        "design-tag";
+
+
+                    element.innerHTML = `
+
+                        <span>
+                            #${tag}
+                        </span>
+
+                        <button
+                            type="button"
+                            aria-label="Remove ${tag}"
+                            data-remove-tag="${index}"
+                        >
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+
+                    `;
+
+
+                    tagList.appendChild(
+                        element
+                    );
+                }
+            );
+
+
+            updateTagInput();
+        }
+
+
+        function addTag(value) {
+
+            const cleaned =
+                String(value || "")
+                    .trim()
+                    .toLowerCase()
+                    .replace(
+                        /^#/,
+                        ""
+                    )
+                    .replace(
+                        /\s+/g,
+                        "-"
+                    );
+
+
+            if (!cleaned) {
+                return;
+            }
+
+
+            if (
+                cleaned.length >
+                24
+            ) {
+                return;
+            }
+
+
+            if (
+                tags.includes(
+                    cleaned
+                )
+            ) {
+                return;
+            }
+
+
+            if (
+                tags.length >= 8
+            ) {
+                return;
+            }
+
+
+            tags.push(
+                cleaned
+            );
+
+
+            tagInput.value =
+                "";
+
+
+            renderTags();
+        }
+
+
+        tagInput?.addEventListener(
+            "keydown",
+            event => {
+
+                if (
+                    event.key === "Enter" ||
+                    event.key === ","
+                ) {
+
+                    event.preventDefault();
+
+                    addTag(
+                        tagInput.value
+                    );
+
+                }
+
+
+                if (
+                    event.key === "Backspace" &&
+                    !tagInput.value &&
+                    tags.length
+                ) {
+
+                    tags.pop();
+
+                    renderTags();
+
+                }
+
+            }
+        );
+
+
+        tagList?.addEventListener(
+            "click",
+            event => {
+
+                const button =
+                    event.target.closest(
+                        "[data-remove-tag]"
+                    );
+
+
+                if (!button) {
+                    return;
+                }
+
+
+                const index =
+                    Number(
+                        button.dataset.removeTag
+                    );
+
+
+                if (
+                    Number.isInteger(index)
+                ) {
+
+                    tags.splice(
+                        index,
+                        1
+                    );
+
+                    renderTags();
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           CANCEL
+           ================================================= */
+
+        document
+            .getElementById(
+                "cancelSubmitButton"
+            )
+            ?.addEventListener(
+                "click",
+                () => {
+
+                    window.location.href =
+                        "dashboard/my-designs.html";
+
+                }
+            );
+
+
+        /* =================================================
+           FORM SUBMIT PLACEHOLDER
+           ================================================= */
+
+        /*
+         * designs.js will take over the actual
+         * Supabase upload/publish operation.
+         *
+         * This handler only prevents accidental
+         * browser submission until that logic
+         * is connected.
+         */
+
+        document
+            .getElementById(
+                "designSubmitForm"
+            )
+            ?.addEventListener(
+                "submit",
+                event => {
+
+                    event.preventDefault();
+
+                }
+            );
+
+
+        /* =================================================
+           CLEANUP
+           ================================================= */
+
+        window.addEventListener(
+            "beforeunload",
+            () => {
+
+                if (
+                    previewObjectUrl
+                ) {
+
+                    URL.revokeObjectURL(
+                        previewObjectUrl
+                    );
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+</html>
