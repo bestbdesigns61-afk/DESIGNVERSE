@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Responsive viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#050508">
+
+    <title>DESIGNVERSE — Design Is A Sport</title>
+
+    <meta
+        name="description"
+        content="DESIGNVERSE is a competitive creative universe where designers create, compete, improve and level up."
+    >
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+
+<body>
+
+    <!-- =========================================
+         BACKGROUND EFFECTS
+    ========================================== -->
+
+    <div class="background-effects" aria-hidden="true">
+        <div class="orb orb-one"></div>
+        <div class="orb orb-two"></div>
+        <div class="orb orb-three"></div>
+
+        <div class="stars"></div>
+        <div class="grid-overlay"></div>
+    </div>
+
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
+
+    <header class="site-header" id="site-header">
+
+        <nav class="navbar container">
+
+            <!-- Logo -->
+            <a href="index.html" class="navbar-brand" aria-label="DESIGNVERSE Home">
+
+                <img
+                    src="assets/logo/designverse-logo.jpg"
+                    alt="DESIGNVERSE"
+                    class="navbar-logo navbar-logo-full"
+                >
+
+                <img
+                    src="assets/logo/dv-icon.svg"
+                    alt="DV"
+                    class="navbar-logo navbar-logo-icon"
+                >
+            </a>
+
+
+            <!-- Desktop Navigation -->
+            <div class="desktop-nav">
+
+                <a href="pages/explore.html">
+                    Explore
+                </a>
+
+                <a href="pages/challenges.html">
+                    Challenges
+                </a>
+
+                <a href="pages/leaderboard.html">
+                    Leaderboard
+                </a>
+
+                <a href="pages/designers.html">
+                    Designers
+                </a>
+
+            </div>
+
+
+            <!-- Desktop Actions -->
+            <div class="nav-actions">
+
+                <a
+                    href="pages/auth/login.html"
+                    class="nav-login"
+                >
+                    Sign In
+                </a>
+
+                <a
+                    href="pages/auth/register.html"
+                    class="btn btn-primary btn-small"
+                >
+                    Join DESIGNVERSE
+                </a>
+
+            </div>
+
+
+            <!-- Mobile Menu Button -->
+            <button
+                class="mobile-menu-button"
+                id="mobile-menu-button"
+                aria-label="Open navigation menu"
+                aria-expanded="false"
+            >
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+        </nav>
+
+
+        <!-- Mobile Navigation -->
+        <div
+            class="mobile-nav"
+            id="mobile-nav"
+            aria-hidden="true"
+        >
+
+            <a href="pages/explore.html">
+                <i class="fa-solid fa-compass"></i>
+                Explore
+            </a>
+
+            <a href="pages/challenges.html">
+                <i class="fa-solid fa-fire"></i>
+                Challenges
+            </a>
+
+            <a href="pages/leaderboard.html">
+                <i class="fa-solid fa-trophy"></i>
+                Leaderboard
+            </a>
+
+            <a href="pages/designers.html">
+                <i class="fa-solid fa-users"></i>
+                Designers
+            </a>
+
+            <div class="mobile-nav-divider"></div>
+
+            <a href="pages/auth/login.html">
+                <i class="fa-solid fa-right-to-bracket"></i>
+                Sign In
+            </a>
+
+            <a
+                href="pages/auth/register.html"
+                class="mobile-join-button"
+            >
+                <i class="fa-solid fa-rocket"></i>
+                Join DESIGNVERSE
+            </a>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+
+    <main>
+
+
+        <!-- =====================================
+             HERO SECTION
+        ====================================== -->
+
+        <section class="hero section">
+
+            <div class="container hero-container">
+
+
+                <!-- Hero Content -->
+                <div class="hero-content">
+
+                    <div class="eyebrow">
+                        <span class="eyebrow-dot"></span>
+                        THE CREATIVE COMPETITION
+                    </div>
+
+
+                    <h1 class="hero-title">
+
+                        DESIGN
+                        <span>IS A SPORT.</span>
+
+                    </h1>
+
+
+                    <p class="hero-description">
+
+                        A competitive creative universe where
+                        designers <strong>create</strong>,
+                        <strong>compete</strong>,
+                        get feedback and
+                        <strong>level up.</strong>
+
+                    </p>
+
+
+                    <div class="hero-buttons">
+
+                        <a
+                            href="pages/challenges.html"
+                            class="btn btn-primary"
+                        >
+                            Enter the Arena
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+
+                        <a
+                            href="pages/explore.html"
+                            class="btn btn-secondary"
+                        >
+                            Explore Designs
+                            <i class="fa-solid fa-compass"></i>
+                        </a>
+
+                    </div>
+
+
+                    <!-- Trust / Activity -->
+                    <div class="hero-trust">
+
+                        <div class="avatar-stack">
+
+                            <div class="avatar avatar-one">B</div>
+                            <div class="avatar avatar-two">A</div>
+                            <div class="avatar avatar-three">D</div>
+                            <div class="avatar avatar-four">S</div>
+
+                        </div>
+
+                        <div class="trust-text">
+
+                            <strong>12,000+ designers</strong>
+
+                            <span>
+                                already creating in the Verse
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================
+                     HERO VISUAL
+                ================================== -->
+
+                <div class="hero-visual">
+
+                    <div class="hero-orbit orbit-one"></div>
+                    <div class="hero-orbit orbit-two"></div>
+                    <div class="hero-orbit orbit-three"></div>
+
+
+                    <div class="hero-planet">
+
+                        <div class="planet-glow"></div>
+
+                        <div class="planet-core">
+
+                            <div class="planet-dv">
+                                DV
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Floating Elements -->
+
+                    <div class="floating-card floating-card-top">
+
+                        <div class="floating-icon">
+                            <i class="fa-solid fa-palette"></i>
+                        </div>
+
+                        <div>
+                            <span>CREATIVE ENERGY</span>
+                            <strong>+94 XP</strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="floating-card floating-card-bottom">
+
+                        <div class="floating-icon trophy">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+
+                        <div>
+                            <span>TOP DESIGNER</span>
+                            <strong>#01</strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="orbit-dot dot-one"></div>
+                    <div class="orbit-dot dot-two"></div>
+                    <div class="orbit-dot dot-three"></div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================
+             PLATFORM STATS
+        ====================================== -->
+
+        <section class="stats-section">
+
+            <div class="container stats-grid">
+
+                <div class="stat-item">
+
+                    <span class="stat-number">
+                        12K+
+                    </span>
+
+                    <span class="stat-label">
+                        Designers
+                    </span>
+
+                </div>
+
+
+                <div class="stat-item">
+
+                    <span class="stat-number">
+                        48K+
+                    </span>
+
+                    <span class="stat-label">
+                        Designs
+                    </span>
+
+                </div>
+
+
+                <div class="stat-item">
+
+                    <span class="stat-number">
+                        1.2K+
+                    </span>
+
+                    <span class="stat-label">
+                        Challenges
+                    </span>
+
+                </div>
+
+
+                <div class="stat-item">
+
+                    <span class="stat-number">
+                        89K+
+                    </span>
+
+                    <span class="stat-label">
+                        Votes
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================
+             TODAY'S CHALLENGE
+        ====================================== -->
+
+        <section class="challenge-section section">
+
+            <div class="container">
+
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <span class="section-label">
+                            <i class="fa-solid fa-fire"></i>
+                            LIVE CHALLENGE
+                        </span>
+
+                        <h2>
+                            Today's Challenge
+                        </h2>
+
+                    </div>
+
+                    <a
+                        href="pages/challenges.html"
+                        class="text-link"
+                    >
+                        View all challenges
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+
+                </div>
+
+
+
+                <article class="featured-challenge glass-card">
+
+                    <div class="challenge-art">
+
+                        <div class="challenge-art-glow"></div>
+
+                        <div class="cyber-lines"></div>
+
+                        <span class="challenge-art-text">
+                            CYBER
+                        </span>
+
+                        <span class="challenge-art-text second">
+                            FUTURE
+                        </span>
+
+                        <div class="challenge-art-circle"></div>
+
+                    </div>
+
+
+                    <div class="challenge-info">
+
+                        <div class="challenge-meta">
+
+                            <span class="badge badge-hot">
+                                <i class="fa-solid fa-fire"></i>
+                                TRENDING
+                            </span>
+
+                            <span class="difficulty">
+                                Intermediate
+                            </span>
+
+                        </div>
+
+
+                        <h3>
+                            Cyberpunk Future
+                        </h3>
+
+
+                        <p>
+                            Create a futuristic promotional poster
+                            for a fictional cyberpunk product,
+                            brand or experience.
+                        </p>
+
+
+                        <div class="challenge-details">
+
+                            <div>
+                                <i class="fa-regular fa-clock"></i>
+
+                                <span>
+                                    18h 42m remaining
+                                </span>
+                            </div>
+
+                            <div>
+                                <i class="fa-solid fa-star"></i>
+
+                                <span>
+                                    500 XP
+                                </span>
+                            </div>
+
+                            <div>
+                                <i class="fa-solid fa-users"></i>
+
+                                <span>
+                                    248 entries
+                                </span>
+                            </div>
+
+                        </div>
+
+
+                        <a
+                            href="pages/challenge.html"
+                            class="btn btn-primary"
+                        >
+                            Enter Challenge
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================
+             TRENDING DESIGNS
+        ====================================== -->
+
+        <section class="trending-section section">
+
+            <div class="container">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <span class="section-label">
+                            <i class="fa-solid fa-bolt"></i>
+                            COMMUNITY
+                        </span>
+
+                        <h2>
+                            Trending Designs
+                        </h2>
+
+                    </div>
+
+                    <a
+                        href="pages/explore.html"
+                        class="text-link"
+                    >
+                        Explore everything
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+
+                </div>
+
+
+                <div class="design-grid">
+
+
+                    <article class="design-card design-large">
+
+                        <div class="design-placeholder design-purple">
+
+                            <span>
+                                NEON
+                            </span>
+
+                            <strong>
+                                DREAMS
+                            </strong>
+
+                        </div>
+
+                        <div class="design-card-info">
+
+                            <div>
+                                <h3>
+                                    Neon Dreams
+                                </h3>
+
+                                <span>
+                                    @alexdesigns
+                                </span>
+                            </div>
+
+                            <span class="design-score">
+                                <i class="fa-solid fa-heart"></i>
+                                2.4K
+                            </span>
+
+                        </div>
+
+                    </article>
+
+
+
+                    <article class="design-card">
+
+                        <div class="design-placeholder design-blue">
+
+                            <span>
+                                FUTURE
+                            </span>
+
+                            <strong>
+                                FORM
+                            </strong>
+
+                        </div>
+
+                        <div class="design-card-info">
+
+                            <div>
+                                <h3>
+                                    Future Form
+                                </h3>
+
+                                <span>
+                                    @mikedesign
+                                </span>
+                            </div>
+
+                            <span class="design-score">
+                                <i class="fa-solid fa-heart"></i>
+                                1.8K
+                            </span>
+
+                        </div>
+
+                    </article>
+
+
+
+                    <article class="design-card">
+
+                        <div class="design-placeholder design-pink">
+
+                            <span>
+                                VOID
+                            </span>
+
+                            <strong>
+                                STUDIO
+                            </strong>
+
+                        </div>
+
+                        <div class="design-card-info">
+
+                            <div>
+                                <h3>
+                                    Void Studio
+                                </h3>
+
+                                <span>
+                                    @sarahcreates
+                                </span>
+                            </div>
+
+                            <span class="design-score">
+                                <i class="fa-solid fa-heart"></i>
+                                1.6K
+                            </span>
+
+                        </div>
+
+                    </article>
+
+
+
+                    <article class="design-card">
+
+                        <div class="design-placeholder design-orange">
+
+                            <span>
+                                RAW
+                            </span>
+
+                            <strong>
+                                ENERGY
+                            </strong>
+
+                        </div>
+
+                        <div class="design-card-info">
+
+                            <div>
+                                <h3>
+                                    Raw Energy
+                                </h3>
+
+                                <span>
+                                    @danielvisuals
+                                </span>
+                            </div>
+
+                            <span class="design-score">
+                                <i class="fa-solid fa-heart"></i>
+                                1.3K
+                            </span>
+
+                        </div>
+
+                    </article>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================
+             HOW IT WORKS
+        ====================================== -->
+
+        <section class="how-section section">
+
+            <div class="container">
+
+                <div class="center-heading">
+
+                    <span class="section-label">
+                        <i class="fa-solid fa-sparkles"></i>
+                        THE VERSE
+                    </span>
+
+                    <h2>
+                        Create. Compete. Improve.
+                    </h2>
+
+                    <p>
+                        DESIGNVERSE turns creativity into
+                        a competitive experience.
+                    </p>
+
+                </div>
+
+
+                <div class="steps-grid">
+
+
+                    <article class="step-card glass-card">
+
+                        <div class="step-number">
+                            01
+                        </div>
+
+                        <div class="step-icon">
+                            <i class="fa-solid fa-pen-nib"></i>
+                        </div>
+
+                        <h3>
+                            Create
+                        </h3>
+
+                        <p>
+                            Turn your ideas into visual experiences
+                            and submit them to challenges.
+                        </p>
+
+                    </article>
+
+
+
+                    <article class="step-card glass-card">
+
+                        <div class="step-number">
+                            02
+                        </div>
+
+                        <div class="step-icon">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+
+                        <h3>
+                            Compete
+                        </h3>
+
+                        <p>
+                            Enter creative challenges and compete
+                            against designers from around the Verse.
+                        </p>
+
+                    </article>
+
+
+
+                    <article class="step-card glass-card">
+
+                        <div class="step-number">
+                            03
+                        </div>
+
+                        <div class="step-icon">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+
+                        <h3>
+                            Improve
+                        </h3>
+
+                        <p>
+                            Get feedback, earn XP, climb the rankings
+                            and become a better designer.
+                        </p>
+
+                    </article>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================
+             LEADERBOARD PREVIEW
+        ====================================== -->
+
+        <section class="leaderboard-section section">
+
+            <div class="container">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <span class="section-label">
+                            <i class="fa-solid fa-trophy"></i>
+                            THE ELITE
+                        </span>
+
+                        <h2>
+                            Top Designers
+                        </h2>
+
+                    </div>
+
+                    <a
+                        href="pages/leaderboard.html"
+                        class="text-link"
+                    >
+                        Full leaderboard
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+
+                </div>
+
+
+                <div class="leaderboard glass-card">
+
+
+                    <div class="leader-row first-place">
+
+                        <span class="rank">
+                            01
+                        </span>
+
+                        <div class="leader-avatar">
+                            A
+                        </div>
+
+                        <div class="leader-user">
+
+                            <strong>
+                                Alex Morgan
+                            </strong>
+
+                            <span>
+                                @alexdesigns
+                            </span>
+
+                        </div>
+
+                        <span class="leader-xp">
+                            12,840 XP
+                        </span>
+
+                        <span class="leader-crown">
+                            <i class="fa-solid fa-crown"></i>
+                        </span>
+
+                    </div>
+
+
+
+                    <div class="leader-row">
+
+                        <span class="rank">
+                            02
+                        </span>
+
+                        <div class="leader-avatar">
+                            B
+                        </div>
+
+                        <div class="leader-user">
+
+                            <strong>
+                                BestB
+                            </strong>
+
+                            <span>
+                                @bestb
+                            </span>
+
+                        </div>
+
+                        <span class="leader-xp">
+                            11,920 XP
+                        </span>
+
+                    </div>
+
+
+
+                    <div class="leader-row">
+
+                        <span class="rank">
+                            03
+                        </span>
+
+                        <div class="leader-avatar">
+                            S
+                        </div>
+
+                        <div class="leader-user">
+
+                            <strong>
+                                Sarah Chen
+                            </strong>
+
+                            <span>
+                                @sarahcreates
+                            </span>
+
+                        </div>
+
+                        <span class="leader-xp">
+                            10,740 XP
+                        </span>
+
+                    </div>
+
+
+
+                    <div class="leader-row">
+
+                        <span class="rank">
+                            04
+                        </span>
+
+                        <div class="leader-avatar">
+                            D
+                        </div>
+
+                        <div class="leader-user">
+
+                            <strong>
+                                Daniel King
+                            </strong>
+
+                            <span>
+                                @danielvisuals
+                            </span>
+
+                        </div>
+
+                        <span class="leader-xp">
+                            9,840 XP
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================
+             FINAL CTA
+        ====================================== -->
+
+        <section class="cta-section section">
+
+            <div class="container">
+
+                <div class="cta-card">
+
+                    <div class="cta-glow"></div>
+
+                    <span class="section-label">
+                        YOUR TURN
+                    </span>
+
+                    <h2>
+                        Ready to enter
+                        <span>the Verse?</span>
+                    </h2>
+
+                    <p>
+                        Your next great design could be
+                        your next big win.
+                    </p>
+
+                    <a
+                        href="pages/auth/register.html"
+                        class="btn btn-primary btn-large"
+                    >
+                        Start Designing
+                        <i class="fa-solid fa-rocket"></i>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <!-- =========================================
+         FOOTER
+    ========================================== -->
+
+    <footer class="site-footer">
+
+        <div class="container footer-container">
+
+
+            <div class="footer-brand">
+
+                <a href="index.html" class="brand">
+
+                    <div class="brand-icon">
+                        <span>DV</span>
+                    </div>
+
+                    <div class="brand-text">
+
+                        <span class="brand-name">
+                            DESIGNVERSE
+                        </span>
+
+                        <span class="brand-subtitle">
+                            BY BESTB DESIGNS
+                        </span>
+
+                    </div>
+
+                </a>
+
+                <p>
+                    Where creativity meets competition.
+                </p>
+
+            </div>
+
+
+
+            <div class="footer-links">
+
+                <div class="footer-column">
+
+                    <h4>
+                        Explore
+                    </h4>
+
+                    <a href="pages/explore.html">
+                        Designs
+                    </a>
+
+                    <a href="pages/challenges.html">
+                        Challenges
+                    </a>
+
+                    <a href="pages/leaderboard.html">
+                        Leaderboard
+                    </a>
+
+                    <a href="pages/designers.html">
+                        Designers
+                    </a>
+
+                </div>
+
+
+                <div class="footer-column">
+
+                    <h4>
+                        DESIGNVERSE
+                    </h4>
+
+                    <a href="pages/about.html">
+                        About
+                    </a>
+
+                    <a href="#">
+                        Community
+                    </a>
+
+                    <a href="#">
+                        Guidelines
+                    </a>
+
+                    <a href="#">
+                        Contact
+                    </a>
+
+                </div>
+
+
+                <div class="footer-column">
+
+                    <h4>
+                        Account
+                    </h4>
+
+                    <a href="pages/auth/login.html">
+                        Sign In
+                    </a>
+
+                    <a href="pages/auth/register.html">
+                        Create Account
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="footer-bottom">
+
+            <div class="container footer-bottom-inner">
+
+                <span>
+                    © 2026 BestB Designs. All rights reserved.
+                </span>
+
+                <span>
+                    DESIGNVERSE
+                </span>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+
+    <!-- =========================================
+         JAVASCRIPT
+    ========================================== -->
+
+    <script src="js/navigation.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+</html>

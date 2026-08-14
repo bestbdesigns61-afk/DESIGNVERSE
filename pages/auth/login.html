@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- =====================================================
+         DESIGNVERSE
+         Login Page
+         ===================================================== -->
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Sign in to DESIGNVERSE — a creative universe for designers."
+    >
+
+    <meta
+        name="theme-color"
+        content="#0a0a0f"
+    >
+
+    <title>Sign In — DESIGNVERSE</title>
+
+
+    <!-- =====================================================
+         FONTS
+         ===================================================== -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         ICONS
+         ===================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+
+    <!-- =====================================================
+         DESIGNVERSE STYLES
+         ===================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="../../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../../css/components.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../../css/animations.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../../css/responsive.css"
+    >
+
+
+    <!-- =====================================================
+         PAGE-SPECIFIC STYLES
+         ===================================================== -->
+
+    <style>
+
+        /* =================================================
+           LOGIN PAGE
+           ================================================= */
+
+        .auth-page {
+
+            min-height: 100vh;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 40px 20px;
+
+            position: relative;
+
+            overflow: hidden;
+        }
+
+
+        /* =================================================
+           BACKGROUND
+           ================================================= */
+
+        .auth-background {
+
+            position: fixed;
+
+            inset: 0;
+
+            pointer-events: none;
+
+            z-index: -1;
+
+            overflow: hidden;
+        }
+
+
+        .auth-orb {
+
+            position: absolute;
+
+            border-radius: 50%;
+
+            filter: blur(90px);
+
+            opacity: 0.25;
+        }
+
+
+        .auth-orb-one {
+
+            width: 320px;
+
+            height: 320px;
+
+            top: -100px;
+
+            left: -80px;
+
+            background:
+                radial-gradient(
+                    circle,
+                    #7c3aed,
+                    transparent 70%
+                );
+
+            animation:
+                authFloat 10s ease-in-out infinite;
+        }
+
+
+        .auth-orb-two {
+
+            width: 300px;
+
+            height: 300px;
+
+            right: -100px;
+
+            bottom: -80px;
+
+            background:
+                radial-gradient(
+                    circle,
+                    #2563eb,
+                    transparent 70%
+                );
+
+            animation:
+                authFloat 12s ease-in-out infinite reverse;
+        }
+
+
+        .auth-grid {
+
+            position: absolute;
+
+            inset: 0;
+
+            opacity: 0.08;
+
+            background-image:
+                linear-gradient(
+                    rgba(255,255,255,0.15)
+                    1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(255,255,255,0.15)
+                    1px,
+                    transparent 1px
+                );
+
+            background-size: 40px 40px;
+
+            mask-image:
+                radial-gradient(
+                    circle at center,
+                    black,
+                    transparent 75%
+                );
+        }
+
+
+        /* =================================================
+           AUTH CONTAINER
+           ================================================= */
+
+        .auth-container {
+
+            width: 100%;
+
+            max-width: 460px;
+
+            position: relative;
+
+            z-index: 2;
+        }
+
+
+        /* =================================================
+           BRAND
+           ================================================= */
+
+        .auth-brand {
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            text-align: center;
+
+            margin-bottom: 28px;
+        }
+
+
+        .auth-logo {
+
+            width: 68px;
+
+            height: 68px;
+
+            object-fit: contain;
+
+            margin-bottom: 16px;
+
+            border-radius: 18px;
+        }
+
+
+        .auth-brand-name {
+
+            margin: 0;
+
+            font-family:
+                "Space Grotesk",
+                sans-serif;
+
+            font-size: 28px;
+
+            font-weight: 700;
+
+            letter-spacing: -1px;
+        }
+
+
+        .auth-brand-name span {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffffff,
+                    #a78bfa
+                );
+
+            -webkit-background-clip: text;
+
+            background-clip: text;
+
+            color: transparent;
+        }
+
+
+        .auth-brand-text {
+
+            margin: 7px 0 0;
+
+            font-size: 14px;
+
+            opacity: 0.65;
+        }
+
+
+        /* =================================================
+           AUTH CARD
+           ================================================= */
+
+        .auth-card {
+
+            width: 100%;
+
+            padding: 36px;
+
+            border-radius: 24px;
+
+            border:
+                1px solid
+                rgba(255,255,255,0.10);
+
+            background:
+                rgba(255,255,255,0.055);
+
+            backdrop-filter:
+                blur(25px);
+
+            -webkit-backdrop-filter:
+                blur(25px);
+
+            box-shadow:
+                0 25px 80px
+                rgba(0,0,0,0.35);
+        }
+
+
+        .auth-header {
+
+            margin-bottom: 28px;
+        }
+
+
+        .auth-header h1 {
+
+            margin: 0 0 8px;
+
+            font-family:
+                "Space Grotesk",
+                sans-serif;
+
+            font-size: 30px;
+
+            letter-spacing: -1px;
+        }
+
+
+        .auth-header p {
+
+            margin: 0;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+
+            opacity: 0.62;
+        }
+
+
+        /* =================================================
+           FORM
+           ================================================= */
+
+        .auth-form {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 18px;
+        }
+
+
+        .form-group {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 8px;
+        }
+
+
+        .form-label {
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            opacity: 0.85;
+        }
+
+
+        .input-wrapper {
+
+            position: relative;
+        }
+
+
+        .input-icon {
+
+            position: absolute;
+
+            left: 15px;
+
+            top: 50%;
+
+            transform:
+                translateY(-50%);
+
+            font-size: 14px;
+
+            opacity: 0.45;
+
+            pointer-events: none;
+        }
+
+
+        .form-input {
+
+            width: 100%;
+
+            min-height: 52px;
+
+            padding:
+                0 48px;
+
+            border:
+                1px solid
+                rgba(255,255,255,0.10);
+
+            border-radius: 13px;
+
+            outline: none;
+
+            background:
+                rgba(255,255,255,0.045);
+
+            color: inherit;
+
+            font-family:
+                "Inter",
+                sans-serif;
+
+            font-size: 14px;
+
+            transition:
+                border-color .2s ease,
+                background .2s ease,
+                box-shadow .2s ease;
+        }
+
+
+        .form-input::placeholder {
+
+            opacity: 0.35;
+        }
+
+
+        .form-input:focus {
+
+            border-color:
+                rgba(167,139,250,0.7);
+
+            background:
+                rgba(255,255,255,0.07);
+
+            box-shadow:
+                0 0 0 4px
+                rgba(124,58,237,0.10);
+        }
+
+
+        /* =================================================
+           PASSWORD TOGGLE
+           ================================================= */
+
+        .password-toggle {
+
+            position: absolute;
+
+            right: 14px;
+
+            top: 50%;
+
+            transform:
+                translateY(-50%);
+
+            border: 0;
+
+            background: transparent;
+
+            color: inherit;
+
+            opacity: 0.5;
+
+            cursor: pointer;
+
+            padding: 6px;
+        }
+
+
+        .password-toggle:hover {
+
+            opacity: 1;
+        }
+
+
+        /* =================================================
+           FORM OPTIONS
+           ================================================= */
+
+        .form-options {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 15px;
+
+            margin-top: -2px;
+        }
+
+
+        .remember-me {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            font-size: 12px;
+
+            opacity: 0.7;
+
+            cursor: pointer;
+        }
+
+
+        .remember-me input {
+
+            accent-color:
+                #8b5cf6;
+        }
+
+
+        .forgot-link {
+
+            font-size: 12px;
+
+            color: #a78bfa;
+
+            text-decoration: none;
+        }
+
+
+        .forgot-link:hover {
+
+            text-decoration: underline;
+        }
+
+
+        /* =================================================
+           SUBMIT BUTTON
+           ================================================= */
+
+        .auth-submit {
+
+            width: 100%;
+
+            min-height: 52px;
+
+            border: 0;
+
+            border-radius: 13px;
+
+            cursor: pointer;
+
+            font-family:
+                "Inter",
+                sans-serif;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+            color: #ffffff;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #7c3aed,
+                    #4f46e5
+                );
+
+            box-shadow:
+                0 12px 30px
+                rgba(124,58,237,0.25);
+
+            transition:
+                transform .2s ease,
+                box-shadow .2s ease,
+                opacity .2s ease;
+        }
+
+
+        .auth-submit:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 16px 35px
+                rgba(124,58,237,0.35);
+        }
+
+
+        .auth-submit:active {
+
+            transform:
+                translateY(0);
+        }
+
+
+        .auth-submit:disabled {
+
+            opacity: 0.55;
+
+            cursor: not-allowed;
+
+            transform: none;
+        }
+
+
+        /* =================================================
+           DIVIDER
+           ================================================= */
+
+        .auth-divider {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            margin: 24px 0;
+
+            font-size: 11px;
+
+            opacity: 0.45;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1px;
+        }
+
+
+        .auth-divider::before,
+        .auth-divider::after {
+
+            content: "";
+
+            height: 1px;
+
+            flex: 1;
+
+            background:
+                rgba(255,255,255,0.10);
+        }
+
+
+        /* =================================================
+           REGISTER
+           ================================================= */
+
+        .auth-footer {
+
+            text-align: center;
+
+            font-size: 13px;
+
+            opacity: 0.7;
+        }
+
+
+        .auth-footer a {
+
+            color: #a78bfa;
+
+            font-weight: 600;
+
+            text-decoration: none;
+        }
+
+
+        .auth-footer a:hover {
+
+            text-decoration: underline;
+        }
+
+
+        /* =================================================
+           MESSAGE
+           ================================================= */
+
+        .auth-message {
+
+            padding: 12px 14px;
+
+            border-radius: 10px;
+
+            font-size: 12px;
+
+            line-height: 1.5;
+
+            margin-bottom: 4px;
+        }
+
+
+        .auth-message.error {
+
+            background:
+                rgba(239,68,68,0.10);
+
+            border:
+                1px solid
+                rgba(239,68,68,0.20);
+
+            color: #fca5a5;
+        }
+
+
+        .auth-message.success {
+
+            background:
+                rgba(34,197,94,0.10);
+
+            border:
+                1px solid
+                rgba(34,197,94,0.20);
+
+            color: #86efac;
+        }
+
+
+        .auth-message.info {
+
+            background:
+                rgba(59,130,246,0.10);
+
+            border:
+                1px solid
+                rgba(59,130,246,0.20);
+        }
+
+
+        /* =================================================
+           FOOTER
+           ================================================= */
+
+        .auth-copyright {
+
+            text-align: center;
+
+            margin-top: 24px;
+
+            font-size: 11px;
+
+            opacity: 0.35;
+        }
+
+
+        /* =================================================
+           ANIMATION
+           ================================================= */
+
+        @keyframes authFloat {
+
+            0%,
+            100% {
+
+                transform:
+                    translate3d(
+                        0,
+                        0,
+                        0
+                    );
+            }
+
+            50% {
+
+                transform:
+                    translate3d(
+                        0,
+                        -25px,
+                        0
+                    );
+            }
+        }
+
+
+        /* =================================================
+           TABLETS
+           ================================================= */
+
+        @media (max-width: 768px) {
+
+            .auth-page {
+
+                padding:
+                    30px 18px;
+            }
+
+
+            .auth-card {
+
+                padding: 30px 24px;
+
+                border-radius: 20px;
+            }
+        }
+
+
+        /* =================================================
+           ANDROID / SMALL SCREENS
+           ================================================= */
+
+        @media (max-width: 480px) {
+
+            .auth-page {
+
+                padding:
+                    22px 14px;
+            }
+
+
+            .auth-card {
+
+                padding:
+                    26px 18px;
+
+                border-radius: 18px;
+            }
+
+
+            .auth-brand-name {
+
+                font-size: 24px;
+            }
+
+
+            .auth-header h1 {
+
+                font-size: 26px;
+            }
+
+
+            .auth-header {
+
+                margin-bottom: 23px;
+            }
+
+
+            .form-options {
+
+                align-items: flex-start;
+
+                flex-direction: column;
+
+                gap: 10px;
+            }
+        }
+
+
+        /* =================================================
+           REDUCED MOTION
+           ================================================= */
+
+        @media (
+            prefers-reduced-motion: reduce
+        ) {
+
+            *,
+            *::before,
+            *::after {
+
+                animation-duration:
+                    0.01ms !important;
+
+                animation-iteration-count:
+                    1 !important;
+
+                transition-duration:
+                    0.01ms !important;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         BACKGROUND
+         ===================================================== -->
+
+    <div
+        class="auth-background"
+        aria-hidden="true"
+    >
+
+        <div
+            class="auth-grid"
+        ></div>
+
+        <div
+            class="auth-orb auth-orb-one"
+        ></div>
+
+        <div
+            class="auth-orb auth-orb-two"
+        ></div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MAIN
+         ===================================================== -->
+
+    <main class="auth-page">
+
+        <div class="auth-container">
+
+
+            <!-- =============================================
+                 BRAND
+                 ============================================= -->
+
+            <div class="auth-brand">
+
+                <!--
+                    Replace this path with the actual
+                    DESIGNVERSE logo if necessary.
+                -->
+
+                <img
+                    src="../../assets/logo/designverse-logo.jpg"
+                    alt="DESIGNVERSE"
+                    class="auth-logo"
+                >
+
+
+                <h2 class="auth-brand-name">
+
+                    <span>DESIGNVERSE</span>
+
+                </h2>
+
+
+                <p class="auth-brand-text">
+
+                    Where creativity meets competition.
+
+                </p>
+
+            </div>
+
+
+            <!-- =============================================
+                 LOGIN CARD
+                 ============================================= -->
+
+            <section
+                class="auth-card"
+                aria-labelledby="loginTitle"
+            >
+
+
+                <header class="auth-header">
+
+                    <h1 id="loginTitle">
+
+                        Welcome back 👋
+
+                    </h1>
+
+                    <p>
+
+                        Sign in to continue exploring,
+                        creating and competing on
+                        DESIGNVERSE.
+
+                    </p>
+
+                </header>
+
+
+                <!-- =========================================
+                     LOGIN FORM
+                     ========================================= -->
+
+                <form
+                    id="loginForm"
+                    class="auth-form"
+                    novalidate
+                >
+
+
+                    <!-- EMAIL -->
+
+                    <div class="form-group">
+
+                        <label
+                            class="form-label"
+                            for="loginEmail"
+                        >
+                            Email address
+                        </label>
+
+
+                        <div
+                            class="input-wrapper"
+                        >
+
+                            <i
+                                class="fa-regular fa-envelope input-icon"
+                                aria-hidden="true"
+                            ></i>
+
+
+                            <input
+                                id="loginEmail"
+                                class="form-input"
+                                type="email"
+                                name="email"
+                                placeholder="you@example.com"
+                                autocomplete="email"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- PASSWORD -->
+
+                    <div class="form-group">
+
+                        <label
+                            class="form-label"
+                            for="loginPassword"
+                        >
+                            Password
+                        </label>
+
+
+                        <div
+                            class="input-wrapper"
+                        >
+
+                            <i
+                                class="fa-solid fa-lock input-icon"
+                                aria-hidden="true"
+                            ></i>
+
+
+                            <input
+                                id="loginPassword"
+                                class="form-input"
+                                type="password"
+                                name="password"
+                                placeholder="Enter your password"
+                                autocomplete="current-password"
+                                required
+                            >
+
+
+                            <button
+                                type="button"
+                                class="password-toggle"
+                                id="passwordToggle"
+                                aria-label="Show password"
+                            >
+
+                                <i
+                                    class="fa-regular fa-eye"
+                                ></i>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- OPTIONS -->
+
+                    <div class="form-options">
+
+                        <label
+                            class="remember-me"
+                        >
+
+                            <input
+                                type="checkbox"
+                                id="rememberMe"
+                            >
+
+                            <span>
+                                Remember me
+                            </span>
+
+                        </label>
+
+
+                        <a
+                            href="forgot-password.html"
+                            class="forgot-link"
+                        >
+                            Forgot password?
+                        </a>
+
+                    </div>
+
+
+                    <!-- SUBMIT -->
+
+                    <button
+                        type="submit"
+                        class="auth-submit"
+                    >
+
+                        <i
+                            class="fa-solid fa-arrow-right-to-bracket"
+                        ></i>
+
+                        &nbsp;
+
+                        Sign In
+
+                    </button>
+
+                </form>
+
+
+                <!-- =========================================
+                     DIVIDER
+                     ========================================= -->
+
+                <div
+                    class="auth-divider"
+                    aria-hidden="true"
+                >
+
+                    <span>
+                        or
+                    </span>
+
+                </div>
+
+
+                <!-- =========================================
+                     REGISTER
+                     ========================================= -->
+
+                <div class="auth-footer">
+
+                    Don't have an account?
+
+                    <a href="register.html">
+
+                        Create one
+
+                    </a>
+
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 COPYRIGHT
+                 ============================================= -->
+
+            <div class="auth-copyright">
+
+                © 2026 DESIGNVERSE
+                ·
+                A BestB Designs project
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         SCRIPTS
+         ===================================================== -->
+
+    <!-- Supabase -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+
+    <!-- DESIGNVERSE UTILITIES -->
+    <script
+        src="../../js/utils.js"
+    ></script>
+
+
+    <!-- SUPABASE CLIENT -->
+    <script
+        src="../../js/supabase.js"
+    ></script>
+
+
+    <!-- AUTHENTICATION -->
+    <script
+        src="../../js/auth.js"
+    ></script>
+
+
+    <!-- NAVIGATION -->
+    <script
+        src="../../js/navigation.js"
+    ></script>
+
+
+    <!-- =====================================================
+         PASSWORD VISIBILITY
+         ===================================================== -->
+
+    <script>
+
+        const passwordInput =
+            document.querySelector(
+                "#loginPassword"
+            );
+
+        const passwordToggle =
+            document.querySelector(
+                "#passwordToggle"
+            );
+
+
+        passwordToggle?.addEventListener(
+            "click",
+            () => {
+
+                const isPassword =
+                    passwordInput.type ===
+                    "password";
+
+
+                passwordInput.type =
+                    isPassword
+                        ? "text"
+                        : "password";
+
+
+                passwordToggle
+                    .setAttribute(
+                        "aria-label",
+                        isPassword
+                            ? "Hide password"
+                            : "Show password"
+                    );
+
+
+                passwordToggle.innerHTML =
+                    isPassword
+                        ? '<i class="fa-regular fa-eye-slash"></i>'
+                        : '<i class="fa-regular fa-eye"></i>';
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>

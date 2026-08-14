@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Create your DESIGNVERSE account and join a universe of creative designers."
+    >
+
+    <meta
+        name="theme-color"
+        content="#0a0a0f"
+    >
+
+    <title>Create Account — DESIGNVERSE</title>
+
+
+    <!-- =====================================================
+         FONTS
+         ===================================================== -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         ICONS
+         ===================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+
+    <!-- =====================================================
+         DESIGNVERSE CSS
+         ===================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="../../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../../css/components.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../../css/animations.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../../css/responsive.css"
+    >
+
+
+    <!-- =====================================================
+         REGISTER PAGE STYLES
+         ===================================================== -->
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            margin: 0;
+        }
+
+
+        .auth-page {
+
+            min-height: 100vh;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 40px 20px;
+
+            position: relative;
+
+            overflow: hidden;
+        }
+
+
+        /* =================================================
+           BACKGROUND
+           ================================================= */
+
+        .auth-background {
+
+            position: fixed;
+
+            inset: 0;
+
+            pointer-events: none;
+
+            z-index: -1;
+
+            overflow: hidden;
+        }
+
+
+        .auth-grid {
+
+            position: absolute;
+
+            inset: 0;
+
+            opacity: 0.07;
+
+            background-image:
+                linear-gradient(
+                    rgba(255,255,255,0.15) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(255,255,255,0.15) 1px,
+                    transparent 1px
+                );
+
+            background-size: 40px 40px;
+
+            mask-image:
+                radial-gradient(
+                    circle at center,
+                    black,
+                    transparent 75%
+                );
+        }
+
+
+        .auth-orb {
+
+            position: absolute;
+
+            border-radius: 50%;
+
+            filter: blur(90px);
+
+            opacity: 0.24;
+        }
+
+
+        .auth-orb-one {
+
+            width: 330px;
+
+            height: 330px;
+
+            top: -120px;
+
+            left: -100px;
+
+            background:
+                radial-gradient(
+                    circle,
+                    #7c3aed,
+                    transparent 70%
+                );
+
+            animation:
+                registerFloat 10s ease-in-out infinite;
+        }
+
+
+        .auth-orb-two {
+
+            width: 320px;
+
+            height: 320px;
+
+            right: -110px;
+
+            bottom: -100px;
+
+            background:
+                radial-gradient(
+                    circle,
+                    #2563eb,
+                    transparent 70%
+                );
+
+            animation:
+                registerFloat 12s ease-in-out infinite reverse;
+        }
+
+
+        @keyframes registerFloat {
+
+            0%,
+            100% {
+                transform:
+                    translate3d(0, 0, 0);
+            }
+
+            50% {
+                transform:
+                    translate3d(0, -25px, 0);
+            }
+        }
+
+
+        /* =================================================
+           CONTAINER
+           ================================================= */
+
+        .auth-container {
+
+            width: 100%;
+
+            max-width: 500px;
+
+            position: relative;
+
+            z-index: 2;
+        }
+
+
+        /* =================================================
+           BRAND
+           ================================================= */
+
+        .auth-brand {
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            text-align: center;
+
+            margin-bottom: 25px;
+        }
+
+
+        .auth-logo {
+
+            width: 64px;
+
+            height: 64px;
+
+            object-fit: contain;
+
+            border-radius: 17px;
+
+            margin-bottom: 14px;
+        }
+
+
+        .auth-brand-name {
+
+            margin: 0;
+
+            font-family:
+                "Space Grotesk",
+                sans-serif;
+
+            font-size: 27px;
+
+            font-weight: 700;
+
+            letter-spacing: -1px;
+        }
+
+
+        .auth-brand-name span {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffffff,
+                    #a78bfa
+                );
+
+            -webkit-background-clip: text;
+
+            background-clip: text;
+
+            color: transparent;
+        }
+
+
+        .auth-brand-text {
+
+            margin: 7px 0 0;
+
+            font-size: 13px;
+
+            opacity: 0.6;
+        }
+
+
+        /* =================================================
+           CARD
+           ================================================= */
+
+        .auth-card {
+
+            width: 100%;
+
+            padding: 34px;
+
+            border-radius: 24px;
+
+            border:
+                1px solid
+                rgba(255,255,255,0.10);
+
+            background:
+                rgba(255,255,255,0.055);
+
+            backdrop-filter:
+                blur(25px);
+
+            -webkit-backdrop-filter:
+                blur(25px);
+
+            box-shadow:
+                0 25px 80px
+                rgba(0,0,0,0.35);
+        }
+
+
+        .auth-header {
+
+            margin-bottom: 25px;
+        }
+
+
+        .auth-header h1 {
+
+            margin: 0 0 8px;
+
+            font-family:
+                "Space Grotesk",
+                sans-serif;
+
+            font-size: 29px;
+
+            letter-spacing: -1px;
+        }
+
+
+        .auth-header p {
+
+            margin: 0;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+
+            opacity: 0.62;
+        }
+
+
+        /* =================================================
+           FORM
+           ================================================= */
+
+        .auth-form {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 16px;
+        }
+
+
+        .form-group {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 7px;
+        }
+
+
+        .form-label {
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            opacity: 0.85;
+        }
+
+
+        .input-wrapper {
+
+            position: relative;
+        }
+
+
+        .input-icon {
+
+            position: absolute;
+
+            left: 15px;
+
+            top: 50%;
+
+            transform:
+                translateY(-50%);
+
+            font-size: 13px;
+
+            opacity: 0.42;
+
+            pointer-events: none;
+        }
+
+
+        .form-input {
+
+            width: 100%;
+
+            min-height: 50px;
+
+            padding:
+                0 46px;
+
+            border:
+                1px solid
+                rgba(255,255,255,0.10);
+
+            border-radius: 12px;
+
+            outline: none;
+
+            background:
+                rgba(255,255,255,0.045);
+
+            color: inherit;
+
+            font-family:
+                "Inter",
+                sans-serif;
+
+            font-size: 13px;
+
+            transition:
+                border-color .2s ease,
+                background .2s ease,
+                box-shadow .2s ease;
+        }
+
+
+        .form-input::placeholder {
+            opacity: 0.32;
+        }
+
+
+        .form-input:focus {
+
+            border-color:
+                rgba(167,139,250,0.7);
+
+            background:
+                rgba(255,255,255,0.07);
+
+            box-shadow:
+                0 0 0 4px
+                rgba(124,58,237,0.10);
+        }
+
+
+        /* =================================================
+           PASSWORD TOGGLE
+           ================================================= */
+
+        .password-toggle {
+
+            position: absolute;
+
+            right: 13px;
+
+            top: 50%;
+
+            transform:
+                translateY(-50%);
+
+            border: 0;
+
+            background: transparent;
+
+            color: inherit;
+
+            opacity: 0.5;
+
+            cursor: pointer;
+
+            padding: 6px;
+        }
+
+
+        .password-toggle:hover {
+            opacity: 1;
+        }
+
+
+        /* =================================================
+           PASSWORD STRENGTH
+           ================================================= */
+
+        .password-strength {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 7px;
+
+            margin-top: 2px;
+        }
+
+
+        .strength-bars {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 5px;
+        }
+
+
+        .strength-bar {
+
+            height: 4px;
+
+            border-radius: 10px;
+
+            background:
+                rgba(255,255,255,0.10);
+
+            transition:
+                background .2s ease;
+        }
+
+
+        .strength-text {
+
+            font-size: 10px;
+
+            opacity: 0.45;
+        }
+
+
+        /* =================================================
+           TERMS
+           ================================================= */
+
+        .terms {
+
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 9px;
+
+            font-size: 11px;
+
+            line-height: 1.5;
+
+            opacity: 0.62;
+
+            margin-top: 2px;
+        }
+
+
+        .terms input {
+
+            margin-top: 3px;
+
+            accent-color:
+                #8b5cf6;
+        }
+
+
+        .terms a {
+
+            color: #a78bfa;
+
+            text-decoration: none;
+        }
+
+
+        .terms a:hover {
+            text-decoration: underline;
+        }
+
+
+        /* =================================================
+           SUBMIT
+           ================================================= */
+
+        .auth-submit {
+
+            width: 100%;
+
+            min-height: 51px;
+
+            border: 0;
+
+            border-radius: 12px;
+
+            cursor: pointer;
+
+            font-family:
+                "Inter",
+                sans-serif;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            color: #ffffff;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #7c3aed,
+                    #4f46e5
+                );
+
+            box-shadow:
+                0 12px 30px
+                rgba(124,58,237,0.25);
+
+            transition:
+                transform .2s ease,
+                box-shadow .2s ease,
+                opacity .2s ease;
+        }
+
+
+        .auth-submit:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 16px 35px
+                rgba(124,58,237,0.35);
+        }
+
+
+        .auth-submit:active {
+
+            transform:
+                translateY(0);
+        }
+
+
+        .auth-submit:disabled {
+
+            opacity: 0.55;
+
+            cursor: not-allowed;
+
+            transform: none;
+        }
+
+
+        /* =================================================
+           LOGIN LINK
+           ================================================= */
+
+        .auth-footer {
+
+            text-align: center;
+
+            font-size: 12px;
+
+            opacity: 0.68;
+
+            margin-top: 23px;
+        }
+
+
+        .auth-footer a {
+
+            color: #a78bfa;
+
+            font-weight: 600;
+
+            text-decoration: none;
+        }
+
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+
+        /* =================================================
+           MESSAGE
+           ================================================= */
+
+        .auth-message {
+
+            padding: 11px 13px;
+
+            border-radius: 10px;
+
+            font-size: 11px;
+
+            line-height: 1.5;
+
+            margin-bottom: 4px;
+        }
+
+
+        .auth-message.error {
+
+            background:
+                rgba(239,68,68,0.10);
+
+            border:
+                1px solid
+                rgba(239,68,68,0.20);
+
+            color: #fca5a5;
+        }
+
+
+        .auth-message.success {
+
+            background:
+                rgba(34,197,94,0.10);
+
+            border:
+                1px solid
+                rgba(34,197,94,0.20);
+
+            color: #86efac;
+        }
+
+
+        .auth-message.info {
+
+            background:
+                rgba(59,130,246,0.10);
+
+            border:
+                1px solid
+                rgba(59,130,246,0.20);
+
+            color: #93c5fd;
+        }
+
+
+        /* =================================================
+           COPYRIGHT
+           ================================================= */
+
+        .auth-copyright {
+
+            text-align: center;
+
+            margin-top: 21px;
+
+            font-size: 10px;
+
+            opacity: 0.34;
+        }
+
+
+        /* =================================================
+           TABLET
+           ================================================= */
+
+        @media (max-width: 768px) {
+
+            .auth-page {
+
+                padding:
+                    30px 18px;
+            }
+
+
+            .auth-card {
+
+                padding:
+                    30px 24px;
+
+                border-radius: 21px;
+            }
+        }
+
+
+        /* =================================================
+           MOBILE
+           ================================================= */
+
+        @media (max-width: 480px) {
+
+            .auth-page {
+
+                padding:
+                    22px 13px;
+            }
+
+
+            .auth-card {
+
+                padding:
+                    25px 17px;
+
+                border-radius: 18px;
+            }
+
+
+            .auth-brand-name {
+
+                font-size: 24px;
+            }
+
+
+            .auth-header h1 {
+
+                font-size: 25px;
+            }
+
+
+            .form-input {
+
+                min-height: 49px;
+            }
+        }
+
+
+        /* =================================================
+           REDUCED MOTION
+           ================================================= */
+
+        @media (
+            prefers-reduced-motion: reduce
+        ) {
+
+            *,
+            *::before,
+            *::after {
+
+                animation-duration:
+                    0.01ms !important;
+
+                animation-iteration-count:
+                    1 !important;
+
+                transition-duration:
+                    0.01ms !important;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         BACKGROUND
+         ===================================================== -->
+
+    <div
+        class="auth-background"
+        aria-hidden="true"
+    >
+
+        <div class="auth-grid"></div>
+
+        <div
+            class="auth-orb auth-orb-one"
+        ></div>
+
+        <div
+            class="auth-orb auth-orb-two"
+        ></div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MAIN
+         ===================================================== -->
+
+    <main class="auth-page">
+
+        <div class="auth-container">
+
+
+            <!-- =============================================
+                 BRAND
+                 ============================================= -->
+
+            <div class="auth-brand">
+
+                <img
+                    src="../../assets/logo/designverse-logo.jpg"
+                    alt="DESIGNVERSE logo"
+                    class="auth-logo"
+                >
+
+
+                <h2 class="auth-brand-name">
+
+                    <span>DESIGNVERSE</span>
+
+                </h2>
+
+
+                <p class="auth-brand-text">
+
+                    Where creativity meets competition.
+
+                </p>
+
+            </div>
+
+
+            <!-- =============================================
+                 REGISTER CARD
+                 ============================================= -->
+
+            <section
+                class="auth-card"
+                aria-labelledby="registerTitle"
+            >
+
+
+                <header class="auth-header">
+
+                    <h1 id="registerTitle">
+
+                        Create your account ✨
+
+                    </h1>
+
+                    <p>
+
+                        Join DESIGNVERSE and start
+                        creating, competing and
+                        connecting with designers.
+
+                    </p>
+
+                </header>
+
+
+                <!-- =========================================
+                     REGISTER FORM
+                     ========================================= -->
+
+                <form
+                    id="registerForm"
+                    class="auth-form"
+                    novalidate
+                >
+
+
+                    <!-- DISPLAY NAME -->
+
+                    <div class="form-group">
+
+                        <label
+                            class="form-label"
+                            for="displayName"
+                        >
+                            Display name
+                        </label>
+
+
+                        <div
+                            class="input-wrapper"
+                        >
+
+                            <i
+                                class="fa-regular fa-user input-icon"
+                                aria-hidden="true"
+                            ></i>
+
+
+                            <input
+                                id="displayName"
+                                class="form-input"
+                                type="text"
+                                name="displayName"
+                                placeholder="Your name"
+                                autocomplete="name"
+                                maxlength="60"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- USERNAME -->
+
+                    <div class="form-group">
+
+                        <label
+                            class="form-label"
+                            for="username"
+                        >
+                            Username
+                        </label>
+
+
+                        <div
+                            class="input-wrapper"
+                        >
+
+                            <i
+                                class="fa-solid fa-at input-icon"
+                                aria-hidden="true"
+                            ></i>
+
+
+                            <input
+                                id="username"
+                                class="form-input"
+                                type="text"
+                                name="username"
+                                placeholder="yourusername"
+                                autocomplete="username"
+                                maxlength="30"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- EMAIL -->
+
+                    <div class="form-group">
+
+                        <label
+                            class="form-label"
+                            for="registerEmail"
+                        >
+                            Email address
+                        </label>
+
+
+                        <div
+                            class="input-wrapper"
+                        >
+
+                            <i
+                                class="fa-regular fa-envelope input-icon"
+                                aria-hidden="true"
+                            ></i>
+
+
+                            <input
+                                id="registerEmail"
+                                class="form-input"
+                                type="email"
+                                name="email"
+                                placeholder="you@example.com"
+                                autocomplete="email"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- PASSWORD -->
+
+                    <div class="form-group">
+
+                        <label
+                            class="form-label"
+                            for="registerPassword"
+                        >
+                            Password
+                        </label>
+
+
+                        <div
+                            class="input-wrapper"
+                        >
+
+                            <i
+                                class="fa-solid fa-lock input-icon"
+                                aria-hidden="true"
+                            ></i>
+
+
+                            <input
+                                id="registerPassword"
+                                class="form-input"
+                                type="password"
+                                name="password"
+                                placeholder="Create a password"
+                                autocomplete="new-password"
+                                minlength="8"
+                                required
+                            >
+
+
+                            <button
+                                type="button"
+                                class="password-toggle"
+                                id="passwordToggle"
+                                aria-label="Show password"
+                            >
+
+                                <i
+                                    class="fa-regular fa-eye"
+                                ></i>
+
+                            </button>
+
+                        </div>
+
+
+                        <!-- PASSWORD STRENGTH -->
+
+                        <div
+                            class="password-strength"
+                            id="passwordStrength"
+                        >
+
+                            <div class="strength-bars">
+
+                                <span
+                                    class="strength-bar"
+                                ></span>
+
+                                <span
+                                    class="strength-bar"
+                                ></span>
+
+                                <span
+                                    class="strength-bar"
+                                ></span>
+
+                                <span
+                                    class="strength-bar"
+                                ></span>
+
+                            </div>
+
+
+                            <span
+                                class="strength-text"
+                                id="strengthText"
+                            >
+                                Use at least 8 characters.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- CONFIRM PASSWORD -->
+
+                    <div class="form-group">
+
+                        <label
+                            class="form-label"
+                            for="confirmPassword"
+                        >
+                            Confirm password
+                        </label>
+
+
+                        <div
+                            class="input-wrapper"
+                        >
+
+                            <i
+                                class="fa-solid fa-shield-halved input-icon"
+                                aria-hidden="true"
+                            ></i>
+
+
+                            <input
+                                id="confirmPassword"
+                                class="form-input"
+                                type="password"
+                                name="confirmPassword"
+                                placeholder="Confirm your password"
+                                autocomplete="new-password"
+                                minlength="8"
+                                required
+                            >
+
+
+                            <button
+                                type="button"
+                                class="password-toggle"
+                                id="confirmPasswordToggle"
+                                aria-label="Show password"
+                            >
+
+                                <i
+                                    class="fa-regular fa-eye"
+                                ></i>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- TERMS -->
+
+                    <label class="terms">
+
+                        <input
+                            type="checkbox"
+                            id="terms"
+                            required
+                        >
+
+                        <span>
+
+                            I agree to the
+                            <a
+                                href="../about.html"
+                            >
+                                DESIGNVERSE rules
+                            </a>
+                            and understand that
+                            respectful and original
+                            creative work is expected.
+
+                        </span>
+
+                    </label>
+
+
+                    <!-- SUBMIT -->
+
+                    <button
+                        type="submit"
+                        class="auth-submit"
+                    >
+
+                        <i
+                            class="fa-solid fa-user-plus"
+                        ></i>
+
+                        &nbsp;
+
+                        Create Account
+
+                    </button>
+
+                </form>
+
+
+                <!-- =========================================
+                     LOGIN
+                     ========================================= -->
+
+                <div class="auth-footer">
+
+                    Already have an account?
+
+                    <a href="login.html">
+
+                        Sign in
+
+                    </a>
+
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 COPYRIGHT
+                 ============================================= -->
+
+            <div class="auth-copyright">
+
+                © 2026 DESIGNVERSE
+                ·
+                A BestB Designs project
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         SUPABASE
+         ===================================================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+
+    <!-- =====================================================
+         DESIGNVERSE JS
+         ===================================================== -->
+
+    <script src="../../js/utils.js"></script>
+
+    <script src="../../js/supabase.js"></script>
+
+    <script src="../../js/auth.js"></script>
+
+    <script src="../../js/navigation.js"></script>
+
+
+    <!-- =====================================================
+         REGISTER PAGE INTERACTIONS
+         ===================================================== -->
+
+    <script>
+
+        /* ================================================
+           PASSWORD TOGGLE
+           ================================================ */
+
+        function setupPasswordToggle(
+            inputId,
+            buttonId
+        ) {
+
+            const input =
+                document.getElementById(
+                    inputId
+                );
+
+            const button =
+                document.getElementById(
+                    buttonId
+                );
+
+
+            button?.addEventListener(
+                "click",
+                () => {
+
+                    const isPassword =
+                        input.type ===
+                        "password";
+
+
+                    input.type =
+                        isPassword
+                            ? "text"
+                            : "password";
+
+
+                    button.setAttribute(
+                        "aria-label",
+                        isPassword
+                            ? "Hide password"
+                            : "Show password"
+                    );
+
+
+                    button.innerHTML =
+                        isPassword
+                            ? '<i class="fa-regular fa-eye-slash"></i>'
+                            : '<i class="fa-regular fa-eye"></i>';
+
+                }
+            );
+        }
+
+
+        setupPasswordToggle(
+            "registerPassword",
+            "passwordToggle"
+        );
+
+
+        setupPasswordToggle(
+            "confirmPassword",
+            "confirmPasswordToggle"
+        );
+
+
+        /* ================================================
+           PASSWORD STRENGTH
+           ================================================ */
+
+        const passwordInput =
+            document.getElementById(
+                "registerPassword"
+            );
+
+        const strengthBars =
+            document.querySelectorAll(
+                ".strength-bar"
+            );
+
+        const strengthText =
+            document.getElementById(
+                "strengthText"
+            );
+
+
+        passwordInput?.addEventListener(
+            "input",
+            () => {
+
+                const password =
+                    passwordInput.value;
+
+
+                let score = 0;
+
+
+                if (password.length >= 8)
+                    score++;
+
+
+                if (/[A-Z]/.test(password))
+                    score++;
+
+
+                if (/[0-9]/.test(password))
+                    score++;
+
+
+                if (
+                    /[^A-Za-z0-9]/.test(password)
+                )
+                    score++;
+
+
+                strengthBars.forEach(
+                    (bar, index) => {
+
+                        bar.style.background =
+                            index < score
+                                ? "#8b5cf6"
+                                : "rgba(255,255,255,0.10)";
+                    }
+                );
+
+
+                if (!password) {
+
+                    strengthText.textContent =
+                        "Use at least 8 characters.";
+
+                } else if (score <= 1) {
+
+                    strengthText.textContent =
+                        "Weak password.";
+
+                } else if (score === 2) {
+
+                    strengthText.textContent =
+                        "Fair password.";
+
+                } else if (score === 3) {
+
+                    strengthText.textContent =
+                        "Good password.";
+
+                } else {
+
+                    strengthText.textContent =
+                        "Strong password.";
+
+                }
+
+            }
+        );
+
+
+        /* ================================================
+           CONFIRM PASSWORD FEEDBACK
+           ================================================ */
+
+        const confirmPassword =
+            document.getElementById(
+                "confirmPassword"
+            );
+
+
+        confirmPassword?.addEventListener(
+            "input",
+            () => {
+
+                if (
+                    !confirmPassword.value
+                ) {
+
+                    confirmPassword.style.borderColor =
+                        "";
+
+                    return;
+                }
+
+
+                if (
+                    confirmPassword.value ===
+                    passwordInput.value
+                ) {
+
+                    confirmPassword.style.borderColor =
+                        "rgba(34,197,94,0.55)";
+
+                } else {
+
+                    confirmPassword.style.borderColor =
+                        "rgba(239,68,68,0.55)";
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+</html>

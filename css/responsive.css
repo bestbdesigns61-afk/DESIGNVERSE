@@ -1,0 +1,1068 @@
+/* =========================================================
+   DESIGNVERSE
+   responsive.css
+   Mobile → Tablet → Laptop → Desktop
+   ========================================================= */
+
+
+/* =========================================================
+   1. GLOBAL RESPONSIVE SAFETY
+   ========================================================= */
+
+html {
+    overflow-x: hidden;
+}
+
+body {
+    min-width: 320px;
+    overflow-x: hidden;
+}
+
+img,
+video,
+svg,
+canvas {
+    max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+    max-width: 100%;
+}
+
+
+/* =========================================================
+   2. MOBILE BASE
+   320px — 575px
+   ========================================================= */
+
+@media (max-width: 575px) {
+
+    /* ---------- Typography ---------- */
+
+    h1 {
+        font-size: clamp(32px, 9vw, 46px);
+        line-height: 1.05;
+    }
+
+    h2 {
+        font-size: clamp(26px, 7vw, 36px);
+    }
+
+    h3 {
+        font-size: 20px;
+    }
+
+    p {
+        font-size: 13px;
+    }
+
+
+    /* ---------- Container ---------- */
+
+    .container {
+        width: 100%;
+
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+
+    /* ---------- Navigation ---------- */
+
+    .desktop-only {
+        display: none !important;
+    }
+
+    .mobile-only {
+        display: block !important;
+    }
+
+    .mobile-nav-toggle {
+        display: grid !important;
+    }
+
+    .nav-links {
+        position: fixed;
+
+        top: 70px;
+        left: 14px;
+        right: 14px;
+
+        display: none;
+
+        flex-direction: column;
+
+        padding: 12px;
+
+        border: 1px solid var(--border);
+
+        border-radius: 18px;
+
+        background:
+            rgba(10, 10, 16, 0.96);
+
+        box-shadow:
+            0 25px 70px rgba(0, 0, 0, 0.5);
+
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+
+        z-index: 1000;
+    }
+
+    .nav-links.open {
+        display: flex;
+    }
+
+    .nav-links a {
+        width: 100%;
+
+        padding: 12px;
+
+        border-radius: 10px;
+    }
+
+
+    /* ---------- Hero ---------- */
+
+    .hero {
+        min-height: auto;
+
+        padding-top: 90px;
+        padding-bottom: 70px;
+
+        text-align: center;
+    }
+
+    .hero-content {
+        width: 100%;
+
+        margin-inline: auto;
+    }
+
+    .hero-title {
+        font-size: clamp(36px, 11vw, 52px);
+    }
+
+    .hero-description {
+        max-width: 100%;
+
+        margin-inline: auto;
+
+        font-size: 13px;
+
+        line-height: 1.7;
+    }
+
+    .hero-actions {
+        width: 100%;
+
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 10px;
+    }
+
+    .hero-actions .btn {
+        width: 100%;
+    }
+
+    .hero-visual {
+        margin-top: 35px;
+    }
+
+
+    /* ---------- Buttons ---------- */
+
+    .btn {
+        min-height: 46px;
+
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .btn-lg {
+        width: 100%;
+    }
+
+
+    /* ---------- Sections ---------- */
+
+    section {
+        padding-top: 60px;
+        padding-bottom: 60px;
+    }
+
+    .section-header {
+        margin-bottom: 28px;
+    }
+
+    .section-header-row {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 15px;
+    }
+
+
+    /* ---------- Grids ---------- */
+
+    .grid,
+    .design-grid,
+    .challenge-grid,
+    .designer-grid,
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .two-column,
+    .two-col,
+    .content-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+
+    /* ---------- Cards ---------- */
+
+    .design-item,
+    .challenge-card,
+    .stat-card {
+        width: 100%;
+    }
+
+    .design-item-image {
+        aspect-ratio: 4 / 3;
+    }
+
+
+    /* ---------- Tabs ---------- */
+
+    .tabs {
+        width: 100%;
+
+        overflow-x: auto;
+
+        justify-content: flex-start;
+
+        scrollbar-width: none;
+    }
+
+    .tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .tab {
+        flex-shrink: 0;
+    }
+
+
+    /* ---------- Search ---------- */
+
+    .search-box {
+        width: 100%;
+    }
+
+
+    /* ---------- Forms ---------- */
+
+    .form-row {
+        grid-template-columns: 1fr !important;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+    }
+
+
+    /* ---------- Upload ---------- */
+
+    .dropzone {
+        min-height: 190px;
+
+        padding: 22px 16px;
+    }
+
+
+    /* ---------- Modal ---------- */
+
+    .modal {
+        padding: 12px;
+    }
+
+    .modal-content {
+        width: 100%;
+
+        max-height: calc(100vh - 24px);
+
+        padding: 20px;
+
+        border-radius: 18px;
+    }
+
+    .modal-footer {
+        flex-direction: column;
+    }
+
+    .modal-footer .btn {
+        width: 100%;
+    }
+
+
+    /* ---------- Toast ---------- */
+
+    .toast-container {
+        right: 12px;
+        bottom: 12px;
+
+        width: calc(100% - 24px);
+    }
+
+
+    /* ---------- Pagination ---------- */
+
+    .pagination {
+        gap: 4px;
+    }
+
+    .page-button {
+        width: 34px;
+        height: 34px;
+    }
+
+
+    /* ---------- Avatar ---------- */
+
+    .avatar-xl {
+        width: 76px;
+        height: 76px;
+    }
+
+
+    /* ---------- Profile ---------- */
+
+    .profile-header {
+        flex-direction: column;
+
+        align-items: center;
+
+        text-align: center;
+    }
+
+    .profile-actions {
+        width: 100%;
+
+        display: flex;
+
+        flex-direction: column;
+    }
+
+    .profile-actions .btn {
+        width: 100%;
+    }
+
+
+    /* ---------- Dashboard ---------- */
+
+    .dashboard-layout {
+        grid-template-columns: 1fr !important;
+    }
+
+    .dashboard-sidebar {
+        position: static;
+
+        width: 100%;
+    }
+
+    .dashboard-main {
+        width: 100%;
+    }
+
+
+    /* ---------- Sidebar ---------- */
+
+    .sidebar {
+        position: fixed;
+
+        top: 0;
+        left: 0;
+        bottom: 0;
+
+        width: min(85vw, 320px);
+
+        transform: translateX(-105%);
+
+        transition:
+            transform 300ms ease;
+
+        z-index: 1500;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+
+    /* ---------- Leaderboard ---------- */
+
+    .leaderboard-row {
+        grid-template-columns:
+            40px
+            1fr
+            auto;
+    }
+
+    .leaderboard-extra {
+        display: none;
+    }
+
+
+    /* ---------- Challenge ---------- */
+
+    .challenge-header {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+    .challenge-actions {
+        width: 100%;
+
+        display: flex;
+
+        flex-direction: column;
+    }
+
+    .challenge-actions .btn {
+        width: 100%;
+    }
+
+
+    /* ---------- Notification ---------- */
+
+    .notification-item {
+        padding: 12px 8px;
+    }
+
+
+    /* ---------- Footer ---------- */
+
+    .footer-grid {
+        grid-template-columns: 1fr !important;
+
+        gap: 30px;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 10px;
+    }
+}
+
+
+/* =========================================================
+   3. LARGE PHONES
+   576px — 767px
+   ========================================================= */
+
+@media (min-width: 576px) and (max-width: 767px) {
+
+    .container {
+        width: 100%;
+
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    .nav-links {
+        gap: 6px;
+    }
+
+    .hero {
+        padding-top: 100px;
+    }
+
+    .hero-title {
+        font-size: clamp(42px, 8vw, 60px);
+    }
+
+    .hero-actions {
+        flex-direction: row;
+
+        justify-content: center;
+    }
+
+    .hero-actions .btn {
+        width: auto;
+    }
+
+    .design-grid,
+    .challenge-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .stats-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .footer-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+
+/* =========================================================
+   4. TABLETS
+   768px — 991px
+   ========================================================= */
+
+@media (min-width: 768px) and (max-width: 991px) {
+
+    .container {
+        width: min(100% - 48px, 920px);
+
+        margin-inline: auto;
+    }
+
+
+    /* ---------- Navigation ---------- */
+
+    .mobile-only,
+    .mobile-nav-toggle {
+        display: none !important;
+    }
+
+    .nav-links {
+        display: flex !important;
+
+        align-items: center;
+
+        gap: 5px;
+    }
+
+
+    /* ---------- Hero ---------- */
+
+    .hero {
+        min-height: 700px;
+
+        display: flex;
+
+        align-items: center;
+    }
+
+    .hero-title {
+        font-size: clamp(48px, 7vw, 68px);
+    }
+
+
+    /* ---------- Grids ---------- */
+
+    .design-grid,
+    .challenge-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .stats-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .two-column,
+    .two-col,
+    .content-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+
+
+    /* ---------- Dashboard ---------- */
+
+    .dashboard-layout {
+        grid-template-columns:
+            210px
+            minmax(0, 1fr) !important;
+    }
+
+    .dashboard-sidebar {
+        display: block;
+    }
+
+
+    /* ---------- Profile ---------- */
+
+    .profile-header {
+        display: grid;
+
+        grid-template-columns:
+            auto
+            1fr
+            auto;
+
+        align-items: center;
+
+        gap: 20px;
+    }
+
+
+    /* ---------- Forms ---------- */
+
+    .form-row {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    /* ---------- Footer ---------- */
+
+    .footer-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+/* =========================================================
+   5. SMALL LAPTOPS
+   992px — 1199px
+   ========================================================= */
+
+@media (min-width: 992px) and (max-width: 1199px) {
+
+    .container {
+        width: min(100% - 56px, 1100px);
+
+        margin-inline: auto;
+    }
+
+
+    /* ---------- Navigation ---------- */
+
+    .mobile-only,
+    .mobile-nav-toggle {
+        display: none !important;
+    }
+
+    .nav-links {
+        display: flex !important;
+    }
+
+
+    /* ---------- Hero ---------- */
+
+    .hero-title {
+        font-size: clamp(56px, 6vw, 76px);
+    }
+
+
+    /* ---------- Design Grid ---------- */
+
+    .design-grid {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    .challenge-grid {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    .stats-grid {
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr)) !important;
+    }
+
+
+    /* ---------- Dashboard ---------- */
+
+    .dashboard-layout {
+        grid-template-columns:
+            230px
+            minmax(0, 1fr) !important;
+    }
+
+
+    /* ---------- Footer ---------- */
+
+    .footer-grid {
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr));
+    }
+}
+
+
+/* =========================================================
+   6. DESKTOP
+   1200px — 1439px
+   ========================================================= */
+
+@media (min-width: 1200px) and (max-width: 1439px) {
+
+    .container {
+        width: min(100% - 64px, 1240px);
+
+        margin-inline: auto;
+    }
+
+
+    .mobile-only,
+    .mobile-nav-toggle {
+        display: none !important;
+    }
+
+    .nav-links {
+        display: flex !important;
+    }
+
+
+    /* ---------- Hero ---------- */
+
+    .hero-title {
+        font-size: clamp(64px, 5vw, 82px);
+    }
+
+
+    /* ---------- Grids ---------- */
+
+    .design-grid {
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr)) !important;
+    }
+
+    .challenge-grid {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr)) !important;
+    }
+
+
+    /* ---------- Dashboard ---------- */
+
+    .dashboard-layout {
+        grid-template-columns:
+            250px
+            minmax(0, 1fr) !important;
+    }
+}
+
+
+/* =========================================================
+   7. LARGE DESKTOP
+   1440px+
+   ========================================================= */
+
+@media (min-width: 1440px) {
+
+    .container {
+        width: min(100% - 80px, 1380px);
+
+        margin-inline: auto;
+    }
+
+
+    .mobile-only,
+    .mobile-nav-toggle {
+        display: none !important;
+    }
+
+    .nav-links {
+        display: flex !important;
+    }
+
+
+    /* ---------- Typography ---------- */
+
+    .hero-title {
+        font-size: clamp(72px, 5vw, 96px);
+    }
+
+
+    /* ---------- Grids ---------- */
+
+    .design-grid {
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr)) !important;
+    }
+
+    .challenge-grid {
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr)) !important;
+    }
+
+
+    /* ---------- Dashboard ---------- */
+
+    .dashboard-layout {
+        grid-template-columns:
+            270px
+            minmax(0, 1fr) !important;
+    }
+
+
+    /* ---------- Hero ---------- */
+
+    .hero {
+        min-height: 820px;
+    }
+}
+
+
+/* =========================================================
+   8. EXTRA LARGE SCREENS
+   1800px+
+   ========================================================= */
+
+@media (min-width: 1800px) {
+
+    .container {
+        width: min(100% - 100px, 1520px);
+    }
+
+    .hero-title {
+        font-size: 100px;
+    }
+
+    .design-grid {
+        grid-template-columns:
+            repeat(5, minmax(0, 1fr)) !important;
+    }
+
+    .challenge-grid {
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr)) !important;
+    }
+}
+
+
+/* =========================================================
+   9. LANDSCAPE PHONES
+   ========================================================= */
+
+@media (max-height: 500px) and (orientation: landscape) {
+
+    .hero {
+        min-height: auto;
+
+        padding-top: 90px;
+        padding-bottom: 60px;
+    }
+
+    .hero-visual {
+        max-height: 300px;
+
+        overflow: hidden;
+    }
+
+    .modal-content {
+        max-height: calc(100vh - 20px);
+    }
+}
+
+
+/* =========================================================
+   10. TOUCH DEVICES
+   ========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+
+    /* Remove hover-dependent visual behavior */
+
+    .design-item-overlay {
+        opacity: 1;
+    }
+
+    .hover-lift:hover,
+    .hover-scale:hover,
+    .magnetic-hover:hover {
+        transform: none;
+    }
+
+    .design-item:hover,
+    .challenge-card:hover {
+        transform: none;
+    }
+
+    .design-item:hover .design-item-image img,
+    .challenge-card:hover .challenge-card-cover img {
+        transform: none;
+    }
+
+    /* Make tap targets comfortable */
+
+    button,
+    a,
+    .tab,
+    .icon-button,
+    .page-button {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .icon-button {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    .page-button {
+        min-width: 42px;
+        min-height: 42px;
+    }
+}
+
+
+/* =========================================================
+   11. REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+
+        animation-iteration-count: 1 !important;
+
+        transition-duration: 0.01ms !important;
+    }
+}
+
+
+/* =========================================================
+   12. HIGH CONTRAST
+   ========================================================= */
+
+@media (prefers-contrast: more) {
+
+    :root {
+        --border: rgba(255, 255, 255, 0.22);
+
+        --border-light: rgba(255, 255, 255, 0.38);
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+        border-width: 2px;
+    }
+}
+
+
+/* =========================================================
+   13. VERY NARROW PHONES
+   320px — 360px
+   ========================================================= */
+
+@media (max-width: 360px) {
+
+    .container {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .hero {
+        padding-top: 80px;
+    }
+
+    .hero-title {
+        font-size: 34px;
+    }
+
+    .hero-description {
+        font-size: 12px;
+    }
+
+    .btn {
+        min-height: 44px;
+
+        padding-left: 13px;
+        padding-right: 13px;
+
+        font-size: 11px;
+    }
+
+    .stat-card {
+        padding: 17px;
+    }
+
+    .modal-content {
+        padding: 17px;
+    }
+}
+
+
+/* =========================================================
+   14. SAFE AREA — MODERN PHONES
+   ========================================================= */
+
+@supports (padding: env(safe-area-inset-bottom)) {
+
+    body {
+        padding-bottom:
+            env(safe-area-inset-bottom);
+    }
+
+    .mobile-bottom-nav {
+        padding-bottom:
+            calc(10px + env(safe-area-inset-bottom));
+    }
+}
+
+
+/* =========================================================
+   15. PRINT
+   ========================================================= */
+
+@media print {
+
+    .navbar,
+    .sidebar,
+    .mobile-bottom-nav,
+    .toast-container,
+    .modal,
+    .mobile-nav-toggle,
+    .hero-actions {
+        display: none !important;
+    }
+
+    body {
+        background: white !important;
+
+        color: black !important;
+    }
+
+    * {
+        box-shadow: none !important;
+
+        text-shadow: none !important;
+    }
+
+    a {
+        color: black !important;
+
+        text-decoration: underline;
+    }
+}
+
+
+/* =========================================================
+   END OF DESIGNVERSE RESPONSIVE SYSTEM
+   ========================================================= */
