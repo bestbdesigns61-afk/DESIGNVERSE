@@ -1,6 +1,6 @@
 /* =========================================================
    DESIGNVERSE — AUTHENTICATION SYSTEM
-   auth.js
+   js/auth.js
    ========================================================= */
 
 "use strict";
@@ -10,7 +10,7 @@
    SUPABASE CLIENT
    ========================================================= */
 
-const getSupabaseClient = () => {
+function getSupabaseClient() {
 
     if (!window.supabaseClient) {
 
@@ -22,214 +22,349 @@ const getSupabaseClient = () => {
     }
 
     return window.supabaseClient;
-};
+}
 
 
 /* =========================================================
-   HELPERS
+   DOM HELPER
    ========================================================= */
 
-const getElement = (selector) => {
+function $(selector) {
     return document.querySelector(selector);
-};
+}
 
 
-const getErrorMessage = (error) => {
+/* =========================================================
+   FRIENDLY AUTH ERRORS
+   ========================================================= */
+
+function getFriendlyError(error) {
 
     if (!error) {
-        return "Something went wrong.";
+        return "Something went wrong. Please try again.";
     }
 
     const message =
-        error.message ||
-        String(error);
+        String(
+            error.message || error
+        );
+
+    const lower =
+        message.toLowerCase();
 
 
     if (
-        message.toLowerCase().includes(
-            "invalid login credentials"
-        )
+        lower.includes("invalid login credentials")
     ) {
         return "Incorrect email or password.";
     }
 
 
     if (
-        message.toLowerCase().includes(
-            "email not confirmed"
-        )
+        lower.includes("email not confirmed")
     ) {
-        return "Please confirm your email before logging in.";
+        return "Please confirm your email address before signing in.";
     }
 
 
     if (
-        message.toLowerCase().includes(
-            "user already registered"
-        )
+        lower.includes("user already registered")
     ) {
         return "An account with this email already exists.";
     }
 
 
     if (
-        message.toLowerCase().includes(
-            "password should be at least"
-        )
+        lower.includes("password should be at least")
     ) {
         return "Your password is too short.";
     }
 
 
     if (
-        message.toLowerCase().includes(
-            "rate limit"
-        )
+        lower.includes("rate limit")
     ) {
-        return "Too many attempts. Please wait a moment and try again.";
+        return "Too many requests. Please wait a little and try again.";
     }
 
 
     if (
-        message.toLowerCase().includes(
-            "row-level security"
-        )
+        lower.includes("network")
+    ) {
+        return "Network error. Check your internet connection.";
+    }
+
+
+    if (
+        lower.includes("row-level security")
     ) {
         return "You don't have permission to perform this action.";
     }
 
 
     return message;
-};
+}
 
 
 /* =========================================================
-   SHOW AUTH MESSAGE
+   AUTH MESSAGE
    ========================================================= */
 
-const showAuthMessage = (
+function showAuthMessage(
     message,
     type = "error"
-) => {
+) {
 
-    let container =
+    let messageBox =
         document.querySelector(
-            "[data-auth-message]"
+            ".auth-message"
         );
 
 
-    if (!container) {
+    if (!messageBox) {
 
-        container =
+        messageBox =
             document.createElement(
                 "div"
             );
 
-        container.setAttribute(
-            "data-auth-message",
-            ""
-        );
-
-        container.className =
+        messageBox.className =
             "auth-message";
 
-        const form =
+
+        const card =
             document.querySelector(
-                "form"
+                ".auth-card"
             );
 
-        if (form) {
 
-            form.parentNode.insertBefore(
-                container,
-                form
-            );
+        if (card) {
+
+            const form =
+                card.querySelector("form");
+
+
+            if (form) {
+
+                card.insertBefore(
+                    messageBox,
+                    form
+                );
+
+            } else {
+
+                card.prepend(
+                    messageBox
+                );
+            }
 
         } else {
 
             document.body.prepend(
-                container
+                messageBox
             );
         }
     }
 
 
-    container.textContent =
-        message;
-
-    container.className =
+    messageBox.className =
         `auth-message ${type}`;
 
 
-    container.classList.remove(
-        "hidden"
+    messageBox.textContent =
+        message;
+
+
+    messageBox.setAttribute(
+        "role",
+        type === "error"
+            ? "alert"
+            : "status"
     );
-
-
-    clearTimeout(
-        container._hideTimer
-    );
-
-
-    container._hideTimer =
-        setTimeout(
-            () => {
-
-                container.classList.add(
-                    "hidden"
-                );
-
-            },
-            5000
-        );
-};
+}
 
 
 /* =========================================================
-   BUTTON LOADING STATE
+   BUTTON LOADING
    ========================================================= */
 
-const setButtonLoading = (
+function setButtonLoading(
     button,
     loading,
     loadingText = "Please wait..."
-) => {
+) {
 
-    if (!button) {
-        return;
-    }
+    if (!button) return;
 
 
     if (loading) {
 
-        button.dataset.originalText =
-            button.innerHTML;
+        if (
+            !button.dataset.originalText
+        ) {
 
-        button.disabled =
-            true;
+            button.dataset.originalText =
+                button.innerHTML;
+        }
+
+
+        button.disabled = true;
+
 
         button.innerHTML = `
             <i class="fa-solid fa-spinner fa-spin"></i>
+            &nbsp;
             ${loadingText}
         `;
 
     } else {
 
-        button.disabled =
-            false;
+        button.disabled = false;
+
 
         button.innerHTML =
             button.dataset.originalText ||
             "Continue";
     }
-};
+}
+
+
+/* =========================================================
+   VALIDATION
+   ========================================================= */
+
+function isValidEmail(email) {
+
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        .test(
+            String(email)
+                .trim()
+                .toLowerCase()
+        );
+}
+
+
+function isValidUsername(username) {
+
+    return /^[a-zA-Z0-9_]{3,30}$/
+        .test(
+            String(username)
+                .trim()
+        );
+}
+
+
+function getPasswordScore(password) {
+
+    let score = 0;
+
+
+    if (password.length >= 8) {
+        score++;
+    }
+
+
+    if (/[A-Z]/.test(password)) {
+        score++;
+    }
+
+
+    if (/[0-9]/.test(password)) {
+        score++;
+    }
+
+
+    if (
+        /[^A-Za-z0-9]/.test(password)
+    ) {
+        score++;
+    }
+
+
+    return score;
+}
+
+
+/* =========================================================
+   SITE PATH HELPERS
+   ========================================================= */
+
+/*
+ * DESIGNVERSE structure:
+ *
+ * /
+ * ├── index.html
+ * └── pages/
+ *     ├── auth/
+ *     └── dashboard/
+ *
+ * This works on a deployed domain and
+ * on localhost.
+ */
+
+function getSiteRoot() {
+
+    const pathname =
+        window.location.pathname;
+
+
+    const pagesIndex =
+        pathname.indexOf(
+            "/pages/"
+        );
+
+
+    if (pagesIndex !== -1) {
+
+        return (
+            pathname.substring(
+                0,
+                pagesIndex
+            ) + "/"
+        );
+    }
+
+
+    return "/";
+}
+
+
+function getRootPageUrl(page) {
+
+    return (
+        getSiteRoot() +
+        page
+    );
+}
+
+
+function getAuthPageUrl(page) {
+
+    return (
+        getSiteRoot() +
+        "pages/auth/" +
+        page
+    );
+}
+
+
+function getDashboardPageUrl(
+    page = "dashboard.html"
+) {
+
+    return (
+        getSiteRoot() +
+        "pages/dashboard/" +
+        page
+    );
+}
 
 
 /* =========================================================
    GET CURRENT USER
    ========================================================= */
 
-const getCurrentUser = async () => {
+async function getCurrentUser() {
 
     const supabase =
         getSupabaseClient();
@@ -243,13 +378,14 @@ const getCurrentUser = async () => {
     const {
         data,
         error
-    } = await supabase.auth.getUser();
+    } =
+        await supabase.auth.getUser();
 
 
     if (error) {
 
         console.error(
-            "Get user error:",
+            "Current user error:",
             error
         );
 
@@ -258,14 +394,14 @@ const getCurrentUser = async () => {
 
 
     return data.user || null;
-};
+}
 
 
 /* =========================================================
    GET CURRENT SESSION
    ========================================================= */
 
-const getCurrentSession = async () => {
+async function getCurrentSession() {
 
     const supabase =
         getSupabaseClient();
@@ -279,13 +415,14 @@ const getCurrentSession = async () => {
     const {
         data,
         error
-    } = await supabase.auth.getSession();
+    } =
+        await supabase.auth.getSession();
 
 
     if (error) {
 
         console.error(
-            "Get session error:",
+            "Session error:",
             error
         );
 
@@ -294,19 +431,19 @@ const getCurrentSession = async () => {
 
 
     return data.session || null;
-};
+}
 
 
 /* =========================================================
    REGISTER
    ========================================================= */
 
-const registerUser = async ({
+async function registerUser({
     email,
     password,
     username,
     displayName
-}) => {
+}) {
 
     const supabase =
         getSupabaseClient();
@@ -315,35 +452,26 @@ const registerUser = async ({
     if (!supabase) {
 
         throw new Error(
-            "Supabase is unavailable."
+            "Authentication service is unavailable."
         );
     }
 
 
     email =
-        email.trim().toLowerCase();
+        String(email || "")
+            .trim()
+            .toLowerCase();
+
 
     username =
-        username.trim().toLowerCase();
+        String(username || "")
+            .trim()
+            .toLowerCase();
+
 
     displayName =
-        displayName.trim();
-
-
-    if (!email) {
-
-        throw new Error(
-            "Please enter your email."
-        );
-    }
-
-
-    if (!username) {
-
-        throw new Error(
-            "Please choose a username."
-        );
-    }
+        String(displayName || "")
+            .trim();
 
 
     if (!displayName) {
@@ -354,7 +482,29 @@ const registerUser = async ({
     }
 
 
-    if (password.length < 8) {
+    if (
+        !isValidUsername(username)
+    ) {
+
+        throw new Error(
+            "Username must be 3–30 characters and may only contain letters, numbers and underscores."
+        );
+    }
+
+
+    if (
+        !isValidEmail(email)
+    ) {
+
+        throw new Error(
+            "Please enter a valid email address."
+        );
+    }
+
+
+    if (
+        password.length < 8
+    ) {
 
         throw new Error(
             "Password must contain at least 8 characters."
@@ -362,67 +512,61 @@ const registerUser = async ({
     }
 
 
-    /*
-     * Store username and display name
-     * in user metadata.
-     *
-     * Our Supabase database trigger
-     * uses these values to create
-     * the profiles row.
-     */
+    if (
+        getPasswordScore(password) < 2
+    ) {
+
+        throw new Error(
+            "Please choose a stronger password."
+        );
+    }
+
 
     const {
         data,
         error
-    } = await supabase.auth.signUp({
+    } =
+        await supabase.auth.signUp({
 
-        email,
+            email,
 
-        password,
+            password,
 
-        options: {
+            options: {
 
-            data: {
+                data: {
 
-                username,
+                    username,
 
-                display_name:
-                    displayName
+                    display_name:
+                        displayName
+                },
 
-            },
-
-            emailRedirectTo:
-                getRedirectUrl(
-                    "login.html"
-                )
-        }
-    });
+                emailRedirectTo:
+                    getAuthPageUrl(
+                        "login.html"
+                    )
+            }
+        });
 
 
     if (error) {
-
-        console.error(
-            "Registration error:",
-            error
-        );
-
         throw error;
     }
 
 
     return data;
-};
+}
 
 
 /* =========================================================
    LOGIN
    ========================================================= */
 
-const loginUser = async ({
+async function loginUser({
     email,
-    password,
-    remember = true
-}) => {
+    password
+}) {
 
     const supabase =
         getSupabaseClient();
@@ -431,19 +575,23 @@ const loginUser = async ({
     if (!supabase) {
 
         throw new Error(
-            "Supabase is unavailable."
+            "Authentication service is unavailable."
         );
     }
 
 
     email =
-        email.trim().toLowerCase();
+        String(email || "")
+            .trim()
+            .toLowerCase();
 
 
-    if (!email) {
+    if (
+        !isValidEmail(email)
+    ) {
 
         throw new Error(
-            "Please enter your email."
+            "Please enter a valid email address."
         );
     }
 
@@ -456,46 +604,33 @@ const loginUser = async ({
     }
 
 
-    /*
-     * Supabase handles the actual
-     * session persistence.
-     *
-     * The remember parameter is kept
-     * for compatibility with the UI.
-     */
-
     const {
         data,
         error
-    } = await supabase.auth.signInWithPassword({
+    } =
+        await supabase.auth
+            .signInWithPassword({
 
-        email,
+                email,
 
-        password
-
-    });
+                password
+            });
 
 
     if (error) {
-
-        console.error(
-            "Login error:",
-            error
-        );
-
         throw error;
     }
 
 
     return data;
-};
+}
 
 
 /* =========================================================
    LOGOUT
    ========================================================= */
 
-const logoutUser = async () => {
+async function logoutUser() {
 
     const supabase =
         getSupabaseClient();
@@ -508,185 +643,174 @@ const logoutUser = async () => {
 
     const {
         error
-    } = await supabase.auth.signOut();
+    } =
+        await supabase.auth.signOut();
 
 
     if (error) {
-
-        console.error(
-            "Logout error:",
-            error
-        );
-
         throw error;
     }
 
 
-    /*
-     * Send user back to login.
-     */
-
     window.location.href =
-        getRedirectUrl(
+        getAuthPageUrl(
             "login.html"
         );
-};
+}
 
 
 /* =========================================================
-   RESET PASSWORD EMAIL
+   FORGOT PASSWORD
    ========================================================= */
 
-const sendPasswordReset =
-    async (email) => {
+async function sendPasswordReset(email) {
 
-        const supabase =
-            getSupabaseClient();
-
-
-        if (!supabase) {
-
-            throw new Error(
-                "Supabase is unavailable."
-            );
-        }
+    const supabase =
+        getSupabaseClient();
 
 
-        email =
-            email.trim().toLowerCase();
+    if (!supabase) {
+
+        throw new Error(
+            "Authentication service is unavailable."
+        );
+    }
 
 
-        if (!email) {
-
-            throw new Error(
-                "Please enter your email."
-            );
-        }
+    email =
+        String(email || "")
+            .trim()
+            .toLowerCase();
 
 
-        const {
-            error
-        } = await supabase.auth
+    if (
+        !isValidEmail(email)
+    ) {
+
+        throw new Error(
+            "Please enter a valid email address."
+        );
+    }
+
+
+    const {
+        error
+    } =
+        await supabase.auth
             .resetPasswordForEmail(
                 email,
                 {
                     redirectTo:
-                        getRedirectUrl(
+                        getAuthPageUrl(
                             "reset-password.html"
                         )
                 }
             );
 
 
-        if (error) {
-
-            console.error(
-                "Password reset error:",
-                error
-            );
-
-            throw error;
-        }
+    if (error) {
+        throw error;
+    }
 
 
-        return true;
-    };
+    return true;
+}
 
 
 /* =========================================================
    UPDATE PASSWORD
    ========================================================= */
 
-const updatePassword =
-    async (password) => {
+async function updatePassword(password) {
 
-        const supabase =
-            getSupabaseClient();
-
-
-        if (!supabase) {
-
-            throw new Error(
-                "Supabase is unavailable."
-            );
-        }
+    const supabase =
+        getSupabaseClient();
 
 
-        if (!password) {
+    if (!supabase) {
 
-            throw new Error(
-                "Please enter a new password."
-            );
-        }
-
-
-        if (password.length < 8) {
-
-            throw new Error(
-                "Password must contain at least 8 characters."
-            );
-        }
+        throw new Error(
+            "Authentication service is unavailable."
+        );
+    }
 
 
-        const {
-            data,
-            error
-        } = await supabase.auth.updateUser({
+    if (
+        password.length < 8
+    ) {
 
+        throw new Error(
+            "Password must contain at least 8 characters."
+        );
+    }
+
+
+    if (
+        getPasswordScore(password) < 2
+    ) {
+
+        throw new Error(
+            "Please choose a stronger password."
+        );
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabase.auth.updateUser({
             password
-
         });
 
 
-        if (error) {
-
-            console.error(
-                "Password update error:",
-                error
-            );
-
-            throw error;
-        }
+    if (error) {
+        throw error;
+    }
 
 
-        return data;
-    };
+    return data;
+}
 
 
 /* =========================================================
-   RESEND CONFIRMATION EMAIL
+   RESEND CONFIRMATION
    ========================================================= */
 
-const resendConfirmation =
-    async (email) => {
+async function resendConfirmation(email) {
 
-        const supabase =
-            getSupabaseClient();
-
-
-        if (!supabase) {
-
-            throw new Error(
-                "Supabase is unavailable."
-            );
-        }
+    const supabase =
+        getSupabaseClient();
 
 
-        email =
-            email.trim().toLowerCase();
+    if (!supabase) {
+
+        throw new Error(
+            "Authentication service is unavailable."
+        );
+    }
 
 
-        if (!email) {
-
-            throw new Error(
-                "Please enter your email."
-            );
-        }
+    email =
+        String(email || "")
+            .trim()
+            .toLowerCase();
 
 
-        const {
-            error
-        } = await supabase.auth.resend({
+    if (
+        !isValidEmail(email)
+    ) {
+
+        throw new Error(
+            "Please enter a valid email address."
+        );
+    }
+
+
+    const {
+        error
+    } =
+        await supabase.auth.resend({
 
             type: "signup",
 
@@ -695,137 +819,41 @@ const resendConfirmation =
             options: {
 
                 emailRedirectTo:
-                    getRedirectUrl(
+                    getAuthPageUrl(
                         "login.html"
                     )
             }
         });
 
 
-        if (error) {
-
-            throw error;
-        }
-
-
-        return true;
-    };
-
-
-/* =========================================================
-   REDIRECT URL HELPER
-   ========================================================= */
-
-const getRedirectUrl = (
-    page
-) => {
-
-    /*
-     * Works both during local development
-     * and when deployed.
-     */
-
-    const currentUrl =
-        new URL(
-            window.location.href
-        );
-
-
-    /*
-     * If the current page is inside:
-     *
-     * /pages/auth/
-     *
-     * go two levels up to the
-     * DESIGNVERSE root.
-     */
-
-    if (
-        currentUrl.pathname.includes(
-            "/pages/auth/"
-        )
-    ) {
-
-        return new URL(
-            `../../${page}`,
-            currentUrl.href
-        ).href;
+    if (error) {
+        throw error;
     }
 
 
-    /*
-     * Fallback.
-     */
-
-    return new URL(
-        page,
-        currentUrl.origin +
-        currentUrl.pathname
-    ).href;
-};
-
-
-/* =========================================================
-   REQUIRE AUTHENTICATION
-   ========================================================= */
-
-const requireAuth = async () => {
-
-    const session =
-        await getCurrentSession();
-
-
-    if (!session) {
-
-        window.location.href =
-            getRedirectUrl(
-                "login.html"
-            );
-
-        return null;
-    }
-
-
-    return session;
-};
-
-
-/* =========================================================
-   REDIRECT IF ALREADY LOGGED IN
-   ========================================================= */
-
-const redirectIfAuthenticated =
-    async () => {
-
-        const session =
-            await getCurrentSession();
-
-
-        if (session) {
-
-            window.location.href =
-                getRedirectUrl(
-                    "../../pages/dashboard/dashboard.html"
-                );
-        }
-    };
+    return true;
+}
 
 
 /* =========================================================
    LOGIN FORM
    ========================================================= */
 
-const setupLoginForm = () => {
+function setupLoginForm() {
 
     const form =
-        getElement(
-            "#loginForm"
-        );
+        $("#loginForm");
 
 
-    if (!form) {
-        return;
-    }
+    if (!form) return;
+
+
+    const emailInput =
+        $("#loginEmail");
+
+
+    const passwordInput =
+        $("#loginPassword");
 
 
     form.addEventListener(
@@ -835,21 +863,9 @@ const setupLoginForm = () => {
             event.preventDefault();
 
 
-            const email =
-                getElement(
-                    "#email"
-                )?.value || "";
-
-
-            const password =
-                getElement(
-                    "#password"
-                )?.value || "";
-
-
             const button =
                 form.querySelector(
-                    "button[type='submit']"
+                    'button[type="submit"]'
                 );
 
 
@@ -864,31 +880,52 @@ const setupLoginForm = () => {
 
                 await loginUser({
 
-                    email,
+                    email:
+                        emailInput?.value || "",
 
-                    password
+                    password:
+                        passwordInput?.value || ""
 
                 });
 
 
                 showAuthMessage(
-                    "Login successful! Welcome to DESIGNVERSE.",
+                    "Login successful! Welcome back 👋",
                     "success"
                 );
 
 
-                /*
-                 * Small delay allows the
-                 * success message to appear.
-                 */
-
                 setTimeout(
                     () => {
 
-                        window.location.href =
-                            getRedirectUrl(
-                                "../../pages/dashboard/dashboard.html"
+                        /*
+                         * First check whether the user
+                         * originally tried to open a
+                         * protected page.
+                         */
+
+                        const redirect =
+                            sessionStorage.getItem(
+                                "designverse_redirect"
                             );
+
+
+                        if (redirect) {
+
+                            sessionStorage.removeItem(
+                                "designverse_redirect"
+                            );
+
+
+                            window.location.href =
+                                redirect;
+
+                            return;
+                        }
+
+
+                        window.location.href =
+                            getDashboardPageUrl();
 
                     },
                     700
@@ -898,14 +935,13 @@ const setupLoginForm = () => {
             } catch (error) {
 
                 console.error(
+                    "Login error:",
                     error
                 );
 
 
                 showAuthMessage(
-                    getErrorMessage(
-                        error
-                    ),
+                    getFriendlyError(error),
                     "error"
                 );
 
@@ -916,29 +952,48 @@ const setupLoginForm = () => {
                     button,
                     false
                 );
-
             }
 
         }
     );
-};
+}
 
 
 /* =========================================================
    REGISTER FORM
    ========================================================= */
 
-const setupRegisterForm = () => {
+function setupRegisterForm() {
 
     const form =
-        getElement(
-            "#registerForm"
-        );
+        $("#registerForm");
 
 
-    if (!form) {
-        return;
-    }
+    if (!form) return;
+
+
+    const displayName =
+        $("#displayName");
+
+
+    const username =
+        $("#username");
+
+
+    const email =
+        $("#registerEmail");
+
+
+    const password =
+        $("#registerPassword");
+
+
+    const confirmPassword =
+        $("#confirmPassword");
+
+
+    const terms =
+        $("#terms");
 
 
     form.addEventListener(
@@ -948,45 +1003,29 @@ const setupRegisterForm = () => {
             event.preventDefault();
 
 
-            const email =
-                getElement(
-                    "#email"
-                )?.value || "";
-
-
-            const password =
-                getElement(
-                    "#password"
-                )?.value || "";
-
-
-            const confirmPassword =
-                getElement(
-                    "#confirmPassword"
-                )?.value || "";
-
-
-            const username =
-                getElement(
-                    "#username"
-                )?.value || "";
-
-
-            const displayName =
-                getElement(
-                    "#displayName"
-                )?.value || "";
-
-
             const button =
                 form.querySelector(
-                    "button[type='submit']"
+                    'button[type="submit"]'
                 );
 
 
             if (
-                password !==
-                confirmPassword
+                terms &&
+                !terms.checked
+            ) {
+
+                showAuthMessage(
+                    "Please accept the DESIGNVERSE rules before creating your account.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            if (
+                password?.value !==
+                confirmPassword?.value
             ) {
 
                 showAuthMessage(
@@ -1010,21 +1049,20 @@ const setupRegisterForm = () => {
                 const result =
                     await registerUser({
 
-                        email,
+                        displayName:
+                            displayName?.value || "",
 
-                        password,
+                        username:
+                            username?.value || "",
 
-                        username,
+                        email:
+                            email?.value || "",
 
-                        displayName
+                        password:
+                            password?.value || ""
 
                     });
 
-
-                /*
-                 * Supabase may require
-                 * email confirmation.
-                 */
 
                 if (
                     result.user &&
@@ -1032,44 +1070,43 @@ const setupRegisterForm = () => {
                 ) {
 
                     showAuthMessage(
-                        "Account created! Check your email to confirm your account.",
+                        "Account created! Check your email to confirm your DESIGNVERSE account.",
                         "success"
                     );
+
+
+                    form.reset();
 
                 } else {
 
                     showAuthMessage(
-                        "Account created successfully!",
+                        "Account created successfully! Welcome to DESIGNVERSE 🚀",
                         "success"
                     );
 
+
+                    setTimeout(
+                        () => {
+
+                            window.location.href =
+                                getDashboardPageUrl();
+
+                        },
+                        900
+                    );
                 }
-
-
-                setTimeout(
-                    () => {
-
-                        window.location.href =
-                            getRedirectUrl(
-                                "login.html"
-                            );
-
-                    },
-                    1800
-                );
 
 
             } catch (error) {
 
                 console.error(
+                    "Registration error:",
                     error
                 );
 
 
                 showAuthMessage(
-                    getErrorMessage(
-                        error
-                    ),
+                    getFriendlyError(error),
                     "error"
                 );
 
@@ -1080,233 +1117,263 @@ const setupRegisterForm = () => {
                     button,
                     false
                 );
-
             }
 
         }
     );
-};
+}
 
 
 /* =========================================================
    FORGOT PASSWORD FORM
    ========================================================= */
 
-const setupForgotPasswordForm =
-    () => {
+function setupForgotPasswordForm() {
 
-        const form =
-            getElement(
-                "#forgotPasswordForm"
-            );
+    const form =
+        $("#forgotPasswordForm");
 
 
-        if (!form) {
-            return;
-        }
+    if (!form) return;
 
 
-        form.addEventListener(
-            "submit",
-            async event => {
-
-                event.preventDefault();
+    const email =
+        $("#forgotEmail");
 
 
-                const email =
-                    getElement(
-                        "#email"
-                    )?.value || "";
+    form.addEventListener(
+        "submit",
+        async event => {
+
+            event.preventDefault();
 
 
-                const button =
-                    form.querySelector(
-                        "button[type='submit']"
-                    );
+            const button =
+                form.querySelector(
+                    'button[type="submit"]'
+                );
 
 
-                try {
+            try {
 
-                    setButtonLoading(
-                        button,
-                        true,
-                        "Sending..."
-                    );
-
-
-                    await sendPasswordReset(
-                        email
-                    );
+                setButtonLoading(
+                    button,
+                    true,
+                    "Sending..."
+                );
 
 
-                    showAuthMessage(
-                        "Password reset instructions have been sent to your email.",
-                        "success"
-                    );
+                await sendPasswordReset(
+                    email?.value || ""
+                );
 
 
-                } catch (error) {
-
-                    console.error(
-                        error
-                    );
-
-
-                    showAuthMessage(
-                        getErrorMessage(
-                            error
-                        ),
-                        "error"
-                    );
+                showAuthMessage(
+                    "If an account exists for that email, a password reset link has been sent.",
+                    "success"
+                );
 
 
-                } finally {
+                form.reset();
 
-                    setButtonLoading(
-                        button,
-                        false
-                    );
 
-                }
+            } catch (error) {
 
+                console.error(
+                    "Password reset error:",
+                    error
+                );
+
+
+                showAuthMessage(
+                    getFriendlyError(error),
+                    "error"
+                );
+
+
+            } finally {
+
+                setButtonLoading(
+                    button,
+                    false
+                );
             }
-        );
-    };
+
+        }
+    );
+}
 
 
 /* =========================================================
    RESET PASSWORD FORM
    ========================================================= */
 
-const setupResetPasswordForm =
-    () => {
+async function setupResetPasswordForm() {
 
-        const form =
-            getElement(
-                "#resetPasswordForm"
+    const form =
+        $("#resetPasswordForm");
+
+
+    if (!form) return;
+
+
+    /*
+     * Give Supabase a moment to process
+     * the recovery URL/session.
+     */
+
+    const supabase =
+        getSupabaseClient();
+
+
+    if (!supabase) return;
+
+
+    const {
+        data: sessionData
+    } =
+        await supabase.auth.getSession();
+
+
+    if (!sessionData.session) {
+
+        showAuthMessage(
+            "This password reset link is invalid or has expired. Please request a new one.",
+            "error"
+        );
+
+
+        const button =
+            form.querySelector(
+                'button[type="submit"]'
             );
 
 
-        if (!form) {
-            return;
+        if (button) {
+            button.disabled = true;
         }
 
 
-        form.addEventListener(
-            "submit",
-            async event => {
-
-                event.preventDefault();
+        return;
+    }
 
 
-                const password =
-                    getElement(
-                        "#password"
-                    )?.value || "";
+    const password =
+        $("#newPassword");
 
 
-                const confirmPassword =
-                    getElement(
-                        "#confirmPassword"
-                    )?.value || "";
+    const confirmPassword =
+        $("#confirmPassword");
 
 
-                const button =
-                    form.querySelector(
-                        "button[type='submit']"
-                    );
+    const button =
+        form.querySelector(
+            'button[type="submit"]'
+        );
 
 
-                if (
-                    password !==
-                    confirmPassword
-                ) {
+    form.addEventListener(
+        "submit",
+        async event => {
 
-                    showAuthMessage(
-                        "Passwords do not match.",
-                        "error"
-                    );
-
-                    return;
-                }
+            event.preventDefault();
 
 
-                try {
+            if (
+                password?.value !==
+                confirmPassword?.value
+            ) {
 
-                    setButtonLoading(
-                        button,
-                        true,
-                        "Updating..."
-                    );
+                showAuthMessage(
+                    "Passwords do not match.",
+                    "error"
+                );
 
-
-                    await updatePassword(
-                        password
-                    );
-
-
-                    showAuthMessage(
-                        "Password updated successfully!",
-                        "success"
-                    );
+                return;
+            }
 
 
-                    setTimeout(
-                        () => {
+            try {
+
+                setButtonLoading(
+                    button,
+                    true,
+                    "Updating..."
+                );
+
+
+                await updatePassword(
+                    password?.value || ""
+                );
+
+
+                showAuthMessage(
+                    "Password updated successfully! 🎉",
+                    "success"
+                );
+
+
+                form.reset();
+
+
+                setTimeout(
+                    async () => {
+
+                        try {
+
+                            await supabase.auth.signOut();
+
+                        } finally {
 
                             window.location.href =
-                                getRedirectUrl(
+                                getAuthPageUrl(
                                     "login.html"
                                 );
+                        }
 
-                        },
-                        1500
-                    );
-
-
-                } catch (error) {
-
-                    console.error(
-                        error
-                    );
+                    },
+                    1200
+                );
 
 
-                    showAuthMessage(
-                        getErrorMessage(
-                            error
-                        ),
-                        "error"
-                    );
+            } catch (error) {
+
+                console.error(
+                    "Password update error:",
+                    error
+                );
 
 
-                } finally {
+                showAuthMessage(
+                    getFriendlyError(error),
+                    "error"
+                );
 
-                    setButtonLoading(
-                        button,
-                        false
-                    );
 
-                }
+            } finally {
 
+                setButtonLoading(
+                    button,
+                    false
+                );
             }
-        );
-    };
+
+        }
+    );
+}
 
 
 /* =========================================================
    LOGOUT BUTTONS
    ========================================================= */
 
-const setupLogoutButtons =
-    () => {
+function setupLogoutButtons() {
 
-        const buttons =
-            document.querySelectorAll(
-                "[data-logout]"
-            );
-
-
-        buttons.forEach(
+    document
+        .querySelectorAll(
+            "[data-logout]"
+        )
+        .forEach(
             button => {
 
                 button.addEventListener(
@@ -1324,10 +1391,10 @@ const setupLogoutButtons =
 
                             await logoutUser();
 
-
                         } catch (error) {
 
                             console.error(
+                                "Logout error:",
                                 error
                             );
 
@@ -1337,12 +1404,9 @@ const setupLogoutButtons =
 
 
                             showAuthMessage(
-                                getErrorMessage(
-                                    error
-                                ),
+                                getFriendlyError(error),
                                 "error"
                             );
-
                         }
 
                     }
@@ -1350,81 +1414,95 @@ const setupLogoutButtons =
 
             }
         );
-    };
+}
+
+
+/* =========================================================
+   PROTECTED PAGES
+   ========================================================= */
+
+async function requireAuth() {
+
+    const session =
+        await getCurrentSession();
+
+
+    if (session) {
+
+        return session;
+    }
+
+
+    /*
+     * Save the page the user wanted.
+     */
+
+    sessionStorage.setItem(
+        "designverse_redirect",
+        window.location.href
+    );
+
+
+    window.location.href =
+        getAuthPageUrl(
+            "login.html"
+        );
+
+
+    return null;
+}
 
 
 /* =========================================================
    AUTH STATE LISTENER
    ========================================================= */
 
-const setupAuthListener =
-    () => {
+function setupAuthStateListener() {
 
-        const supabase =
-            getSupabaseClient();
+    const supabase =
+        getSupabaseClient();
 
 
-        if (!supabase) {
-            return;
+    if (!supabase) return;
+
+
+    supabase.auth.onAuthStateChange(
+        (
+            event,
+            session
+        ) => {
+
+            console.log(
+                "DESIGNVERSE auth event:",
+                event
+            );
+
+
+            window.dispatchEvent(
+                new CustomEvent(
+                    "designverse:auth",
+                    {
+                        detail: {
+                            event,
+                            session,
+                            user:
+                                session?.user ||
+                                null
+                        }
+                    }
+                )
+            );
+
         }
-
-
-        supabase.auth.onAuthStateChange(
-            (
-                event,
-                session
-            ) => {
-
-                console.log(
-                    "DESIGNVERSE auth:",
-                    event
-                );
-
-
-                /*
-                 * When the password recovery
-                 * link is opened, Supabase
-                 * creates a recovery session.
-                 */
-
-                if (
-                    event ===
-                    "PASSWORD_RECOVERY"
-                ) {
-
-                    console.log(
-                        "Password recovery session detected."
-                    );
-
-                }
-
-
-                /*
-                 * SIGNED_OUT can be used by
-                 * dashboard pages to update UI.
-                 */
-
-                if (
-                    event ===
-                    "SIGNED_OUT"
-                ) {
-
-                    console.log(
-                        "User signed out."
-                    );
-
-                }
-
-            }
-        );
-    };
+    );
+}
 
 
 /* =========================================================
-   INITIALIZE AUTH
+   INITIALIZE
    ========================================================= */
 
-const initAuth = async () => {
+async function initAuth() {
 
     setupLoginForm();
 
@@ -1432,17 +1510,19 @@ const initAuth = async () => {
 
     setupForgotPasswordForm();
 
-    setupResetPasswordForm();
+    await setupResetPasswordForm();
 
     setupLogoutButtons();
 
-    setupAuthListener();
+    setupAuthStateListener();
 
 
     /*
-     * Protect pages marked with:
+     * Any page with:
      *
      * <body data-protected>
+     *
+     * requires a valid Supabase session.
      */
 
     if (
@@ -1453,12 +1533,11 @@ const initAuth = async () => {
 
         await requireAuth();
     }
-
-};
+}
 
 
 /* =========================================================
-   GLOBAL DESIGNVERSE AUTH API
+   GLOBAL API
    ========================================================= */
 
 window.DVAuth = {
@@ -1481,12 +1560,9 @@ window.DVAuth = {
 
     requireAuth,
 
-    redirectIfAuthenticated,
-
     showAuthMessage,
 
-    getErrorMessage
-
+    getFriendlyError
 };
 
 
