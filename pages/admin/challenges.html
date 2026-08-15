@@ -39,7 +39,7 @@
 
     <link
         rel="preconnect"
-        href="https://fonts.gstatic.com"
+        href="https://fonts.googleapis.com"
         crossorigin
     >
 
@@ -94,11 +94,9 @@
             --admin-sidebar-width: 250px;
         }
 
-
         * {
             box-sizing: border-box;
         }
-
 
         body {
             margin: 0;
@@ -120,7 +118,6 @@
            ================================================= */
 
         .admin-sidebar {
-
             position: fixed;
 
             top: 82px;
@@ -136,8 +133,7 @@
             overflow-y: auto;
 
             border-right:
-                1px solid
-                var(--border);
+                1px solid var(--border);
 
             background:
                 rgba(5,5,8,0.90);
@@ -156,7 +152,6 @@
 
 
         .admin-sidebar-label {
-
             padding:
                 0 12px 10px;
 
@@ -164,7 +159,6 @@
                 var(--text-muted);
 
             font-size: 9px;
-
             font-weight: 800;
 
             letter-spacing:
@@ -176,7 +170,6 @@
 
 
         .admin-nav {
-
             display: flex;
 
             flex-direction:
@@ -187,7 +180,6 @@
 
 
         .admin-nav a {
-
             min-height: 44px;
 
             display: flex;
@@ -205,7 +197,6 @@
                 var(--text-muted);
 
             font-size: 12px;
-
             font-weight: 600;
 
             transition:
@@ -216,7 +207,6 @@
 
 
         .admin-nav a i {
-
             width: 18px;
 
             text-align: center;
@@ -226,7 +216,6 @@
 
 
         .admin-nav a:hover {
-
             color: white;
 
             background:
@@ -238,7 +227,6 @@
 
 
         .admin-nav a.active {
-
             color: white;
 
             background:
@@ -255,7 +243,6 @@
 
 
         .admin-divider {
-
             height: 1px;
 
             margin:
@@ -267,14 +254,12 @@
 
 
         .admin-logout {
-
             color:
                 #fca5a5 !important;
         }
 
 
         .admin-logout:hover {
-
             background:
                 rgba(239,68,68,0.08)
                 !important;
@@ -286,7 +271,6 @@
            ================================================= */
 
         .admin-main {
-
             width:
                 calc(
                     100% -
@@ -302,7 +286,6 @@
 
 
         .admin-container {
-
             width:
                 min(100%, 1320px);
 
@@ -312,11 +295,10 @@
 
 
         /* =================================================
-           PAGE HEADER
+           HEADER
            ================================================= */
 
         .admin-page-header {
-
             display: flex;
 
             align-items:
@@ -333,7 +315,6 @@
 
 
         .admin-eyebrow {
-
             display: inline-flex;
 
             align-items: center;
@@ -346,9 +327,11 @@
             color:
                 #c4b5fd;
 
-            font-size: 9px;
+            font-size:
+                9px;
 
-            font-weight: 800;
+            font-weight:
+                800;
 
             letter-spacing:
                 0.16em;
@@ -359,14 +342,12 @@
 
 
         .admin-eyebrow i {
-
             color:
                 #a855f7;
         }
 
 
         .admin-page-header h1 {
-
             margin:
                 0 0 8px;
 
@@ -383,7 +364,6 @@
 
 
         .admin-page-header p {
-
             max-width:
                 670px;
 
@@ -392,7 +372,8 @@
             color:
                 var(--text-muted);
 
-            font-size: 11px;
+            font-size:
+                11px;
 
             line-height:
                 1.7;
@@ -400,7 +381,6 @@
 
 
         .admin-role-badge {
-
             display: inline-flex;
 
             align-items: center;
@@ -440,12 +420,53 @@
 
 
         /* =================================================
-           ADMIN GRID
+           NOTICE
+           ================================================= */
+
+        .admin-notice {
+            display:
+                flex;
+
+            align-items:
+                flex-start;
+
+            gap:
+                10px;
+
+            margin-bottom:
+                20px;
+
+            padding:
+                12px 14px;
+
+            border:
+                1px solid
+                rgba(245,158,11,0.18);
+
+            border-radius:
+                12px;
+
+            background:
+                rgba(245,158,11,0.05);
+
+            color:
+                #fcd34d;
+
+            font-size:
+                9px;
+
+            line-height:
+                1.55;
+        }
+
+
+        /* =================================================
+           CONTENT GRID
            ================================================= */
 
         .admin-content-grid {
-
-            display: grid;
+            display:
+                grid;
 
             grid-template-columns:
                 minmax(0, 1.2fr)
@@ -460,11 +481,10 @@
 
 
         /* =================================================
-           CARD
+           CARDS
            ================================================= */
 
         .admin-card {
-
             padding:
                 23px;
 
@@ -485,15 +505,14 @@
 
 
         .admin-card + .admin-card {
-
             margin-top:
                 20px;
         }
 
 
         .admin-card-header {
-
-            display: flex;
+            display:
+                flex;
 
             align-items:
                 flex-start;
@@ -510,7 +529,6 @@
 
 
         .admin-card-header h2 {
-
             margin:
                 0 0 5px;
 
@@ -520,7 +538,6 @@
 
 
         .admin-card-header p {
-
             margin: 0;
 
             color:
@@ -535,7 +552,6 @@
 
 
         .admin-step {
-
             width:
                 32px;
 
@@ -577,12 +593,12 @@
 
 
         /* =================================================
-           FORM
+           FORM GRID
            ================================================= */
 
         .admin-form-grid {
-
-            display: grid;
+            display:
+                grid;
 
             grid-template-columns:
                 1fr 1fr;
@@ -593,8 +609,8 @@
 
 
         .admin-form-group {
-
-            display: flex;
+            display:
+                flex;
 
             flex-direction:
                 column;
@@ -605,14 +621,12 @@
 
 
         .admin-form-group.full {
-
             grid-column:
                 1 / -1;
         }
 
 
         .admin-label {
-
             color:
                 rgba(255,255,255,0.87);
 
@@ -625,7 +639,6 @@
 
 
         .admin-label span {
-
             color:
                 var(--text-muted);
 
@@ -637,7 +650,6 @@
         .admin-input,
         .admin-select,
         .admin-textarea {
-
             width: 100%;
 
             border:
@@ -672,7 +684,6 @@
 
         .admin-input,
         .admin-select {
-
             height:
                 45px;
 
@@ -682,7 +693,6 @@
 
 
         .admin-textarea {
-
             min-height:
                 125px;
 
@@ -699,7 +709,6 @@
 
         .admin-input::placeholder,
         .admin-textarea::placeholder {
-
             color:
                 var(--text-muted);
         }
@@ -708,7 +717,6 @@
         .admin-input:focus,
         .admin-select:focus,
         .admin-textarea:focus {
-
             border-color:
                 rgba(168,85,247,0.55);
 
@@ -722,7 +730,6 @@
 
 
         .admin-select option {
-
             color:
                 white;
 
@@ -731,12 +738,7 @@
         }
 
 
-        /* =================================================
-           SLUG
-           ================================================= */
-
         .slug-preview {
-
             margin-top:
                 2px;
 
@@ -749,9 +751,96 @@
 
 
         .slug-preview strong {
-
             color:
                 #c4b5fd;
+        }
+
+
+        .date-hint {
+            color:
+                var(--text-muted);
+
+            font-size:
+                8px;
+
+            line-height:
+                1.4;
+        }
+
+
+        .admin-field-error {
+            display:
+                none;
+
+            color:
+                #fca5a5;
+
+            font-size:
+                8px;
+        }
+
+
+        .admin-field-error.visible {
+            display:
+                block;
+        }
+
+
+        .admin-input.error,
+        .admin-select.error,
+        .admin-textarea.error {
+            border-color:
+                rgba(239,68,68,0.60);
+        }
+
+
+        /* =================================================
+           TIMELINE NOTE
+           ================================================= */
+
+        .timeline-note {
+            display:
+                flex;
+
+            align-items:
+                flex-start;
+
+            gap:
+                10px;
+
+            margin-top:
+                6px;
+
+            padding:
+                10px 12px;
+
+            border:
+                1px solid
+                rgba(168,85,247,0.14);
+
+            border-radius:
+                11px;
+
+            background:
+                rgba(124,58,237,0.045);
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                8px;
+
+            line-height:
+                1.55;
+        }
+
+
+        .timeline-note i {
+            color:
+                #c4b5fd;
+
+            margin-top:
+                2px;
         }
 
 
@@ -760,7 +849,6 @@
            ================================================= */
 
         .cover-upload {
-
             position:
                 relative;
 
@@ -804,7 +892,6 @@
 
 
         .cover-upload:hover {
-
             border-color:
                 rgba(168,85,247,0.62);
 
@@ -819,7 +906,6 @@
 
 
         .cover-upload.dragover {
-
             border-color:
                 #a78bfa;
 
@@ -829,7 +915,6 @@
 
 
         .cover-upload-content {
-
             display:
                 flex;
 
@@ -851,7 +936,6 @@
 
 
         .cover-upload-icon {
-
             width:
                 60px;
 
@@ -886,7 +970,6 @@
 
 
         .cover-upload h3 {
-
             margin:
                 0 0 6px;
 
@@ -896,7 +979,6 @@
 
 
         .cover-upload p {
-
             max-width:
                 350px;
 
@@ -915,7 +997,6 @@
 
 
         .cover-upload-note {
-
             color:
                 var(--text-muted);
 
@@ -925,7 +1006,6 @@
 
 
         #challengeCoverInput {
-
             position:
                 absolute;
 
@@ -946,12 +1026,7 @@
         }
 
 
-        /* =================================================
-           COVER PREVIEW
-           ================================================= */
-
         .cover-preview {
-
             display:
                 none;
 
@@ -970,14 +1045,12 @@
 
 
         .cover-preview.visible {
-
             display:
                 block;
         }
 
 
         .cover-preview img {
-
             width:
                 100%;
 
@@ -993,7 +1066,6 @@
 
 
         .cover-preview-bar {
-
             position:
                 absolute;
 
@@ -1037,7 +1109,6 @@
 
 
         .cover-preview-name {
-
             min-width:
                 0;
 
@@ -1059,7 +1130,6 @@
 
 
         .cover-change-button {
-
             flex-shrink:
                 0;
 
@@ -1088,25 +1158,10 @@
 
 
         /* =================================================
-           DATES
-           ================================================= */
-
-        .date-hint {
-
-            color:
-                var(--text-muted);
-
-            font-size:
-                8px;
-        }
-
-
-        /* =================================================
            RULES
            ================================================= */
 
         .rules-box {
-
             padding:
                 13px;
 
@@ -1123,9 +1178,7 @@
 
 
         .rules-box p {
-
-            margin:
-                0;
+            margin: 0;
 
             color:
                 var(--text-muted);
@@ -1139,11 +1192,10 @@
 
 
         /* =================================================
-           PUBLISH CONTROLS
+           PUBLISH
            ================================================= */
 
         .publish-section {
-
             margin-top:
                 20px;
 
@@ -1157,7 +1209,6 @@
 
 
         .publish-row {
-
             display:
                 flex;
 
@@ -1173,14 +1224,12 @@
 
 
         .publish-info {
-
             max-width:
                 480px;
         }
 
 
         .publish-info strong {
-
             display:
                 block;
 
@@ -1196,7 +1245,6 @@
 
 
         .publish-info span {
-
             color:
                 var(--text-muted);
 
@@ -1209,7 +1257,6 @@
 
 
         .publish-actions {
-
             display:
                 flex;
 
@@ -1226,7 +1273,6 @@
            ================================================= */
 
         .challenge-list {
-
             display:
                 flex;
 
@@ -1239,7 +1285,6 @@
 
 
         .challenge-list-item {
-
             display:
                 grid;
 
@@ -1270,7 +1315,6 @@
 
 
         .challenge-list-cover {
-
             width:
                 66px;
 
@@ -1293,7 +1337,6 @@
 
 
         .challenge-list-cover img {
-
             width:
                 100%;
 
@@ -1306,14 +1349,12 @@
 
 
         .challenge-list-info {
-
             min-width:
                 0;
         }
 
 
         .challenge-list-info h3 {
-
             margin:
                 0 0 4px;
 
@@ -1335,7 +1376,6 @@
 
 
         .challenge-list-info span {
-
             color:
                 var(--text-muted);
 
@@ -1345,7 +1385,6 @@
 
 
         .challenge-list-status {
-
             padding:
                 6px 8px;
 
@@ -1370,7 +1409,6 @@
 
 
         .challenge-list-status.active {
-
             color:
                 #86efac;
 
@@ -1380,7 +1418,6 @@
 
 
         .challenge-list-status.upcoming {
-
             color:
                 #93c5fd;
 
@@ -1389,8 +1426,16 @@
         }
 
 
-        .challenge-list-status.completed {
+        .challenge-list-status.voting {
+            color:
+                #fcd34d;
 
+            background:
+                rgba(245,158,11,0.08);
+        }
+
+
+        .challenge-list-status.completed {
             color:
                 #c4b5fd;
 
@@ -1400,7 +1445,6 @@
 
 
         .challenge-list-empty {
-
             padding:
                 24px;
 
@@ -1423,38 +1467,240 @@
 
 
         /* =================================================
-           ADMIN NOTICE
+           LIVE PREVIEW
            ================================================= */
 
-        .admin-notice {
+        .challenge-preview-card {
+            overflow:
+                hidden;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:
+                20px;
+
+            background:
+                rgba(255,255,255,0.035);
+        }
+
+
+        .preview-cover {
+            position:
+                relative;
+
+            aspect-ratio:
+                16 / 10;
+
+            overflow:
+                hidden;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #120825,
+                    #153b75
+                );
+        }
+
+
+        .preview-cover-placeholder {
+            width:
+                100%;
+
+            height:
+                100%;
 
             display:
                 flex;
 
-            align-items:
-                flex-start;
+            flex-direction:
+                column;
 
-            gap:
-                10px;
-
-            margin-bottom:
-                20px;
+            justify-content:
+                flex-end;
 
             padding:
-                12px 14px;
+                20px;
+
+            background:
+                radial-gradient(
+                    circle at 80% 20%,
+                    rgba(168,85,247,0.50),
+                    transparent 27%
+                ),
+                linear-gradient(
+                    135deg,
+                    #120825,
+                    #153b75
+                );
+        }
+
+
+        .preview-cover-placeholder span {
+            color:
+                rgba(255,255,255,0.65);
+
+            font-size:
+                8px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                0.18em;
+        }
+
+
+        .preview-cover-placeholder strong {
+            color:
+                white;
+
+            font-family:
+                "Space Grotesk",
+                sans-serif;
+
+            font-size:
+                clamp(
+                    22px,
+                    3vw,
+                    38px
+                );
+
+            line-height:
+                0.92;
+
+            letter-spacing:
+                -0.07em;
+        }
+
+
+        .preview-cover img {
+            display:
+                none;
+
+            width:
+                100%;
+
+            height:
+                100%;
+
+            object-fit:
+                cover;
+        }
+
+
+        .preview-status {
+            position:
+                absolute;
+
+            top:
+                12px;
+
+            left:
+                12px;
+
+            display:
+                inline-flex;
+
+            align-items:
+                center;
+
+            gap:
+                5px;
+
+            padding:
+                6px 8px;
+
+            border-radius:
+                8px;
+
+            background:
+                rgba(5,5,8,0.76);
 
             border:
                 1px solid
-                rgba(245,158,11,0.18);
-
-            border-radius:
-                12px;
-
-            background:
-                rgba(245,158,11,0.05);
+                rgba(255,255,255,0.12);
 
             color:
-                #fcd34d;
+                #93c5fd;
+
+            font-size:
+                8px;
+
+            font-weight:
+                700;
+
+            text-transform:
+                uppercase;
+        }
+
+
+        .preview-body {
+            padding:
+                16px;
+        }
+
+
+        .preview-category {
+            display:
+                inline-flex;
+
+            align-items:
+                center;
+
+            gap:
+                5px;
+
+            margin-bottom:
+                8px;
+
+            color:
+                #c4b5fd;
+
+            font-size:
+                8px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                0.08em;
+
+            text-transform:
+                uppercase;
+        }
+
+
+        .preview-title {
+            margin:
+                0 0 7px;
+
+            color:
+                white;
+
+            font-family:
+                "Space Grotesk",
+                sans-serif;
+
+            font-size:
+                17px;
+
+            line-height:
+                1.15;
+        }
+
+
+        .preview-description {
+            min-height:
+                39px;
+
+            margin:
+                0 0 13px;
+
+            color:
+                var(--text-muted);
 
             font-size:
                 9px;
@@ -1464,52 +1710,118 @@
         }
 
 
-        .admin-notice i {
+        .preview-meta {
+            display:
+                grid;
 
-            margin-top:
-                2px;
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap:
+                7px;
         }
 
 
-        /* =================================================
-           ERROR MESSAGES
-           ================================================= */
+        .preview-meta-item {
+            padding:
+                9px;
 
-        .admin-field-error {
+            border:
+                1px solid
+                rgba(255,255,255,0.06);
 
+            border-radius:
+                10px;
+
+            background:
+                rgba(255,255,255,0.025);
+        }
+
+
+        .preview-meta-item span {
             display:
-                none;
+                block;
+
+            margin-bottom:
+                3px;
 
             color:
-                #fca5a5;
+                var(--text-muted);
+
+            font-size:
+                7px;
+
+            text-transform:
+                uppercase;
+        }
+
+
+        .preview-meta-item strong {
+            color:
+                white;
+
+            font-size:
+                10px;
+        }
+
+
+        .preview-timeline {
+            margin-top:
+                13px;
+
+            padding-top:
+                13px;
+
+            border-top:
+                1px solid
+                var(--border);
+        }
+
+
+        .preview-timeline-row {
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap:
+                7px;
+        }
+
+
+        .preview-time-item span {
+            display:
+                block;
+
+            margin-bottom:
+                4px;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                7px;
+
+            text-transform:
+                uppercase;
+        }
+
+
+        .preview-time-item strong {
+            color:
+                white;
 
             font-size:
                 8px;
         }
 
 
-        .admin-field-error.visible {
-
-            display:
-                block;
-        }
-
-
-        .admin-input.error,
-        .admin-select.error,
-        .admin-textarea.error {
-
-            border-color:
-                rgba(239,68,68,0.60);
-        }
-
-
         /* =================================================
-           MOBILE SIDEBAR BUTTON
+           MOBILE MENU
            ================================================= */
 
         .admin-mobile-toggle {
-
             display:
                 none;
 
@@ -1581,24 +1893,23 @@
         @media (max-width: 850px) {
 
             .admin-sidebar {
-
                 transform:
                     translateX(-105%);
             }
 
 
             .admin-sidebar.open {
-
                 transform:
                     translateX(0);
             }
 
 
             .admin-main {
+                width:
+                    100%;
 
-                width: 100%;
-
-                margin-left: 0;
+                margin-left:
+                    0;
 
                 padding:
                     24px 18px 80px;
@@ -1606,7 +1917,6 @@
 
 
             .admin-mobile-toggle {
-
                 display:
                     grid;
             }
@@ -1616,7 +1926,6 @@
         @media (max-width: 650px) {
 
             .admin-page-header {
-
                 align-items:
                     flex-start;
 
@@ -1626,21 +1935,18 @@
 
 
             .admin-form-grid {
-
                 grid-template-columns:
                     1fr;
             }
 
 
             .admin-form-group.full {
-
                 grid-column:
                     auto;
             }
 
 
             .publish-row {
-
                 align-items:
                     stretch;
 
@@ -1650,16 +1956,20 @@
 
 
             .publish-actions {
-
                 width:
                     100%;
             }
 
 
             .publish-actions .btn {
-
                 flex:
                     1;
+            }
+
+
+            .preview-timeline-row {
+                grid-template-columns:
+                    1fr;
             }
         }
 
@@ -1667,14 +1977,12 @@
         @media (max-width: 450px) {
 
             .admin-main {
-
                 padding:
                     20px 13px 80px;
             }
 
 
             .admin-card {
-
                 padding:
                     18px;
 
@@ -1684,7 +1992,6 @@
 
 
             .challenge-list-item {
-
                 grid-template-columns:
                     56px
                     minmax(0,1fr);
@@ -1692,7 +1999,6 @@
 
 
             .challenge-list-cover {
-
                 width:
                     56px;
 
@@ -1702,11 +2008,17 @@
 
 
             .challenge-list-status {
-
                 grid-column:
                     2;
+
                 justify-self:
                     start;
+            }
+
+
+            .preview-meta {
+                grid-template-columns:
+                    1fr 1fr;
             }
         }
 
@@ -1716,7 +2028,6 @@
             *,
             *::before,
             *::after {
-
                 animation-duration:
                     0.01ms !important;
 
@@ -1756,6 +2067,7 @@
                 <div class="brand-icon">
                     <span>DV</span>
                 </div>
+
 
                 <div class="brand-text">
 
@@ -1841,9 +2153,7 @@
 
             <nav class="admin-nav">
 
-                <a
-                    href="index.html"
-                >
+                <a href="index.html">
 
                     <i
                         class="fa-solid fa-gauge-high"
@@ -1868,9 +2178,7 @@
                 </a>
 
 
-                <a
-                    href="submissions.html"
-                >
+                <a href="submissions.html">
 
                     <i
                         class="fa-solid fa-images"
@@ -1881,9 +2189,7 @@
                 </a>
 
 
-                <a
-                    href="users.html"
-                >
+                <a href="users.html">
 
                     <i
                         class="fa-solid fa-users"
@@ -1894,9 +2200,7 @@
                 </a>
 
 
-                <a
-                    href="reports.html"
-                >
+                <a href="reports.html">
 
                     <i
                         class="fa-solid fa-flag"
@@ -1909,9 +2213,7 @@
             </nav>
 
 
-            <div
-                class="admin-divider"
-            ></div>
+            <div class="admin-divider"></div>
 
 
             <div
@@ -1923,9 +2225,7 @@
 
             <nav class="admin-nav">
 
-                <a
-                    href="../challenges.html"
-                >
+                <a href="../challenges.html">
 
                     <i
                         class="fa-solid fa-compass"
@@ -1949,9 +2249,7 @@
                 </a>
 
 
-                <a
-                    href="../../index.html"
-                >
+                <a href="../../index.html">
 
                     <i
                         class="fa-solid fa-house"
@@ -2039,7 +2337,7 @@
 
                         <p>
 
-                            Create, publish and manage
+                            Create, schedule and manage
                             creative competitions for
                             the DESIGNVERSE community.
 
@@ -2064,7 +2362,7 @@
 
 
                 <!-- =========================================
-                     ADMIN NOTICE
+                     NOTICE
                      ========================================= -->
 
                 <div
@@ -2078,11 +2376,14 @@
 
                     <span>
 
-                        Only DESIGNVERSE administrator
-                        accounts should access this page.
-                        Challenge publishing will be
-                        protected by Supabase Row Level
-                        Security.
+                        Challenge lifecycle:
+                        <strong>Upcoming</strong> →
+                        <strong>Active</strong> →
+                        <strong>Voting</strong> →
+                        <strong>Completed</strong>.
+
+                        The voting deadline must be later
+                        than the submission deadline.
 
                     </span>
 
@@ -2140,7 +2441,7 @@
 
 
                             <!-- =================================
-                                 BASIC INFO
+                                 BASIC INFORMATION
                                  ================================== -->
 
                             <div
@@ -2229,51 +2530,35 @@
                                         required
                                     >
 
-                                        <option
-                                            value=""
-                                        >
+                                        <option value="">
                                             Select category
                                         </option>
 
-                                        <option
-                                            value="branding"
-                                        >
+                                        <option value="branding">
                                             Branding
                                         </option>
 
-                                        <option
-                                            value="poster"
-                                        >
+                                        <option value="poster">
                                             Poster
                                         </option>
 
-                                        <option
-                                            value="ui-ux"
-                                        >
+                                        <option value="ui-ux">
                                             UI / UX
                                         </option>
 
-                                        <option
-                                            value="illustration"
-                                        >
+                                        <option value="illustration">
                                             Illustration
                                         </option>
 
-                                        <option
-                                            value="logo"
-                                        >
+                                        <option value="logo">
                                             Logo
                                         </option>
 
-                                        <option
-                                            value="motion"
-                                        >
+                                        <option value="motion">
                                             Motion
                                         </option>
 
-                                        <option
-                                            value="other"
-                                        >
+                                        <option value="other">
                                             Other
                                         </option>
 
@@ -2298,7 +2583,9 @@
                                         class="admin-label"
                                         for="challengeDifficulty"
                                     >
+
                                         Difficulty
+
                                     </label>
 
 
@@ -2308,9 +2595,7 @@
                                         class="admin-select"
                                     >
 
-                                        <option
-                                            value="easy"
-                                        >
+                                        <option value="easy">
                                             Easy
                                         </option>
 
@@ -2321,9 +2606,7 @@
                                             Medium
                                         </option>
 
-                                        <option
-                                            value="hard"
-                                        >
+                                        <option value="hard">
                                             Hard
                                         </option>
 
@@ -2411,7 +2694,9 @@
                                         class="admin-label"
                                         for="challengePrize"
                                     >
+
                                         Prize
+
                                     </label>
 
 
@@ -2437,7 +2722,9 @@
                                         class="admin-label"
                                         for="challengePoints"
                                     >
+
                                         XP reward
+
                                     </label>
 
 
@@ -2487,67 +2774,198 @@
 
                                 </div>
 
+                            </div>
 
-                                <!-- START -->
+
+                            <!-- =================================
+                                 SCHEDULE
+                                 ================================== -->
+
+                            <div
+                                class="admin-card"
+                                style="
+                                    margin-top:20px;
+                                    padding:18px;
+                                "
+                            >
 
                                 <div
-                                    class="admin-form-group"
+                                    class="admin-card-header"
+                                    style="
+                                        margin-bottom:15px;
+                                    "
                                 >
 
-                                    <label
-                                        class="admin-label"
-                                        for="challengeStartsAt"
-                                    >
-                                        Start date & time
-                                    </label>
+                                    <div>
 
+                                        <h2>
+                                            Competition Schedule
+                                        </h2>
 
-                                    <input
-                                        type="datetime-local"
-                                        id="challengeStartsAt"
-                                        name="starts_at"
-                                        class="admin-input"
-                                        required
-                                    >
+                                        <p>
+                                            Define when submissions
+                                            open, close and voting ends.
+                                        </p>
+
+                                    </div>
 
 
                                     <span
-                                        class="date-hint"
+                                        class="admin-step"
                                     >
-                                        When designers can begin submitting.
+                                        02
                                     </span>
 
                                 </div>
 
 
-                                <!-- END -->
-
                                 <div
-                                    class="admin-form-group"
+                                    class="admin-form-grid"
                                 >
 
-                                    <label
-                                        class="admin-label"
-                                        for="challengeEndsAt"
-                                    >
-                                        End date & time
-                                    </label>
 
+                                    <!-- START -->
 
-                                    <input
-                                        type="datetime-local"
-                                        id="challengeEndsAt"
-                                        name="ends_at"
-                                        class="admin-input"
-                                        required
+                                    <div
+                                        class="admin-form-group"
                                     >
 
+                                        <label
+                                            class="admin-label"
+                                            for="challengeStartsAt"
+                                        >
 
-                                    <span
-                                        class="date-hint"
+                                            Starts at
+
+                                            <span>
+                                                Required
+                                            </span>
+
+                                        </label>
+
+
+                                        <input
+                                            type="datetime-local"
+                                            id="challengeStartsAt"
+                                            name="starts_at"
+                                            class="admin-input"
+                                            required
+                                        >
+
+
+                                        <span
+                                            class="date-hint"
+                                        >
+                                            Submissions open at this time.
+                                        </span>
+
+                                    </div>
+
+
+                                    <!-- SUBMISSION DEADLINE -->
+
+                                    <div
+                                        class="admin-form-group"
                                     >
-                                        Submission deadline.
-                                    </span>
+
+                                        <label
+                                            class="admin-label"
+                                            for="challengeEndsAt"
+                                        >
+
+                                            Submission deadline
+
+                                            <span>
+                                                Required
+                                            </span>
+
+                                        </label>
+
+
+                                        <input
+                                            type="datetime-local"
+                                            id="challengeEndsAt"
+                                            name="ends_at"
+                                            class="admin-input"
+                                            required
+                                        >
+
+
+                                        <span
+                                            class="date-hint"
+                                        >
+                                            New submissions stop at this time.
+                                        </span>
+
+                                    </div>
+
+
+                                    <!-- VOTING END -->
+
+                                    <div
+                                        class="admin-form-group full"
+                                    >
+
+                                        <label
+                                            class="admin-label"
+                                            for="challengeVotingEndsAt"
+                                        >
+
+                                            Voting ends at
+
+                                            <span>
+                                                Required
+                                            </span>
+
+                                        </label>
+
+
+                                        <input
+                                            type="datetime-local"
+                                            id="challengeVotingEndsAt"
+                                            name="voting_ends_at"
+                                            class="admin-input"
+                                            required
+                                        >
+
+
+                                        <span
+                                            class="date-hint"
+                                        >
+                                            Voting remains open after submissions close until this time.
+                                        </span>
+
+
+                                        <div
+                                            class="timeline-note"
+                                        >
+
+                                            <i
+                                                class="fa-solid fa-timeline"
+                                            ></i>
+
+                                            <span>
+
+                                                Schedule rule:
+                                                <strong>
+                                                    Starts at
+                                                </strong>
+                                                must be before
+                                                <strong>
+                                                    Submission deadline
+                                                </strong>,
+                                                and the
+                                                <strong>
+                                                    Voting deadline
+                                                </strong>
+                                                must be after the
+                                                submission deadline.
+
+                                            </span>
+
+                                        </div>
+
+                                    </div>
 
                                 </div>
 
@@ -2590,7 +3008,7 @@
                                     <span
                                         class="admin-step"
                                     >
-                                        02
+                                        03
                                     </span>
 
                                 </div>
@@ -2611,7 +3029,6 @@
 
                                     <div
                                         class="cover-upload-content"
-                                        id="coverUploadContent"
                                     >
 
                                         <div
@@ -2753,20 +3170,22 @@
                                     <span
                                         class="admin-step"
                                     >
-                                        03
+                                        04
                                     </span>
 
                                 </div>
 
 
-                                <div class="rules-box">
+                                <div
+                                    class="rules-box"
+                                >
 
                                     <textarea
                                         id="challengeRules"
                                         name="rules"
                                         class="admin-textarea"
                                         maxlength="3000"
-                                        placeholder="1. Original work only&#10;2. Follow the creative brief&#10;3. Submit before the deadline..."
+                                        placeholder="1. Original work only&#10;2. Follow the creative brief&#10;3. Submit before the deadline&#10;4. Respect the DESIGNVERSE community..."
                                     ></textarea>
 
                                 </div>
@@ -2794,13 +3213,14 @@
                                             Ready to publish?
                                         </strong>
 
+
                                         <span>
 
-                                            Publishing creates the
-                                            challenge in Supabase
-                                            and makes it available
-                                            to the DESIGNVERSE
-                                            community.
+                                            Publishing creates
+                                            the challenge in
+                                            Supabase and makes
+                                            it available to the
+                                            DESIGNVERSE community.
 
                                         </span>
 
@@ -2890,16 +3310,15 @@
 
 
                             <article
-                                class="challenge-card"
-                                id="challengePreviewCard"
+                                class="challenge-preview-card"
                             >
 
                                 <div
-                                    class="challenge-card-cover"
+                                    class="preview-cover"
                                 >
 
                                     <div
-                                        class="challenge-cover-placeholder"
+                                        class="preview-cover-placeholder"
                                         id="previewCoverPlaceholder"
                                     >
 
@@ -2910,7 +3329,7 @@
                                         <strong
                                             id="previewCoverTitle"
                                         >
-                                            NEW<br>
+                                            NEW
                                             CHALLENGE
                                         </strong>
 
@@ -2921,12 +3340,11 @@
                                         src=""
                                         alt="Challenge preview"
                                         id="previewCoverImage"
-                                        style="display:none;"
                                     >
 
 
                                     <span
-                                        class="challenge-status upcoming"
+                                        class="preview-status"
                                     >
 
                                         <i
@@ -2941,11 +3359,11 @@
 
 
                                 <div
-                                    class="challenge-card-body"
+                                    class="preview-body"
                                 >
 
                                     <div
-                                        class="challenge-category"
+                                        class="preview-category"
                                     >
 
                                         <i
@@ -2964,7 +3382,7 @@
 
 
                                     <h3
-                                        class="challenge-card-title"
+                                        class="preview-title"
                                         id="previewTitle"
                                     >
                                         New Challenge
@@ -2972,7 +3390,7 @@
 
 
                                     <p
-                                        class="challenge-card-description"
+                                        class="preview-description"
                                         id="previewDescription"
                                     >
                                         Your challenge description
@@ -2981,11 +3399,11 @@
 
 
                                     <div
-                                        class="challenge-meta"
+                                        class="preview-meta"
                                     >
 
                                         <div
-                                            class="challenge-meta-item"
+                                            class="preview-meta-item"
                                         >
 
                                             <span>
@@ -3002,7 +3420,7 @@
 
 
                                         <div
-                                            class="challenge-meta-item"
+                                            class="preview-meta-item"
                                         >
 
                                             <span>
@@ -3019,7 +3437,7 @@
 
 
                                         <div
-                                            class="challenge-meta-item"
+                                            class="preview-meta-item"
                                         >
 
                                             <span>
@@ -3038,30 +3456,64 @@
 
 
                                     <div
-                                        class="challenge-card-footer"
+                                        class="preview-timeline"
                                     >
 
-                                        <span
-                                            class="challenge-deadline"
+                                        <div
+                                            class="preview-timeline-row"
                                         >
 
-                                            <i
-                                                class="fa-regular fa-clock"
-                                            ></i>
+                                            <div
+                                                class="preview-time-item"
+                                            >
 
-                                            Not scheduled
+                                                <span>
+                                                    Starts
+                                                </span>
 
-                                        </span>
+                                                <strong
+                                                    id="previewStartsAt"
+                                                >
+                                                    Not set
+                                                </strong>
+
+                                            </div>
 
 
-                                        <span
-                                            class="btn btn-primary btn-small"
-                                        >
-                                            View
-                                            <i
-                                                class="fa-solid fa-arrow-right"
-                                            ></i>
-                                        </span>
+                                            <div
+                                                class="preview-time-item"
+                                            >
+
+                                                <span>
+                                                    Submissions
+                                                </span>
+
+                                                <strong
+                                                    id="previewEndsAt"
+                                                >
+                                                    Not set
+                                                </strong>
+
+                                            </div>
+
+
+                                            <div
+                                                class="preview-time-item"
+                                            >
+
+                                                <span>
+                                                    Voting
+                                                </span>
+
+                                                <strong
+                                                    id="previewVotingEndsAt"
+                                                >
+                                                    Not set
+                                                </strong>
+
+                                            </div>
+
+                                        </div>
 
                                     </div>
 
@@ -3136,26 +3588,21 @@
         src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
     ></script>
 
-
     <script
         src="../../js/utils.js"
     ></script>
-
 
     <script
         src="../../js/supabase.js"
     ></script>
 
-
     <script
         src="../../js/auth.js"
     ></script>
 
-
     <script
         src="../../js/admin.js"
     ></script>
-
 
     <script
         src="../../js/navigation.js"
@@ -3219,8 +3666,7 @@
                         () => {
 
                             if (
-                                window.innerWidth <=
-                                850
+                                window.innerWidth <= 850
                             ) {
 
                                 adminSidebar.classList.remove(
@@ -3241,6 +3687,7 @@
                                     adminMobileToggle.innerHTML =
                                         '<i class="fa-solid fa-bars"></i>';
                                 }
+
                             }
 
                         }
@@ -3251,7 +3698,7 @@
 
 
         /* =================================================
-           CHALLENGE TITLE → SLUG
+           SLUG
            ================================================= */
 
         const titleInput =
@@ -3287,7 +3734,8 @@
                 0,
                 80
             )
-            || "challenge-slug";
+            ||
+            "challenge-slug";
         }
 
 
@@ -3308,7 +3756,108 @@
 
 
         /* =================================================
-           IMAGE UPLOAD
+           DATE HELPERS
+           ================================================= */
+
+        function formatDateTime(
+            value
+        ) {
+
+            if (!value) {
+                return "Not set";
+            }
+
+
+            const date =
+                new Date(
+                    value
+                );
+
+
+            if (
+                Number.isNaN(
+                    date.getTime()
+                )
+            ) {
+
+                return "Invalid";
+            }
+
+
+            return date.toLocaleString(
+                undefined,
+                {
+                    month: "short",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "2-digit"
+                }
+            );
+        }
+
+
+        function setMinimumDates() {
+
+            const now =
+                new Date();
+
+
+            now.setMinutes(
+                now.getMinutes() -
+                now.getTimezoneOffset()
+            );
+
+
+            const minimum =
+                now.toISOString()
+                    .slice(
+                        0,
+                        16
+                    );
+
+
+            const starts =
+                document.getElementById(
+                    "challengeStartsAt"
+                );
+
+
+            const ends =
+                document.getElementById(
+                    "challengeEndsAt"
+                );
+
+
+            const votingEnds =
+                document.getElementById(
+                    "challengeVotingEndsAt"
+                );
+
+
+            starts?.setAttribute(
+                "min",
+                minimum
+            );
+
+
+            ends?.setAttribute(
+                "min",
+                minimum
+            );
+
+
+            votingEnds?.setAttribute(
+                "min",
+                minimum
+            );
+        }
+
+
+        setMinimumDates();
+
+
+        /* =================================================
+           COVER UPLOAD
            ================================================= */
 
         const coverInput =
@@ -3347,12 +3896,6 @@
             );
 
 
-        const coverError =
-            document.getElementById(
-                "coverError"
-            );
-
-
         const previewCoverImage =
             document.getElementById(
                 "previewCoverImage"
@@ -3362,6 +3905,12 @@
         const previewCoverPlaceholder =
             document.getElementById(
                 "previewCoverPlaceholder"
+            );
+
+
+        const coverError =
+            document.getElementById(
+                "coverError"
             );
 
 
@@ -3396,10 +3945,62 @@
 
 
             if (coverError) {
-
                 coverError.textContent =
                     "";
             }
+        }
+
+
+        function validateCover(
+            file
+        ) {
+
+            if (!file) {
+
+                return {
+                    valid: true
+                };
+            }
+
+
+            const allowed = [
+                "image/jpeg",
+                "image/png",
+                "image/webp",
+                "image/gif"
+            ];
+
+
+            if (
+                !allowed.includes(
+                    file.type
+                )
+            ) {
+
+                return {
+                    valid: false,
+                    message:
+                        "Please use JPG, PNG, WEBP or GIF."
+                };
+            }
+
+
+            if (
+                file.size >
+                10 * 1024 * 1024
+            ) {
+
+                return {
+                    valid: false,
+                    message:
+                        "Challenge covers must be 10 MB or smaller."
+                };
+            }
+
+
+            return {
+                valid: true
+            };
         }
 
 
@@ -3415,51 +4016,18 @@
             }
 
 
-            const allowedTypes = [
-
-                "image/jpeg",
-
-                "image/png",
-
-                "image/webp",
-
-                "image/gif"
-
-            ];
-
-
-            const maxSize =
-                10 *
-                1024 *
-                1024;
-
-
-            if (
-                !allowedTypes.includes(
-                    file.type
-                )
-            ) {
-
-                showCoverError(
-                    "Please upload a JPG, PNG, WEBP or GIF image."
+            const validation =
+                validateCover(
+                    file
                 );
 
 
-                coverInput.value =
-                    "";
-
-
-                return;
-            }
-
-
             if (
-                file.size >
-                maxSize
+                !validation.valid
             ) {
 
                 showCoverError(
-                    "Challenge covers must be 10 MB or smaller."
+                    validation.message
                 );
 
 
@@ -3521,12 +4089,8 @@
             "change",
             event => {
 
-                const file =
-                    event.target.files?.[0];
-
-
                 handleCoverFile(
-                    file
+                    event.target.files?.[0]
                 );
 
             }
@@ -3535,7 +4099,9 @@
 
         changeCoverButton?.addEventListener(
             "click",
-            () => {
+            event => {
+
+                event.preventDefault();
 
                 coverInput?.click();
 
@@ -3543,18 +4109,15 @@
         );
 
 
-        /* =================================================
-           COVER DRAG/DROP
-           ================================================= */
-
         [
             "dragenter",
             "dragover"
-        ].forEach(
-            eventName => {
+        ]
+        .forEach(
+            name => {
 
                 coverUpload?.addEventListener(
-                    eventName,
+                    name,
                     event => {
 
                         event.preventDefault();
@@ -3573,11 +4136,12 @@
         [
             "dragleave",
             "drop"
-        ].forEach(
-            eventName => {
+        ]
+        .forEach(
+            name => {
 
                 coverUpload?.addEventListener(
-                    eventName,
+                    name,
                     event => {
 
                         event.preventDefault();
@@ -3622,7 +4186,7 @@
                         transfer.files;
 
                 } catch {
-                    /* Browser may restrict assignment. */
+                    /* Browser may block FileList assignment. */
                 }
 
 
@@ -3668,6 +4232,24 @@
             );
 
 
+        const startsInput =
+            document.getElementById(
+                "challengeStartsAt"
+            );
+
+
+        const endsInput =
+            document.getElementById(
+                "challengeEndsAt"
+            );
+
+
+        const votingEndsInput =
+            document.getElementById(
+                "challengeVotingEndsAt"
+            );
+
+
         const previewTitle =
             document.getElementById(
                 "previewTitle"
@@ -3707,6 +4289,24 @@
         const previewPrize =
             document.getElementById(
                 "previewPrize"
+            );
+
+
+        const previewStarts =
+            document.getElementById(
+                "previewStartsAt"
+            );
+
+
+        const previewEnds =
+            document.getElementById(
+                "previewEndsAt"
+            );
+
+
+        const previewVotingEnds =
+            document.getElementById(
+                "previewVotingEndsAt"
             );
 
 
@@ -3755,7 +4355,9 @@
 
 
             const description =
-                descriptionInput?.value.trim() ||
+                descriptionInput
+                    ?.value
+                    .trim() ||
                 "Your challenge description will appear here.";
 
 
@@ -3775,7 +4377,9 @@
 
 
             const prize =
-                prizeInput?.value.trim() ||
+                prizeInput
+                    ?.value
+                    .trim() ||
                 "—";
 
 
@@ -3783,10 +4387,8 @@
                 title;
 
 
-            previewCoverTitle.innerHTML =
-                escapeHTMLForPreview(
-                    title
-                );
+            previewCoverTitle.textContent =
+                title;
 
 
             previewDescription.textContent =
@@ -3807,32 +4409,29 @@
 
 
             previewPoints.textContent =
-                `${points} XP`;
+                `${Number(points || 0).toLocaleString()} XP`;
 
 
             previewPrize.textContent =
                 prize;
 
-        }
 
-
-        function escapeHTMLForPreview(
-            value
-        ) {
-
-            const div =
-                document.createElement(
-                    "div"
+            previewStarts.textContent =
+                formatDateTime(
+                    startsInput?.value
                 );
 
 
-            div.textContent =
-                String(
-                    value || ""
+            previewEnds.textContent =
+                formatDateTime(
+                    endsInput?.value
                 );
 
 
-            return div.innerHTML;
+            previewVotingEnds.textContent =
+                formatDateTime(
+                    votingEndsInput?.value
+                );
         }
 
 
@@ -3841,7 +4440,10 @@
             categoryInput,
             difficultyInput,
             pointsInput,
-            prizeInput
+            prizeInput,
+            startsInput,
+            endsInput,
+            votingEndsInput
         ]
         .forEach(
             element => {
@@ -3865,7 +4467,109 @@
 
 
         /* =================================================
-           RESET FORM
+           SCHEDULE VALIDATION
+           ================================================= */
+
+        function validateSchedule() {
+
+            const starts =
+                startsInput?.value;
+
+
+            const ends =
+                endsInput?.value;
+
+
+            const votingEnds =
+                votingEndsInput?.value;
+
+
+            if (
+                !starts ||
+                !ends ||
+                !votingEnds
+            ) {
+
+                return {
+                    valid: false,
+                    message:
+                        "Start, submission deadline and voting deadline are all required."
+                };
+            }
+
+
+            const startDate =
+                new Date(
+                    starts
+                );
+
+
+            const endDate =
+                new Date(
+                    ends
+                );
+
+
+            const votingEndDate =
+                new Date(
+                    votingEnds
+                );
+
+
+            if (
+                Number.isNaN(
+                    startDate.getTime()
+                ) ||
+                Number.isNaN(
+                    endDate.getTime()
+                ) ||
+                Number.isNaN(
+                    votingEndDate.getTime()
+                )
+            ) {
+
+                return {
+                    valid: false,
+                    message:
+                        "Please enter valid schedule dates."
+                };
+            }
+
+
+            if (
+                endDate <=
+                startDate
+            ) {
+
+                return {
+                    valid: false,
+                    message:
+                        "The submission deadline must be after the start time."
+                };
+            }
+
+
+            if (
+                votingEndDate <=
+                endDate
+            ) {
+
+                return {
+                    valid: false,
+                    message:
+                        "The voting deadline must be after the submission deadline."
+                };
+            }
+
+
+            return {
+                valid: true
+            };
+        }
+
+
+        /* =================================================
+           FORM RESET
            ================================================= */
 
         document
@@ -3894,6 +4598,9 @@
                         ?.reset();
 
 
+                    clearCoverError();
+
+
                     if (
                         coverObjectUrl
                     ) {
@@ -3901,6 +4608,7 @@
                         URL.revokeObjectURL(
                             coverObjectUrl
                         );
+
 
                         coverObjectUrl =
                             null;
@@ -3918,6 +4626,10 @@
                         "";
 
 
+                    previewCoverImage.src =
+                        "";
+
+
                     previewCoverImage.style.display =
                         "none";
 
@@ -3926,16 +4638,82 @@
                         "";
 
 
-                    clearCoverError();
-
-
-                    updatePreview();
-
-
                     slugPreview.textContent =
                         "challenge-slug";
 
+
+                    setMinimumDates();
+
+                    updatePreview();
+
                 }
+            );
+
+
+        /* =================================================
+           CLIENT-SIDE SCHEDULE CHECK
+           ================================================= */
+
+        document
+            .getElementById(
+                "challengeForm"
+            )
+            ?.addEventListener(
+                "submit",
+                event => {
+
+                    const schedule =
+                        validateSchedule();
+
+
+                    if (
+                        !schedule.valid
+                    ) {
+
+                        /*
+                         * admin.js also validates on
+                         * submission. We prevent the
+                         * request here so the user gets
+                         * immediate feedback.
+                         */
+
+                        event.preventDefault();
+
+
+                        window.setTimeout(
+                            () => {
+
+                                /*
+                                 * admin.js has its own
+                                 * toast/error handling.
+                                 * This message keeps the
+                                 * client-side validation
+                                 * visible even before the
+                                 * database request.
+                                 */
+
+                                if (
+                                    window.DVAdmin &&
+                                    typeof
+                                    window.DVAdmin.showToast ===
+                                    "function"
+                                ) {
+
+                                    window.DVAdmin.showToast(
+                                        schedule.message,
+                                        "error"
+                                    );
+                                }
+
+                            },
+                            0
+                        );
+
+                        return;
+                    }
+
+                },
+                true
             );
 
 
@@ -3962,4 +4740,5 @@
     </script>
 
 </body>
+
 </html>

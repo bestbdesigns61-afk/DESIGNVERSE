@@ -2,15 +2,26 @@
    DESIGNVERSE — CHALLENGES SYSTEM
    js/challenges.js
 
+   Challenge lifecycle:
+
+   UPCOMING
+      ↓ starts_at
+   ACTIVE
+      ↓ ends_at
+   VOTING
+      ↓ voting_ends_at
+   COMPLETED
+
    Handles:
-   - Loading challenges from Supabase
-   - Rendering challenge cards
+   - Supabase challenge loading
+   - Challenge status
    - Search
    - Category filtering
    - Status filtering
    - Challenge statistics
-   - Countdown / deadline display
-   - Challenge links
+   - Countdown timers
+   - Challenge cards
+   - Challenge detail links
    - Loading / empty / error states
    ========================================================= */
 
@@ -18,7 +29,6 @@
 
 
 const DVChallenges = (() => {
-
 
     /* =====================================================
        STATE
@@ -36,7 +46,9 @@ const DVChallenges = (() => {
 
         status: "all",
 
-        initialized: false
+        initialized: false,
+
+        countdownTimer: null
 
     };
 
@@ -56,13 +68,12 @@ const DVChallenges = (() => {
             return null;
         }
 
-
         return window.supabaseClient;
     }
 
 
     /* =====================================================
-       DOM HELPERS
+       DOM
        ===================================================== */
 
     function $(selector) {
@@ -117,6 +128,7 @@ const DVChallenges = (() => {
                     max_submissions,
                     starts_at,
                     ends_at,
+                    voting_ends_at,
                     status,
                     created_by,
                     created_at,
@@ -125,7 +137,7 @@ const DVChallenges = (() => {
                 .order(
                     "starts_at",
                     {
-                        ascending: false
+                        ascending: true
                     }
                 );
 
@@ -141,11 +153,39 @@ const DVChallenges = (() => {
             hideLoading();
 
 
-            showError(
-                getChallengeErrorMessage(
-                    error
+            const message =
+                String(
+                    error.message ||
+                    ""
+                ).toLowerCase();
+
+
+            if (
+                message.includes(
+                    "voting_ends_at"
+                ) &&
+                (
+                    message.includes(
+                        "does not exist"
+                    ) ||
+                    message.includes(
+                        "schema cache"
+                    )
                 )
-            );
+            ) {
+
+                showError(
+                    "The challenges table needs the voting_ends_at column."
+                );
+
+            } else {
+
+                showError(
+                    getChallengeErrorMessage(
+                        error
+                    )
+                );
+            }
 
 
             return [];
@@ -158,24 +198,7 @@ const DVChallenges = (() => {
             );
 
 
-        /*
-         * Use the live date calculation for
-         * display/filtering rather than trusting
-         * stale status values.
-         */
-
-        state.challenges =
-            state.challenges.map(
-                challenge => ({
-                    ...challenge,
-
-                    displayStatus:
-                        calculateStatus(
-                            challenge
-                        )
-                })
-            );
-
+        recalculateStatuses();
 
         updateStatistics();
 
@@ -189,7 +212,7 @@ const DVChallenges = (() => {
 
 
     /* =====================================================
-       NORMALIZE CHALLENGES
+       NORMALIZE
        ===================================================== */
 
     function normalizeChallenges(
@@ -224,11 +247,24 @@ const DVChallenges = (() => {
                     ),
 
                 max_submissions:
-                    challenge.max_submissions
+                    challenge.max_submissions !== null &&
+                    challenge.max_submissions !== undefined
                         ? Number(
                             challenge.max_submissions
                         )
-                        : null
+                        : null,
+
+                starts_at:
+                    challenge.starts_at ||
+                    null,
+
+                ends_at:
+                    challenge.ends_at ||
+                    null,
+
+                voting_ends_at:
+                    challenge.voting_ends_at ||
+                    null
 
             })
         );
@@ -236,31 +272,15 @@ const DVChallenges = (() => {
 
 
     /* =====================================================
-       CALCULATE STATUS
+       STATUS CALCULATION
        ===================================================== */
 
     function calculateStatus(
         challenge
     ) {
 
-        const now =
-            Date.now();
-
-
-        const starts =
-            new Date(
-                challenge.starts_at
-            ).getTime();
-
-
-        const ends =
-            new Date(
-                challenge.ends_at
-            ).getTime();
-
-
         /*
-         * Respect explicitly cancelled challenges.
+         * Cancelled always wins.
          */
 
         if (
@@ -272,97 +292,168 @@ const DVChallenges = (() => {
         }
 
 
+        const now =
+            Date.now();
+
+
+        const startsAt =
+            parseDate(
+                challenge.starts_at
+            );
+
+
+        const endsAt =
+            parseDate(
+                challenge.ends_at
+            );
+
+
+        const votingEndsAt =
+            parseDate(
+                challenge.voting_ends_at
+            );
+
+
+        /*
+         * No valid start date.
+         * Fall back to database status.
+         */
+
         if (
-            Number.isFinite(
-                starts
-            ) &&
-            now < starts
+            startsAt === null
+        ) {
+
+            return (
+                challenge.status ||
+                "upcoming"
+            );
+        }
+
+
+        /*
+         * UPCOMING
+         */
+
+        if (
+            now < startsAt
         ) {
 
             return "upcoming";
         }
 
 
+        /*
+         * ACTIVE
+         */
+
         if (
-            Number.isFinite(
-                starts
-            ) &&
-            Number.isFinite(
-                ends
-            ) &&
-            now >= starts &&
-            now < ends
+            endsAt !== null &&
+            now < endsAt
         ) {
-
-            /*
-             * If the database says voting,
-             * keep it as voting.
-             */
-
-            if (
-                challenge.status ===
-                "voting"
-            ) {
-
-                return "voting";
-            }
-
 
             return "active";
         }
 
 
+        /*
+         * VOTING
+         */
+
         if (
-            Number.isFinite(
-                ends
-            ) &&
-            now >= ends
+            endsAt !== null &&
+            now >= endsAt
         ) {
 
+            /*
+             * A configured voting period exists.
+             */
+
             if (
-                challenge.status ===
-                "voting"
+                votingEndsAt !== null &&
+                now < votingEndsAt
             ) {
 
                 return "voting";
             }
 
+
+            /*
+             * Voting deadline has passed.
+             */
+
+            if (
+                votingEndsAt !== null &&
+                now >= votingEndsAt
+            ) {
+
+                return "completed";
+            }
+
+
+            /*
+             * Legacy challenge without
+             * voting_ends_at.
+             */
 
             return "completed";
         }
 
 
         /*
-         * Fallback to database status.
+         * Fallback when ends_at is missing.
          */
 
         return (
             challenge.status ||
-            "upcoming"
+            "active"
         );
     }
 
 
     /* =====================================================
-       UPDATE STATISTICS
+       RECALCULATE ALL STATUSES
+       ===================================================== */
+
+    function recalculateStatuses() {
+
+        state.challenges =
+            state.challenges.map(
+                challenge => ({
+
+                    ...challenge,
+
+                    displayStatus:
+                        calculateStatus(
+                            challenge
+                        )
+
+                })
+            );
+    }
+
+
+    /* =====================================================
+       STATISTICS
        ===================================================== */
 
     function updateStatistics() {
 
         const active =
-            state.challenges.filter(
-                challenge =>
-                    challenge.displayStatus ===
-                    "active"
-            ).length;
+            countStatus(
+                "active"
+            );
 
 
         const upcoming =
-            state.challenges.filter(
-                challenge =>
-                    challenge.displayStatus ===
-                    "upcoming"
-            ).length;
+            countStatus(
+                "upcoming"
+            );
+
+
+        const voting =
+            countStatus(
+                "voting"
+            );
 
 
         const total =
@@ -371,20 +462,50 @@ const DVChallenges = (() => {
 
         setText(
             "#activeChallengesCount",
-            formatNumber(active)
+            formatNumber(
+                active
+            )
         );
 
 
         setText(
             "#upcomingChallengesCount",
-            formatNumber(upcoming)
+            formatNumber(
+                upcoming
+            )
         );
 
 
         setText(
             "#totalChallengesCount",
-            formatNumber(total)
+            formatNumber(
+                total
+            )
         );
+
+
+        /*
+         * Optional element for future UI.
+         */
+
+        setText(
+            "#votingChallengesCount",
+            formatNumber(
+                voting
+            )
+        );
+    }
+
+
+    function countStatus(
+        status
+    ) {
+
+        return state.challenges.filter(
+            challenge =>
+                challenge.displayStatus ===
+                status
+        ).length;
     }
 
 
@@ -409,7 +530,7 @@ const DVChallenges = (() => {
 
 
     /* =====================================================
-       CATEGORY FILTER
+       CATEGORY
        ===================================================== */
 
     function filterByCategory(
@@ -426,7 +547,7 @@ const DVChallenges = (() => {
 
 
     /* =====================================================
-       STATUS FILTER
+       STATUS
        ===================================================== */
 
     function filterByStatus(
@@ -443,7 +564,7 @@ const DVChallenges = (() => {
 
 
     /* =====================================================
-       APPLY FILTERS
+       FILTER
        ===================================================== */
 
     function applyFilters() {
@@ -528,7 +649,7 @@ const DVChallenges = (() => {
 
 
     /* =====================================================
-       RENDER CHALLENGES
+       RENDER
        ===================================================== */
 
     function renderChallenges() {
@@ -537,13 +658,14 @@ const DVChallenges = (() => {
             $("#challengesGrid");
 
 
-        const empty =
-            $("#challengesEmpty");
-
-
         if (!grid) {
+
             return;
         }
+
+
+        const empty =
+            $("#challengesEmpty");
 
 
         grid.innerHTML =
@@ -556,7 +678,9 @@ const DVChallenges = (() => {
 
         setText(
             "#challengeResultsCount",
-            `${formatNumber(results)} ${
+            `${formatNumber(
+                results
+            )} ${
                 results === 1
                     ? "challenge"
                     : "challenges"
@@ -572,32 +696,13 @@ const DVChallenges = (() => {
                 true;
 
 
-            empty?.classList.add(
-                "visible"
-            );
-
-
-            if (empty) {
-
-                empty.style.display =
-                    "flex";
-            }
-
+            showEmptyState();
 
             return;
         }
 
 
-        empty?.classList.remove(
-            "visible"
-        );
-
-
-        if (empty) {
-
-            empty.style.display =
-                "";
-        }
+        hideEmptyState();
 
 
         state.filteredChallenges
@@ -620,7 +725,7 @@ const DVChallenges = (() => {
 
 
     /* =====================================================
-       CREATE CHALLENGE CARD
+       CREATE CARD
        ===================================================== */
 
     function createChallengeCard(
@@ -667,19 +772,29 @@ const DVChallenges = (() => {
                 );
 
 
+        const status =
+            challenge.displayStatus;
+
+
         const statusClass =
             getStatusClass(
-                challenge.displayStatus
+                status
             );
 
 
         const statusLabel =
             formatStatus(
-                challenge.displayStatus
+                status
             );
 
 
-        const icon =
+        const statusIcon =
+            getStatusIcon(
+                status
+            );
+
+
+        const categoryIcon =
             getCategoryIcon(
                 challenge.category
             );
@@ -693,7 +808,13 @@ const DVChallenges = (() => {
 
         const actionText =
             getActionText(
-                challenge.displayStatus
+                status
+            );
+
+
+        const detailUrl =
+            getChallengeUrl(
+                challenge
             );
 
 
@@ -708,9 +829,7 @@ const DVChallenges = (() => {
                 >
 
                     <i
-                        class="fa-solid ${getStatusIcon(
-                            challenge.displayStatus
-                        )}"
+                        class="fa-solid ${statusIcon}"
                     ></i>
 
                     ${escapeHTML(
@@ -727,7 +846,7 @@ const DVChallenges = (() => {
                 <div class="challenge-category">
 
                     <i
-                        class="fa-solid ${icon}"
+                        class="fa-solid ${categoryIcon}"
                     ></i>
 
                     ${escapeHTML(
@@ -827,9 +946,7 @@ const DVChallenges = (() => {
 
 
                     <a
-                        href="challenge.html?id=${encodeURIComponent(
-                            challenge.id
-                        )}"
+                        href="${detailUrl}"
                         class="btn btn-primary btn-small"
                     >
 
@@ -868,12 +985,6 @@ const DVChallenges = (() => {
             );
 
 
-        const categoryName =
-            formatCategory(
-                challenge.category
-            );
-
-
         return `
 
             <div
@@ -882,7 +993,9 @@ const DVChallenges = (() => {
 
                 <span>
                     ${escapeHTML(
-                        categoryName
+                        formatCategory(
+                            challenge.category
+                        )
                     )}
                 </span>
 
@@ -903,12 +1016,30 @@ const DVChallenges = (() => {
 
 
     /* =====================================================
-       CHALLENGE DETAIL URL
+       DETAIL URL
        ===================================================== */
 
     function getChallengeUrl(
         challenge
     ) {
+
+        /*
+         * Slug gives cleaner URLs.
+         * ID remains the fallback.
+         */
+
+        if (
+            challenge.slug
+        ) {
+
+            return (
+                `challenge.html?slug=` +
+                encodeURIComponent(
+                    challenge.slug
+                )
+            );
+        }
+
 
         return (
             `challenge.html?id=` +
@@ -931,62 +1062,54 @@ const DVChallenges = (() => {
             challenge.displayStatus;
 
 
-        if (
-            status ===
-            "completed"
+        switch (
+            status
         ) {
 
-            return "Challenge ended";
+            case "upcoming":
+
+                return (
+                    "Starts " +
+                    formatRelativeDate(
+                        challenge.starts_at
+                    )
+                );
+
+
+            case "active":
+
+                return (
+                    timeRemaining(
+                        challenge.ends_at
+                    ) +
+                    " left"
+                );
+
+
+            case "voting":
+
+                return (
+                    "Voting · " +
+                    timeRemaining(
+                        challenge.voting_ends_at
+                    )
+                );
+
+
+            case "completed":
+
+                return "Voting ended";
+
+
+            case "cancelled":
+
+                return "Cancelled";
+
+
+            default:
+
+                return "View challenge";
         }
-
-
-        if (
-            status ===
-            "cancelled"
-        ) {
-
-            return "Cancelled";
-        }
-
-
-        if (
-            status ===
-            "voting"
-        ) {
-
-            return "Voting in progress";
-        }
-
-
-        if (
-            status ===
-            "upcoming"
-        ) {
-
-            return (
-                "Starts " +
-                formatRelativeDate(
-                    challenge.starts_at
-                )
-            );
-        }
-
-
-        if (
-            status ===
-            "active"
-        ) {
-
-            return (
-                timeRemaining(
-                    challenge.ends_at
-                ) +
-                " left"
-            );
-        }
-
-
-        return "View challenge";
     }
 
 
@@ -998,7 +1121,9 @@ const DVChallenges = (() => {
         status
     ) {
 
-        switch (status) {
+        switch (
+            status
+        ) {
 
             case "active":
                 return "Enter";
@@ -1046,7 +1171,9 @@ const DVChallenges = (() => {
         status
     ) {
 
-        switch (status) {
+        switch (
+            status
+        ) {
 
             case "active":
                 return "fa-circle";
@@ -1073,31 +1200,35 @@ const DVChallenges = (() => {
         status
     ) {
 
-        switch (status) {
+        const statuses = {
 
-            case "active":
-                return "Active";
+            active:
+                "Active",
 
-            case "upcoming":
-                return "Upcoming";
+            upcoming:
+                "Upcoming",
 
-            case "voting":
-                return "Voting";
+            voting:
+                "Voting",
 
-            case "completed":
-                return "Completed";
+            completed:
+                "Completed",
 
-            case "cancelled":
-                return "Cancelled";
+            cancelled:
+                "Cancelled"
 
-            default:
-                return "Challenge";
-        }
+        };
+
+
+        return (
+            statuses[status] ||
+            "Challenge"
+        );
     }
 
 
     /* =====================================================
-       CATEGORY HELPERS
+       CATEGORY
        ===================================================== */
 
     function formatCategory(
@@ -1242,39 +1373,69 @@ const DVChallenges = (() => {
 
 
         return (
-            value.charAt(0)
-                .toUpperCase() +
+            value.charAt(0).toUpperCase() +
             value.slice(1)
         );
     }
 
 
     /* =====================================================
-       TIME HELPERS
+       DATE HELPERS
        ===================================================== */
+
+    function parseDate(
+        value
+    ) {
+
+        if (!value) {
+
+            return null;
+        }
+
+
+        const timestamp =
+            new Date(
+                value
+            ).getTime();
+
+
+        if (
+            Number.isNaN(
+                timestamp
+            )
+        ) {
+
+            return null;
+        }
+
+
+        return timestamp;
+    }
+
 
     function timeRemaining(
         dateString
     ) {
 
         const target =
-            new Date(
+            parseDate(
                 dateString
-            ).getTime();
-
-
-        const now =
-            Date.now();
-
-
-        let difference =
-            target - now;
+            );
 
 
         if (
-            !Number.isFinite(
-                difference
-            ) ||
+            target === null
+        ) {
+
+            return "Unknown";
+        }
+
+
+        let difference =
+            target - Date.now();
+
+
+        if (
             difference <= 0
         ) {
 
@@ -1351,27 +1512,22 @@ const DVChallenges = (() => {
     ) {
 
         const target =
-            new Date(
+            parseDate(
                 dateString
-            ).getTime();
-
-
-        const now =
-            Date.now();
-
-
-        const difference =
-            target - now;
+            );
 
 
         if (
-            !Number.isFinite(
-                difference
-            )
+            target === null
         ) {
 
             return "soon";
         }
+
+
+        const difference =
+            target -
+            Date.now();
 
 
         if (
@@ -1428,83 +1584,85 @@ const DVChallenges = (() => {
 
 
     /* =====================================================
-       LIVE COUNTDOWN REFRESH
+       COUNTDOWN
        ===================================================== */
 
     function startCountdownRefresh() {
 
-        /*
-         * Recalculate status and remaining time
-         * every minute.
-         */
+        if (
+            state.countdownTimer
+        ) {
 
-        setInterval(
-            () => {
-
-                if (
-                    !state.challenges.length
-                ) {
-
-                    return;
-                }
+            clearInterval(
+                state.countdownTimer
+            );
+        }
 
 
-                let changed =
-                    false;
+        state.countdownTimer =
+            setInterval(
+                () => {
+
+                    if (
+                        !state.challenges.length
+                    ) {
+
+                        return;
+                    }
 
 
-                state.challenges =
-                    state.challenges.map(
-                        challenge => {
-
-                            const status =
-                                calculateStatus(
-                                    challenge
-                                );
-
-
-                            if (
-                                status !==
+                    const oldStatuses =
+                        state.challenges.map(
+                            challenge =>
                                 challenge.displayStatus
-                            ) {
-
-                                changed =
-                                    true;
-                            }
+                        );
 
 
-                            return {
-
-                                ...challenge,
-
-                                displayStatus:
-                                    status
-
-                            };
-
-                        }
-                    );
+                    recalculateStatuses();
 
 
-                if (changed) {
+                    const newStatuses =
+                        state.challenges.map(
+                            challenge =>
+                                challenge.displayStatus
+                        );
+
+
+                    const statusChanged =
+                        oldStatuses.some(
+                            (
+                                oldStatus,
+                                index
+                            ) =>
+                                oldStatus !==
+                                newStatuses[
+                                    index
+                                ]
+                        );
+
 
                     updateStatistics();
 
-                    applyFilters();
-
-                } else {
 
                     /*
-                     * Refresh the cards so active
-                     * countdowns remain accurate.
+                     * Re-render every minute so
+                     * countdown text stays accurate.
                      */
 
-                    renderChallenges();
-                }
+                    if (
+                        statusChanged
+                    ) {
 
-            },
-            60 * 1000
-        );
+                        applyFilters();
+
+                    } else {
+
+                        renderChallenges();
+                    }
+
+                },
+                60 * 1000
+            );
     }
 
 
@@ -1558,7 +1716,53 @@ const DVChallenges = (() => {
 
 
     /* =====================================================
-       ERROR
+       EMPTY STATE
+       ===================================================== */
+
+    function showEmptyState() {
+
+        const empty =
+            $("#challengesEmpty");
+
+
+        if (!empty) {
+            return;
+        }
+
+
+        empty.classList.add(
+            "visible"
+        );
+
+
+        empty.style.display =
+            "flex";
+    }
+
+
+    function hideEmptyState() {
+
+        const empty =
+            $("#challengesEmpty");
+
+
+        if (!empty) {
+            return;
+        }
+
+
+        empty.classList.remove(
+            "visible"
+        );
+
+
+        empty.style.display =
+            "";
+    }
+
+
+    /* =====================================================
+       ERROR STATE
        ===================================================== */
 
     function showError(
@@ -1647,7 +1851,7 @@ const DVChallenges = (() => {
 
 
     /* =====================================================
-       FILTER CONTROLS
+       CONTROLS
        ===================================================== */
 
     function setupControls() {
@@ -1671,7 +1875,6 @@ const DVChallenges = (() => {
                 searchChallenges(
                     event.target.value
                 );
-
             }
         );
 
@@ -1683,7 +1886,6 @@ const DVChallenges = (() => {
                 filterByCategory(
                     event.target.value
                 );
-
             }
         );
 
@@ -1695,7 +1897,6 @@ const DVChallenges = (() => {
                 filterByStatus(
                     event.target.value
                 );
-
             }
         );
     }
@@ -1874,6 +2075,33 @@ const DVChallenges = (() => {
 
 
     /* =====================================================
+       DESTROY
+       ===================================================== */
+
+    function destroy() {
+
+        if (
+            state.countdownTimer
+        ) {
+
+            clearInterval(
+                state.countdownTimer
+            );
+
+
+            state.countdownTimer =
+                null;
+        }
+    }
+
+
+    window.addEventListener(
+        "pagehide",
+        destroy
+    );
+
+
+    /* =====================================================
        INITIALIZE
        ===================================================== */
 
@@ -1888,7 +2116,8 @@ const DVChallenges = (() => {
 
 
         /*
-         * Only run on the challenges page.
+         * Only initialize on the challenge
+         * listing page.
          */
 
         if (
@@ -1906,9 +2135,11 @@ const DVChallenges = (() => {
 
         setupControls();
 
-        startCountdownRefresh();
 
         await loadChallenges();
+
+
+        startCountdownRefresh();
     }
 
 
@@ -1936,7 +2167,11 @@ const DVChallenges = (() => {
 
         getChallengeUrl,
 
-        calculateStatus
+        calculateStatus,
+
+        recalculateStatuses,
+
+        destroy
 
     };
 
@@ -1960,7 +2195,6 @@ document.addEventListener(
     () => {
 
         DVChallenges.init();
-
     }
 );
 
