@@ -3,23 +3,39 @@
    js/designs.js
 
    Handles:
-   - Loading user's designs
-   - Uploading designs
-   - Supabase Storage
-   - Creating database records
-   - Searching
-   - Filtering
-   - Deleting designs
-   - Design statistics
-   - Submit form
+   - Normal design creation
+   - Design image upload
+   - Design metadata
+   - Tags
+   - Public/private visibility
+   - My Designs loading
+   - Design deletion
+   - Edit/update support
+   - Challenge-aware separation
+
+   IMPORTANT:
+
+   NORMAL DESIGN FLOW
+      submit.html
+         ↓
+      designs.js
+         ↓
+      designs table
+
+   CHALLENGE ENTRY FLOW
+      challenge.html
+         ↓
+      submit.html?challenge=ID
+         ↓
+      submissions.js
+         ↓
+      submissions table
+
+   designs.js NEVER creates a submission record.
    ========================================================= */
 
 "use strict";
 
-
-/* =========================================================
-   DESIGNVERSE DESIGNS
-   ========================================================= */
 
 const DVDesigns = (() => {
 
@@ -30,21 +46,33 @@ const DVDesigns = (() => {
 
     const state = {
 
-        designs: [],
-
-        filteredDesigns: [],
-
-        userId: null,
-
-        search: "",
-
-        category: "all",
-
         initialized: false,
 
-        submitting: false
+        user: null,
+
+        designs: [],
+
+        currentDesign: null,
+
+        editing: false,
+
+        submitting: false,
+
+        imageObjectUrl: null
 
     };
+
+
+    /* =====================================================
+       DOM
+       ===================================================== */
+
+    function $(selector) {
+
+        return document.querySelector(
+            selector
+        );
+    }
 
 
     /* =====================================================
@@ -56,7 +84,7 @@ const DVDesigns = (() => {
         if (!window.supabaseClient) {
 
             console.error(
-                "DESIGNVERSE: Supabase client not available."
+                "DESIGNVERSE: Supabase client unavailable."
             );
 
             return null;
@@ -64,28 +92,6 @@ const DVDesigns = (() => {
 
 
         return window.supabaseClient;
-    }
-
-
-    /* =====================================================
-       DOM HELPERS
-       ===================================================== */
-
-    function $(selector) {
-
-        return document.querySelector(
-            selector
-        );
-    }
-
-
-    function $$(selector) {
-
-        return [
-            ...document.querySelectorAll(
-                selector
-            )
-        ];
     }
 
 
@@ -100,6 +106,7 @@ const DVDesigns = (() => {
 
 
         if (!supabase) {
+
             return null;
         }
 
@@ -122,7 +129,31 @@ const DVDesigns = (() => {
         }
 
 
-        return data.user || null;
+        state.user =
+            data?.user ||
+            null;
+
+
+        return state.user;
+    }
+
+
+    /* =====================================================
+       CHALLENGE MODE DETECTION
+       ===================================================== */
+
+    function isChallengeMode() {
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        return Boolean(
+            params.get("challenge") ||
+            params.get("challenge_id")
+        );
     }
 
 
@@ -130,7 +161,7 @@ const DVDesigns = (() => {
        LOAD USER DESIGNS
        ===================================================== */
 
-    async function loadDesigns() {
+    async function loadMyDesigns() {
 
         const supabase =
             getSupabase();
@@ -138,29 +169,23 @@ const DVDesigns = (() => {
 
         if (!supabase) {
 
-            showError(
-                "Unable to connect to DESIGNVERSE."
+            throw new Error(
+                "Supabase is unavailable."
             );
-
-            return [];
         }
 
 
         const user =
+            state.user ||
             await getCurrentUser();
 
 
         if (!user) {
 
-            return [];
+            throw new Error(
+                "Please sign in to view your designs."
+            );
         }
-
-
-        state.userId =
-            user.id;
-
-
-        showLoading();
 
 
         const {
@@ -204,18 +229,7 @@ const DVDesigns = (() => {
                 error
             );
 
-
-            hideLoading();
-
-
-            showError(
-                getDesignErrorMessage(
-                    error
-                )
-            );
-
-
-            return [];
+            throw error;
         }
 
 
@@ -223,766 +237,457 @@ const DVDesigns = (() => {
             data || [];
 
 
-        state.filteredDesigns =
-            [...state.designs];
-
-
-        hideLoading();
-
-        updateStats();
-
-        renderDesigns();
-
-
         return state.designs;
     }
 
 
     /* =====================================================
-       STATISTICS
+       LOAD SINGLE DESIGN
        ===================================================== */
 
-    function updateStats() {
+    async function loadDesign(
+        designId
+    ) {
 
-        const totalDesigns =
-            state.designs.length;
-
-
-        const totalViews =
-            state.designs.reduce(
-                (
-                    total,
-                    design
-                ) => {
-
-                    return (
-                        total +
-                        Number(
-                            design.views || 0
-                        )
-                    );
-
-                },
-                0
-            );
-
-
-        const totalLikes =
-            state.designs.reduce(
-                (
-                    total,
-                    design
-                ) => {
-
-                    return (
-                        total +
-                        Number(
-                            design.likes_count || 0
-                        )
-                    );
-
-                },
-                0
-            );
-
-
-        const totalVotes =
-            state.designs.reduce(
-                (
-                    total,
-                    design
-                ) => {
-
-                    return (
-                        total +
-                        Number(
-                            design.votes_count || 0
-                        )
-                    );
-
-                },
-                0
-            );
-
-
-        setText(
-            "#totalDesigns",
-            formatNumber(
-                totalDesigns
-            )
-        );
-
-
-        setText(
-            "#totalViews",
-            formatCompactNumber(
-                totalViews
-            )
-        );
-
-
-        setText(
-            "#totalLikes",
-            formatCompactNumber(
-                totalLikes
-            )
-        );
-
-
-        setText(
-            "#totalVotes",
-            formatCompactNumber(
-                totalVotes
-            )
-        );
-    }
-
-
-    /* =====================================================
-       RENDER DESIGNS
-       ===================================================== */
-
-    function renderDesigns() {
-
-        const grid =
-            $("#designsGrid");
-
-
-        if (!grid) {
-            return;
-        }
-
-
-        grid.innerHTML = "";
+        const supabase =
+            getSupabase();
 
 
         if (
-            state.filteredDesigns.length ===
-            0
+            !supabase ||
+            !designId
         ) {
 
-            grid.hidden = true;
-
-            showEmptyState();
-
-            return;
+            return null;
         }
 
 
-        hideEmptyState();
+        const {
+            data,
+            error
+        } =
+            await supabase
+                .from("designs")
+                .select(`
+                    id,
+                    designer_id,
+                    title,
+                    description,
+                    category,
+                    image_url,
+                    thumbnail_url,
+                    tags,
+                    views,
+                    likes_count,
+                    votes_count,
+                    is_public,
+                    created_at,
+                    updated_at
+                `)
+                .eq(
+                    "id",
+                    designId
+                )
+                .single();
 
 
-        state.filteredDesigns
-            .forEach(
-                design => {
+        if (error) {
 
-                    grid.appendChild(
-                        createDesignCard(
-                            design
-                        )
-                    );
-
-                }
+            console.error(
+                "DESIGNVERSE design load error:",
+                error
             );
 
+            throw error;
+        }
 
-        grid.hidden =
-            false;
+
+        state.currentDesign =
+            data;
+
+
+        return data;
     }
 
 
     /* =====================================================
-       DESIGN CARD
+       VALIDATE DESIGN DATA
        ===================================================== */
 
-    function createDesignCard(
-        design
-    ) {
+    function validateDesignData({
 
-        const article =
-            document.createElement(
-                "article"
-            );
+        title,
 
+        description,
 
-        article.className =
-            "user-design-card";
+        category,
 
+        tags,
 
-        article.dataset.designCard =
-            "";
+        isPublic
 
+    }) {
 
-        article.dataset.designId =
-            design.id;
-
-
-        article.dataset.category =
-            design.category ||
-            "other";
-
-
-        article.dataset.title =
-            design.title ||
-            "";
-
-
-        const imageSource =
-            design.thumbnail_url ||
-            design.image_url;
-
-
-        const categoryLabel =
-            formatCategory(
-                design.category
-            );
-
-
-        const visibility =
-            design.is_public
-                ? "Public"
-                : "Private";
-
-
-        const visibilityIcon =
-            design.is_public
-                ? "fa-globe"
-                : "fa-lock";
-
-
-        const imageMarkup =
-            imageSource
-
-                ? `
-                    <img
-                        src="${escapeAttribute(
-                            imageSource
-                        )}"
-                        alt="${escapeAttribute(
-                            design.title ||
-                            "Design"
-                        )}"
-                        loading="lazy"
-                    >
-                `
-
-                : createPlaceholder(
-                    design
-                );
-
-
-        article.innerHTML = `
-
-            <div class="user-design-image">
-
-                ${imageMarkup}
-
-                <div class="user-design-overlay">
-
-                    <div class="design-overlay-actions">
-
-                        <button
-                            type="button"
-                            class="design-overlay-button"
-                            data-design-view
-                            aria-label="View design"
-                            title="View design"
-                        >
-                            <i class="fa-solid fa-eye"></i>
-                        </button>
-
-
-                        <button
-                            type="button"
-                            class="design-overlay-button"
-                            data-design-edit
-                            aria-label="Edit design"
-                            title="Edit design"
-                        >
-                            <i class="fa-solid fa-pen"></i>
-                        </button>
-
-
-                        <button
-                            type="button"
-                            class="design-overlay-button"
-                            data-design-delete
-                            aria-label="Delete design"
-                            title="Delete design"
-                        >
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="user-design-body">
-
-                <div class="user-design-title-row">
-
-                    <h2 class="user-design-title">
-                        ${escapeHTML(
-                            design.title ||
-                            "Untitled Design"
-                        )}
-                    </h2>
-
-
-                    <span class="design-visibility">
-
-                        <i
-                            class="fa-solid ${visibilityIcon}"
-                        ></i>
-
-                        ${visibility}
-
-                    </span>
-
-                </div>
-
-
-                <div class="user-design-meta">
-
-                    <div class="user-design-meta-left">
-
-                        <span>
-
-                            <i
-                                class="fa-regular fa-eye"
-                            ></i>
-
-                            ${formatCompactNumber(
-                                design.views || 0
-                            )}
-
-                        </span>
-
-
-                        <span>
-
-                            <i
-                                class="fa-regular fa-heart"
-                            ></i>
-
-                            ${formatCompactNumber(
-                                design.likes_count || 0
-                            )}
-
-                        </span>
-
-
-                        <span>
-
-                            <i
-                                class="fa-solid fa-bolt"
-                            ></i>
-
-                            ${formatCompactNumber(
-                                design.votes_count || 0
-                            )}
-
-                        </span>
-
-                    </div>
-
-
-                    <span>
-
-                        ${escapeHTML(
-                            categoryLabel
-                        )}
-
-                    </span>
-
-                </div>
-
-            </div>
-
-        `;
-
-
-        const viewButton =
-            article.querySelector(
-                "[data-design-view]"
-            );
-
-
-        viewButton?.addEventListener(
-            "click",
-            () => {
-
-                openDesign(
-                    design
-                );
-
-            }
-        );
-
-
-        const editButton =
-            article.querySelector(
-                "[data-design-edit]"
-            );
-
-
-        editButton?.addEventListener(
-            "click",
-            () => {
-
-                editDesign(
-                    design
-                );
-
-            }
-        );
-
-
-        const deleteButton =
-            article.querySelector(
-                "[data-design-delete]"
-            );
-
-
-        deleteButton?.addEventListener(
-            "click",
-            async () => {
-
-                await handleDelete(
-                    design,
-                    deleteButton,
-                    article
-                );
-
-            }
-        );
-
-
-        return article;
-    }
-
-
-    /* =====================================================
-       IMAGE PLACEHOLDER
-       ===================================================== */
-
-    function createPlaceholder(
-        design
-    ) {
-
-        const variations = {
-
-            branding: "blue",
-
-            poster: "",
-
-            "ui-ux": "pink",
-
-            illustration: "orange",
-
-            logo: "blue",
-
-            motion: "pink",
-
-            other: ""
-
-        };
-
-
-        const variation =
-            variations[
-                design.category
-            ] || "";
-
-
-        return `
-
-            <div
-                class="design-placeholder ${variation}"
-            >
-
-                <span>
-                    DESIGNVERSE
-                </span>
-
-                <strong>
-                    ${escapeHTML(
-                        truncateTitle(
-                            design.title ||
-                            "DESIGN",
-                            18
-                        )
-                    )}
-                </strong>
-
-            </div>
-
-        `;
-    }
-
-
-    /* =====================================================
-       SEARCH
-       ===================================================== */
-
-    function searchDesigns(
-        query
-    ) {
-
-        state.search =
+        const cleanTitle =
             String(
-                query || ""
+                title || ""
             )
-            .trim()
-            .toLowerCase();
+            .trim();
 
 
-        applyFilters();
-    }
+        if (!cleanTitle) {
+
+            throw new Error(
+                "Please enter a design title."
+            );
+        }
 
 
-    /* =====================================================
-       CATEGORY FILTER
-       ===================================================== */
+        if (
+            cleanTitle.length >
+            80
+        ) {
 
-    function filterByCategory(
-        category
-    ) {
-
-        state.category =
-            category ||
-            "all";
+            throw new Error(
+                "Design title must be 80 characters or fewer."
+            );
+        }
 
 
-        applyFilters();
-    }
+        if (
+            String(
+                description || ""
+            ).length >
+            1000
+        ) {
+
+            throw new Error(
+                "Design description must be 1000 characters or fewer."
+            );
+        }
 
 
-    /* =====================================================
-       APPLY FILTERS
-       ===================================================== */
+        if (!category) {
 
-    function applyFilters() {
-
-        state.filteredDesigns =
-            state.designs.filter(
-                design => {
-
-                    const title =
-                        String(
-                            design.title ||
-                            ""
-                        )
-                        .toLowerCase();
+            throw new Error(
+                "Please select a design category."
+            );
+        }
 
 
-                    const description =
-                        String(
-                            design.description ||
-                            ""
-                        )
-                        .toLowerCase();
+        if (
+            !Array.isArray(
+                tags
+            )
+        ) {
+
+            throw new Error(
+                "Invalid design tags."
+            );
+        }
 
 
-                    const tags =
-                        Array.isArray(
-                            design.tags
-                        )
-                            ? design.tags
-                            : [];
+        if (
+            tags.length >
+            8
+        ) {
+
+            throw new Error(
+                "You can add up to 8 tags."
+            );
+        }
 
 
-                    const tagText =
-                        tags
-                            .join(" ")
-                            .toLowerCase();
-
-
-                    const matchesSearch =
-                        !state.search ||
-                        title.includes(
-                            state.search
-                        ) ||
-                        description.includes(
-                            state.search
-                        ) ||
-                        tagText.includes(
-                            state.search
-                        );
-
-
-                    const matchesCategory =
-                        state.category ===
-                            "all" ||
-                        design.category ===
-                            state.category;
-
-
-                    return (
-                        matchesSearch &&
-                        matchesCategory
-                    );
-
-                }
+        const normalizedTags =
+            normalizeTags(
+                tags
             );
 
 
-        renderDesigns();
-    }
-
-
-    /* =====================================================
-       UPLOAD VALIDATION
-       ===================================================== */
-
-    function validateDesignFile(
-        file
-    ) {
-
-        const allowedTypes = [
-
-            "image/jpeg",
-
-            "image/png",
-
-            "image/webp",
-
-            "image/gif"
-
-        ];
-
-
-        const maxSize =
-            10 *
-            1024 *
-            1024;
-
-
-        if (!file) {
-
-            return {
-
-                valid: false,
-
-                message:
-                    "Please select an image."
-
-            };
-        }
-
-
         if (
-            !allowedTypes.includes(
-                file.type
+            normalizedTags.some(
+                tag =>
+                    tag.length >
+                    24
             )
         ) {
 
-            return {
-
-                valid: false,
-
-                message:
-                    "Please upload a JPG, PNG, WEBP or GIF image."
-
-            };
-        }
-
-
-        if (
-            file.size >
-            maxSize
-        ) {
-
-            return {
-
-                valid: false,
-
-                message:
-                    "Your design must be smaller than 10 MB."
-
-            };
+            throw new Error(
+                "Each tag must be 24 characters or fewer."
+            );
         }
 
 
         return {
 
-            valid: true,
+            title:
+                cleanTitle,
 
-            message: ""
+            description:
+                String(
+                    description || ""
+                )
+                .trim(),
+
+            category,
+
+            tags:
+                normalizedTags,
+
+            isPublic:
+                Boolean(
+                    isPublic
+                )
 
         };
     }
 
 
     /* =====================================================
-       GENERATE STORAGE PATH
+       CREATE DESIGN
        ===================================================== */
 
-    function generateDesignPath(
-        userId,
-        file
-    ) {
+    async function createDesign({
 
-        const originalName =
-            file.name
-                .split(".")
-                .shift()
-                .toLowerCase()
-                .replace(
-                    /[^a-z0-9]+/g,
-                    "-"
-                )
-                .replace(
-                    /^-+|-+$/g,
-                    ""
-                );
+        title,
+
+        description,
+
+        category,
+
+        tags,
+
+        isPublic,
+
+        imageFile
+
+    }) {
+
+        const supabase =
+            getSupabase();
 
 
-        const extension =
-            getFileExtension(
-                file
+        if (!supabase) {
+
+            throw new Error(
+                "Supabase is unavailable."
             );
+        }
 
 
-        const uniqueId =
-            generateId();
+        const user =
+            state.user ||
+            await getCurrentUser();
 
 
-        const safeName =
-            originalName ||
-            "design";
+        if (!user) {
+
+            throw new Error(
+                "Please sign in before publishing a design."
+            );
+        }
+
+
+        const validated =
+            validateDesignData({
+
+                title,
+
+                description,
+
+                category,
+
+                tags,
+
+                isPublic
+
+            });
+
+
+        validateImageFile(
+            imageFile
+        );
 
 
         /*
-         * IMPORTANT:
-         *
-         * The first folder is USER UUID.
-         * This matches our Storage RLS policy.
-         *
-         * designs/
-         *     USER_UUID/
-         *         unique-file.webp
+         * Create database row FIRST so we obtain
+         * the design UUID for Storage.
          */
 
-        return (
-            `${userId}/` +
-            `${Date.now()}-` +
-            `${uniqueId}-` +
-            `${safeName}.` +
-            `${extension}`
-        );
+        const {
+            data: design,
+            error: insertError
+        } =
+            await supabase
+                .from("designs")
+                .insert({
+
+                    designer_id:
+                        user.id,
+
+                    title:
+                        validated.title,
+
+                    description:
+                        validated.description ||
+                        null,
+
+                    category:
+                        validated.category,
+
+                    tags:
+                        validated.tags,
+
+                    is_public:
+                        validated.isPublic
+
+                })
+                .select()
+                .single();
+
+
+        if (insertError) {
+
+            console.error(
+                "DESIGNVERSE design insert error:",
+                insertError
+            );
+
+            throw insertError;
+        }
+
+
+        let uploadedPath =
+            null;
+
+
+        try {
+
+            const uploaded =
+                await uploadDesignImage(
+                    design.id,
+                    imageFile
+                );
+
+
+            uploadedPath =
+                uploaded.path;
+
+
+            const {
+                data:
+                    updatedDesign,
+                error:
+                    updateError
+            } =
+                await supabase
+                    .from("designs")
+                    .update({
+
+                        image_url:
+                            uploaded.url,
+
+                        thumbnail_url:
+                            uploaded.url,
+
+                        updated_at:
+                            new Date()
+                                .toISOString()
+
+                    })
+                    .eq(
+                        "id",
+                        design.id
+                    )
+                    .eq(
+                        "designer_id",
+                        user.id
+                    )
+                    .select()
+                    .single();
+
+
+            if (updateError) {
+
+                throw updateError;
+            }
+
+
+            state.designs = [
+
+                updatedDesign,
+
+                ...state.designs
+
+            ];
+
+
+            state.currentDesign =
+                updatedDesign;
+
+
+            return updatedDesign;
+
+
+        } catch (error) {
+
+            /*
+             * Rollback database row and Storage file
+             * if image upload/update fails.
+             */
+
+            if (
+                uploadedPath
+            ) {
+
+                await removeDesignImage(
+                    uploadedPath
+                );
+            }
+
+
+            await supabase
+                .from("designs")
+                .delete()
+                .eq(
+                    "id",
+                    design.id
+                )
+                .eq(
+                    "designer_id",
+                    user.id
+                );
+
+
+            throw error;
+        }
     }
 
 
     /* =====================================================
-       UPLOAD FILE TO STORAGE
+       UPDATE DESIGN
        ===================================================== */
 
-    async function uploadDesignFile(
-        file
+    async function updateDesign(
+
+        designId,
+
+        {
+
+            title,
+
+            description,
+
+            category,
+
+            tags,
+
+            isPublic,
+
+            imageFile
+
+        }
+
     ) {
 
         const supabase =
@@ -998,36 +703,280 @@ const DVDesigns = (() => {
 
 
         const user =
+            state.user ||
             await getCurrentUser();
 
 
         if (!user) {
 
             throw new Error(
-                "Please sign in before uploading a design."
+                "Please sign in before editing a design."
             );
         }
 
 
-        const validation =
-            validateDesignFile(
+        const validated =
+            validateDesignData({
+
+                title,
+
+                description,
+
+                category,
+
+                tags,
+
+                isPublic
+
+            });
+
+
+        const existing =
+            state.designs.find(
+                design =>
+                    design.id ===
+                    designId
+            ) ||
+            await loadDesign(
+                designId
+            );
+
+
+        if (!existing) {
+
+            throw new Error(
+                "Design not found."
+            );
+        }
+
+
+        if (
+            existing.designer_id !==
+            user.id
+        ) {
+
+            throw new Error(
+                "You can only edit your own designs."
+            );
+        }
+
+
+        let imageUrl =
+            existing.image_url ||
+            null;
+
+
+        let thumbnailUrl =
+            existing.thumbnail_url ||
+            null;
+
+
+        let newPath =
+            null;
+
+
+        try {
+
+            /*
+             * Optional image replacement.
+             */
+
+            if (
+                imageFile
+            ) {
+
+                validateImageFile(
+                    imageFile
+                );
+
+
+                const uploaded =
+                    await uploadDesignImage(
+                        designId,
+                        imageFile,
+                        {
+                            replace:
+                                true
+                        }
+                    );
+
+
+                newPath =
+                    uploaded.path;
+
+
+                imageUrl =
+                    uploaded.url;
+
+
+                thumbnailUrl =
+                    uploaded.url;
+            }
+
+
+            const {
+                data,
+                error
+            } =
+                await supabase
+                    .from("designs")
+                    .update({
+
+                        title:
+                            validated.title,
+
+                        description:
+                            validated.description ||
+                            null,
+
+                        category:
+                            validated.category,
+
+                        tags:
+                            validated.tags,
+
+                        is_public:
+                            validated.isPublic,
+
+                        image_url:
+                            imageUrl,
+
+                        thumbnail_url:
+                            thumbnailUrl,
+
+                        updated_at:
+                            new Date()
+                                .toISOString()
+
+                    })
+                    .eq(
+                        "id",
+                        designId
+                    )
+                    .eq(
+                        "designer_id",
+                        user.id
+                    )
+                    .select()
+                    .single();
+
+
+            if (error) {
+
+                throw error;
+            }
+
+
+            state.currentDesign =
+                data;
+
+
+            const index =
+                state.designs.findIndex(
+                    design =>
+                        design.id ===
+                        designId
+                );
+
+
+            if (
+                index !== -1
+            ) {
+
+                state.designs[index] =
+                    data;
+            }
+
+
+            return data;
+
+
+        } catch (error) {
+
+            /*
+             * If replacing an image succeeds but
+             * the database update fails, remove the
+             * newly uploaded file.
+             */
+
+            if (
+                newPath
+            ) {
+
+                await removeDesignImage(
+                    newPath
+                );
+            }
+
+
+            throw error;
+        }
+    }
+
+
+    /* =====================================================
+       UPLOAD DESIGN IMAGE
+       ===================================================== */
+
+    async function uploadDesignImage(
+        designId,
+        file,
+        options = {}
+    ) {
+
+        const supabase =
+            getSupabase();
+
+
+        if (!supabase) {
+
+            throw new Error(
+                "Supabase is unavailable."
+            );
+        }
+
+
+        validateImageFile(
+            file
+        );
+
+
+        const extension =
+            getFileExtension(
                 file
             );
 
 
-        if (!validation.valid) {
-
-            throw new Error(
-                validation.message
-            );
-        }
+        const safeName =
+            file.name
+                .split(".")
+                .slice(
+                    0,
+                    -1
+                )
+                .join(".")
+                .toLowerCase()
+                .replace(
+                    /[^a-z0-9]+/g,
+                    "-"
+                )
+                .replace(
+                    /^-+|-+$/g,
+                    ""
+                )
+                .substring(
+                    0,
+                    60
+                ) ||
+            "design";
 
 
         const filePath =
-            generateDesignPath(
-                user.id,
-                file
-            );
+            `${designId}/` +
+            `${Date.now()}-` +
+            `${generateId()}-` +
+            `${safeName}.` +
+            `${extension}`;
 
 
         const {
@@ -1035,7 +984,9 @@ const DVDesigns = (() => {
         } =
             await supabase
                 .storage
-                .from("designs")
+                .from(
+                    "designs"
+                )
                 .upload(
                     filePath,
                     file,
@@ -1057,7 +1008,7 @@ const DVDesigns = (() => {
         if (error) {
 
             console.error(
-                "Storage upload error:",
+                "DESIGNVERSE design upload error:",
                 error
             );
 
@@ -1070,20 +1021,20 @@ const DVDesigns = (() => {
         } =
             supabase
                 .storage
-                .from("designs")
+                .from(
+                    "designs"
+                )
                 .getPublicUrl(
                     filePath
                 );
 
 
-        const publicUrl =
-            data?.publicUrl;
-
-
-        if (!publicUrl) {
+        if (
+            !data?.publicUrl
+        ) {
 
             throw new Error(
-                "Unable to create the design image URL."
+                "Unable to generate the design image URL."
             );
         }
 
@@ -1094,324 +1045,9 @@ const DVDesigns = (() => {
                 filePath,
 
             url:
-                publicUrl
+                data.publicUrl
 
         };
-    }
-
-
-    /* =====================================================
-       CREATE DATABASE DESIGN RECORD
-       ===================================================== */
-
-    async function createDesignRecord({
-        title,
-        description,
-        category,
-        tags,
-        isPublic,
-        imageUrl
-    }) {
-
-        const supabase =
-            getSupabase();
-
-
-        if (!supabase) {
-
-            throw new Error(
-                "Supabase is unavailable."
-            );
-        }
-
-
-        const user =
-            await getCurrentUser();
-
-
-        if (!user) {
-
-            throw new Error(
-                "Please sign in before publishing."
-            );
-        }
-
-
-        const {
-            data,
-            error
-        } =
-            await supabase
-                .from("designs")
-                .insert({
-
-                    designer_id:
-                        user.id,
-
-                    title:
-                        title.trim(),
-
-                    description:
-                        description.trim() ||
-                        null,
-
-                    category:
-                        category,
-
-                    image_url:
-                        imageUrl,
-
-                    thumbnail_url:
-                        null,
-
-                    tags:
-                        tags,
-
-                    views:
-                        0,
-
-                    likes_count:
-                        0,
-
-                    votes_count:
-                        0,
-
-                    is_public:
-                        isPublic
-
-                })
-                .select()
-                .single();
-
-
-        if (error) {
-
-            console.error(
-                "Design database insert error:",
-                error
-            );
-
-            throw error;
-        }
-
-
-        return data;
-    }
-
-
-    /* =====================================================
-       PUBLISH DESIGN
-       ===================================================== */
-
-    async function publishDesign({
-        file,
-        title,
-        description,
-        category,
-        tags,
-        isPublic
-    }) {
-
-        if (
-            state.submitting
-        ) {
-
-            throw new Error(
-                "Your design is already being uploaded."
-            );
-        }
-
-
-        state.submitting =
-            true;
-
-
-        let uploadedPath =
-            null;
-
-
-        try {
-
-            /* ---------------------------------------------
-               VALIDATE FORM
-               --------------------------------------------- */
-
-            validatePublishData({
-
-                file,
-
-                title,
-
-                category
-
-            });
-
-
-            /* ---------------------------------------------
-               UPLOAD IMAGE
-               --------------------------------------------- */
-
-            const uploaded =
-                await uploadDesignFile(
-                    file
-                );
-
-
-            uploadedPath =
-                uploaded.path;
-
-
-            /* ---------------------------------------------
-               CREATE DB RECORD
-               --------------------------------------------- */
-
-            let design;
-
-
-            try {
-
-                design =
-                    await createDesignRecord({
-
-                        title,
-
-                        description,
-
-                        category,
-
-                        tags,
-
-                        isPublic,
-
-                        imageUrl:
-                            uploaded.url
-
-                    });
-
-            } catch (databaseError) {
-
-                /*
-                 * If the database insert fails,
-                 * remove the newly uploaded file
-                 * so we don't leave an orphaned
-                 * Storage object.
-                 */
-
-                await removeStorageFile(
-                    uploadedPath
-                );
-
-
-                throw databaseError;
-            }
-
-
-            return design;
-
-        } finally {
-
-            state.submitting =
-                false;
-        }
-    }
-
-
-    /* =====================================================
-       VALIDATE PUBLISH DATA
-       ===================================================== */
-
-    function validatePublishData({
-        file,
-        title,
-        category
-    }) {
-
-        const validation =
-            validateDesignFile(
-                file
-            );
-
-
-        if (!validation.valid) {
-
-            throw new Error(
-                validation.message
-            );
-        }
-
-
-        if (
-            !String(title || "")
-                .trim()
-        ) {
-
-            throw new Error(
-                "Please enter a title for your design."
-            );
-        }
-
-
-        if (
-            String(title)
-                .trim()
-                .length >
-            80
-        ) {
-
-            throw new Error(
-                "Design title must be 80 characters or fewer."
-            );
-        }
-
-
-        if (!category) {
-
-            throw new Error(
-                "Please select a design category."
-            );
-        }
-    }
-
-
-    /* =====================================================
-       REMOVE STORAGE FILE
-       ===================================================== */
-
-    async function removeStorageFile(
-        filePath
-    ) {
-
-        const supabase =
-            getSupabase();
-
-
-        if (
-            !supabase ||
-            !filePath
-        ) {
-
-            return;
-        }
-
-
-        const {
-            error
-        } =
-            await supabase
-                .storage
-                .from("designs")
-                .remove([
-                    filePath
-                ]);
-
-
-        if (error) {
-
-            console.warn(
-                "Storage cleanup error:",
-                error
-            );
-        }
     }
 
 
@@ -1420,7 +1056,7 @@ const DVDesigns = (() => {
        ===================================================== */
 
     async function deleteDesign(
-        design
+        designId
     ) {
 
         const supabase =
@@ -1436,13 +1072,33 @@ const DVDesigns = (() => {
 
 
         const user =
+            state.user ||
             await getCurrentUser();
 
 
         if (!user) {
 
             throw new Error(
-                "You must be logged in."
+                "Please sign in."
+            );
+        }
+
+
+        const design =
+            state.designs.find(
+                item =>
+                    item.id ===
+                    designId
+            ) ||
+            await loadDesign(
+                designId
+            );
+
+
+        if (!design) {
+
+            throw new Error(
+                "Design not found."
             );
         }
 
@@ -1453,14 +1109,65 @@ const DVDesigns = (() => {
         ) {
 
             throw new Error(
-                "You cannot delete this design."
+                "You can only delete your own designs."
             );
         }
 
 
         /*
-         * Delete database record.
+         * Delete database row.
+         *
+         * Your database currently has ON DELETE
+         * CASCADE from submissions.design_id,
+         * so deleting a design that has been used
+         * in a challenge can also delete its
+         * submissions.
+         *
+         * We therefore block deletion when the
+         * design is already used in a submission.
          */
+
+        const {
+            count,
+            error:
+                submissionCheckError
+        } =
+            await supabase
+                .from("submissions")
+                .select(
+                    "id",
+                    {
+                        count:
+                            "exact",
+                        head:
+                            true
+                    }
+                )
+                .eq(
+                    "design_id",
+                    designId
+                );
+
+
+        if (
+            submissionCheckError
+        ) {
+
+            console.warn(
+                "Unable to verify design submissions:",
+                submissionCheckError
+            );
+
+        } else if (
+            Number(count || 0) >
+            0
+        ) {
+
+            throw new Error(
+                "This design has already been submitted to a challenge and cannot be deleted."
+            );
+        }
+
 
         const {
             error
@@ -1470,7 +1177,7 @@ const DVDesigns = (() => {
                 .delete()
                 .eq(
                     "id",
-                    design.id
+                    designId
                 )
                 .eq(
                     "designer_id",
@@ -1485,93 +1192,46 @@ const DVDesigns = (() => {
 
 
         /*
-         * Find Storage path.
-         */
-
-        const filePaths =
-            [];
-
-
-        const imagePath =
-            extractStoragePath(
-                design.image_url,
-                "designs"
-            );
-
-
-        const thumbnailPath =
-            extractStoragePath(
-                design.thumbnail_url,
-                "designs"
-            );
-
-
-        if (imagePath) {
-
-            filePaths.push(
-                imagePath
-            );
-        }
-
-
-        if (
-            thumbnailPath &&
-            !filePaths.includes(
-                thumbnailPath
-            )
-        ) {
-
-            filePaths.push(
-                thumbnailPath
-            );
-        }
-
-
-        /*
-         * Delete Storage files.
+         * Remove Storage objects after the row
+         * has been removed.
          */
 
         if (
-            filePaths.length
+            design.image_url
         ) {
 
-            const {
-                error:
-                    storageError
-            } =
-                await supabase
-                    .storage
-                    .from("designs")
-                    .remove(
-                        filePaths
-                    );
+            const path =
+                extractStoragePath(
+                    design.image_url,
+                    "designs"
+                );
 
 
-            if (storageError) {
+            if (path) {
 
-                console.warn(
-                    "Storage cleanup warning:",
-                    storageError
+                await removeDesignImage(
+                    path
                 );
             }
         }
 
 
-        /*
-         * Update local state.
-         */
-
         state.designs =
             state.designs.filter(
                 item =>
                     item.id !==
-                    design.id
+                    designId
             );
 
 
-        applyFilters();
+        if (
+            state.currentDesign?.id ===
+            designId
+        ) {
 
-        updateStats();
+            state.currentDesign =
+                null;
+        }
 
 
         return true;
@@ -1579,18 +1239,962 @@ const DVDesigns = (() => {
 
 
     /* =====================================================
-       HANDLE DELETE
+       REMOVE DESIGN IMAGE
+       ===================================================== */
+
+    async function removeDesignImage(
+        path
+    ) {
+
+        const supabase =
+            getSupabase();
+
+
+        if (
+            !supabase ||
+            !path
+        ) {
+
+            return;
+        }
+
+
+        const {
+            error
+        } =
+            await supabase
+                .storage
+                .from(
+                    "designs"
+                )
+                .remove([
+                    path
+                ]);
+
+
+        if (error) {
+
+            console.warn(
+                "DESIGNVERSE design Storage cleanup failed:",
+                error
+            );
+        }
+    }
+
+
+    /* =====================================================
+       IMAGE VALIDATION
+       ===================================================== */
+
+    function validateImageFile(
+        file
+    ) {
+
+        if (!file) {
+
+            throw new Error(
+                "Please select a design image."
+            );
+        }
+
+
+        const allowedTypes = [
+
+            "image/jpeg",
+
+            "image/png",
+
+            "image/webp",
+
+            "image/gif"
+
+        ];
+
+
+        const maxSize =
+            10 *
+            1024 *
+            1024;
+
+
+        if (
+            !allowedTypes.includes(
+                file.type
+            )
+        ) {
+
+            throw new Error(
+                "Design image must be JPG, PNG, WEBP or GIF."
+            );
+        }
+
+
+        if (
+            file.size >
+            maxSize
+        ) {
+
+            throw new Error(
+                "Design image must be 10 MB or smaller."
+            );
+        }
+    }
+
+
+    /* =====================================================
+       IMAGE PREVIEW
+       ===================================================== */
+
+    function setupImagePreview() {
+
+        const input =
+            $("#designImageInput");
+
+
+        const uploadZone =
+            $("#uploadZone");
+
+
+        const uploadPreview =
+            $("#uploadPreview");
+
+
+        const previewImage =
+            $("#designPreviewImage");
+
+
+        const previewName =
+            $("#previewFileName");
+
+
+        const previewSize =
+            $("#previewFileSize");
+
+
+        const changeButton =
+            $("#changeImageButton");
+
+
+        if (!input) {
+
+            return;
+        }
+
+
+        input.addEventListener(
+            "change",
+            () => {
+
+                handleImageSelection(
+                    input.files?.[0]
+                );
+
+            }
+        );
+
+
+        changeButton?.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+
+
+                input.click();
+
+            }
+        );
+
+
+        [
+            "dragenter",
+            "dragover"
+        ]
+        .forEach(
+            eventName => {
+
+                uploadZone?.addEventListener(
+                    eventName,
+                    event => {
+
+                        event.preventDefault();
+
+
+                        uploadZone.classList.add(
+                            "dragover"
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+        [
+            "dragleave",
+            "drop"
+        ]
+        .forEach(
+            eventName => {
+
+                uploadZone?.addEventListener(
+                    eventName,
+                    event => {
+
+                        event.preventDefault();
+
+
+                        uploadZone.classList.remove(
+                            "dragover"
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+        uploadZone?.addEventListener(
+            "drop",
+            event => {
+
+                const file =
+                    event.dataTransfer
+                        ?.files?.[0];
+
+
+                if (!file) {
+
+                    return;
+                }
+
+
+                /*
+                 * Attempt to sync the dropped file
+                 * with the native file input.
+                 */
+
+                try {
+
+                    const transfer =
+                        new DataTransfer();
+
+
+                    transfer.items.add(
+                        file
+                    );
+
+
+                    input.files =
+                        transfer.files;
+
+                } catch {
+                    /* Browser may block FileList assignment. */
+                }
+
+
+                handleImageSelection(
+                    file
+                );
+            }
+        );
+
+
+        function handleImageSelection(
+            file
+        ) {
+
+            clearImageError();
+
+
+            try {
+
+                validateImageFile(
+                    file
+                );
+
+            } catch (error) {
+
+                showImageError(
+                    error.message
+                );
+
+
+                input.value =
+                    "";
+
+
+                return;
+            }
+
+
+            if (
+                state.imageObjectUrl
+            ) {
+
+                URL.revokeObjectURL(
+                    state.imageObjectUrl
+                );
+            }
+
+
+            state.imageObjectUrl =
+                URL.createObjectURL(
+                    file
+                );
+
+
+            if (previewImage) {
+
+                previewImage.src =
+                    state.imageObjectUrl;
+            }
+
+
+            if (previewName) {
+
+                previewName.textContent =
+                    file.name;
+            }
+
+
+            if (previewSize) {
+
+                previewSize.textContent =
+                    formatBytes(
+                        file.size
+                    );
+            }
+
+
+            if (uploadZone) {
+
+                uploadZone.style.display =
+                    "none";
+            }
+
+
+            uploadPreview?.classList.add(
+                "visible"
+            );
+
+
+            /*
+             * Optional live validation marker.
+             */
+
+            input.dataset.valid =
+                "true";
+        }
+    }
+
+
+    /* =====================================================
+       FORM SETUP
+       ===================================================== */
+
+    function setupForm() {
+
+        const form =
+            $("#designSubmitForm");
+
+
+        if (!form) {
+
+            return;
+        }
+
+
+        /*
+         * DO NOT attach the form when we are in
+         * challenge-selection-only mode.
+         *
+         * The normal design form remains available
+         * on the page, but the challenge entry flow
+         * is handled by submissions.js.
+         */
+
+        form.addEventListener(
+            "submit",
+            async event => {
+
+                event.preventDefault();
+
+
+                /*
+                 * A challenge URL does not disable
+                 * normal design creation completely.
+                 * But the user must intentionally be
+                 * in "Upload Design" mode.
+                 */
+
+                if (
+                    isChallengeMode() &&
+                    getActiveSubmitMode() ===
+                    "challenge"
+                ) {
+
+                    return;
+                }
+
+
+                if (
+                    state.submitting
+                ) {
+
+                    return;
+                }
+
+
+                try {
+
+                    state.submitting =
+                        true;
+
+
+                    setPublishButtonLoading(
+                        true
+                    );
+
+
+                    const imageFile =
+                        $("#designImageInput")
+                            ?.files?.[0] ||
+                        null;
+
+
+                    const title =
+                        $("#designTitle")
+                            ?.value ||
+                        "";
+
+
+                    const description =
+                        $("#designDescription")
+                            ?.value ||
+                        "";
+
+
+                    const category =
+                        $("#designCategory")
+                            ?.value ||
+                        "";
+
+
+                    const isPublic =
+                        getVisibilityValue();
+
+
+                    const tags =
+                        readTagsFromForm();
+
+
+                    const design =
+                        await createDesign({
+
+                            title,
+
+                            description,
+
+                            category,
+
+                            tags,
+
+                            isPublic,
+
+                            imageFile
+
+                        });
+
+
+                    showFormSuccess(
+                        design
+                    );
+
+
+                    resetDesignForm();
+
+
+                    /*
+                     * Give the user a moment to see
+                     * the success message.
+                     */
+
+                    setTimeout(
+                        () => {
+
+                            window.location.href =
+                                "dashboard/my-designs.html";
+
+                        },
+                        1200
+                    );
+
+
+                } catch (error) {
+
+                    console.error(
+                        "DESIGNVERSE design publication error:",
+                        error
+                    );
+
+
+                    showFormError(
+                        getDesignErrorMessage(
+                            error
+                        )
+                    );
+
+
+                } finally {
+
+                    state.submitting =
+                        false;
+
+
+                    setPublishButtonLoading(
+                        false
+                    );
+                }
+
+            }
+        );
+
+
+        /*
+         * Character counter.
+         */
+
+        const description =
+            $("#designDescription");
+
+
+        const counter =
+            $("#descriptionCount");
+
+
+        description?.addEventListener(
+            "input",
+            () => {
+
+                if (counter) {
+
+                    counter.textContent =
+                        `${description.value.length} / 1000`;
+                }
+
+            }
+        );
+    }
+
+
+    /* =====================================================
+       ACTIVE SUBMIT MODE
+       ===================================================== */
+
+    function getActiveSubmitMode() {
+
+        const active =
+            document.querySelector(
+                "[data-submit-mode].active"
+            );
+
+
+        return (
+            active?.dataset.submitMode ||
+            "upload"
+        );
+    }
+
+
+    /* =====================================================
+       READ VISIBILITY
+       ===================================================== */
+
+    function getVisibilityValue() {
+
+        const selected =
+            document.querySelector(
+                'input[name="visibility"]:checked'
+            );
+
+
+        return (
+            selected?.value !==
+            "private"
+        );
+    }
+
+
+    /* =====================================================
+       TAGS
+       ===================================================== */
+
+    function readTagsFromForm() {
+
+        const hidden =
+            $("#designTags");
+
+
+        if (!hidden) {
+
+            return [];
+        }
+
+
+        try {
+
+            const parsed =
+                JSON.parse(
+                    hidden.value ||
+                    "[]"
+                );
+
+
+            return normalizeTags(
+                parsed
+            );
+
+        } catch {
+
+            return [];
+        }
+    }
+
+
+    function normalizeTags(
+        tags
+    ) {
+
+        if (
+            !Array.isArray(
+                tags
+            )
+        ) {
+
+            return [];
+        }
+
+
+        return [
+            ...new Set(
+                tags
+                    .map(
+                        tag =>
+                            String(
+                                tag ||
+                                ""
+                            )
+                            .trim()
+                            .toLowerCase()
+                            .replace(
+                                /^#/,
+                                ""
+                            )
+                            .replace(
+                                /\s+/g,
+                                "-"
+                            )
+                    )
+                    .filter(
+                        Boolean
+                    )
+            )
+        ]
+        .slice(
+            0,
+            8
+        );
+    }
+
+
+    /* =====================================================
+       BUTTON LOADING
+       ===================================================== */
+
+    function setPublishButtonLoading(
+        loading
+    ) {
+
+        const button =
+            $("#publishDesignButton");
+
+
+        if (!button) {
+
+            return;
+        }
+
+
+        if (loading) {
+
+            button.disabled =
+                true;
+
+
+            button.dataset.originalText =
+                button.innerHTML;
+
+
+            button.innerHTML = `
+
+                <i
+                    class="fa-solid fa-spinner fa-spin"
+                ></i>
+
+                &nbsp;
+
+                Publishing...
+
+            `;
+
+        } else {
+
+            button.disabled =
+                false;
+
+
+            button.innerHTML =
+                button.dataset.originalText ||
+                `
+
+                    <i
+                        class="fa-solid fa-rocket"
+                    ></i>
+
+                    Publish Design
+
+                `;
+        }
+    }
+
+
+    /* =====================================================
+       FORM RESET
+       ===================================================== */
+
+    function resetDesignForm() {
+
+        const form =
+            $("#designSubmitForm");
+
+
+        form?.reset();
+
+
+        const tags =
+            $("#designTags");
+
+
+        if (tags) {
+
+            tags.value =
+                "[]";
+        }
+
+
+        /*
+         * Clear external tag UI if submit.html
+         * has created it.
+         */
+
+        const tagList =
+            $("#tagList");
+
+
+        if (tagList) {
+
+            tagList.innerHTML =
+                "";
+        }
+
+
+        const descriptionCount =
+            $("#descriptionCount");
+
+
+        if (descriptionCount) {
+
+            descriptionCount.textContent =
+                "0 / 1000";
+        }
+
+
+        const uploadZone =
+            $("#uploadZone");
+
+
+        const uploadPreview =
+            $("#uploadPreview");
+
+
+        if (state.imageObjectUrl) {
+
+            URL.revokeObjectURL(
+                state.imageObjectUrl
+            );
+
+
+            state.imageObjectUrl =
+                null;
+        }
+
+
+        if (uploadZone) {
+
+            uploadZone.style.display =
+                "";
+        }
+
+
+        uploadPreview?.classList.remove(
+            "visible"
+        );
+
+
+        const image =
+            $("#designPreviewImage");
+
+
+        if (image) {
+
+            image.removeAttribute(
+                "src"
+            );
+        }
+
+
+        clearImageError();
+    }
+
+
+    /* =====================================================
+       ERROR/SUCCESS UI
+       ===================================================== */
+
+    function showImageError(
+        message
+    ) {
+
+        const error =
+            $("#imageError");
+
+
+        if (!error) {
+            return;
+        }
+
+
+        error.textContent =
+            message;
+
+
+        error.classList.add(
+            "visible"
+        );
+    }
+
+
+    function clearImageError() {
+
+        const error =
+            $("#imageError");
+
+
+        error?.classList.remove(
+            "visible"
+        );
+
+
+        if (error) {
+
+            error.textContent =
+                "";
+        }
+    }
+
+
+    function showFormSuccess(
+        design
+    ) {
+
+        const element =
+            $("#submissionSuccess");
+
+
+        if (element) {
+
+            element.textContent =
+                `"${design.title}" was published successfully! 🎨`;
+
+
+            element.classList.add(
+                "visible"
+            );
+        }
+
+
+        showToast(
+            "Design published successfully! 🎨",
+            "success"
+        );
+    }
+
+
+    function showFormError(
+        message
+    ) {
+
+        const element =
+            $("#submissionError");
+
+
+        if (element) {
+
+            element.textContent =
+                message;
+
+
+            element.classList.add(
+                "visible"
+            );
+        }
+
+
+        showToast(
+            message,
+            "error"
+        );
+    }
+
+
+    /* =====================================================
+       DELETE UI
        ===================================================== */
 
     async function handleDelete(
-        design,
-        button,
-        card
+        designId
     ) {
+
+        const design =
+            state.designs.find(
+                item =>
+                    item.id ===
+                    designId
+            );
+
+
+        if (!design) {
+
+            return;
+        }
+
 
         const confirmed =
             window.confirm(
-                `Delete "${design.title || "this design"}"? This cannot be undone.`
+                `Delete "${design.title}"?`
             );
 
 
@@ -1600,33 +2204,10 @@ const DVDesigns = (() => {
         }
 
 
-        const originalHTML =
-            button.innerHTML;
-
-
         try {
 
-            button.disabled =
-                true;
-
-
-            button.innerHTML = `
-                <i class="fa-solid fa-spinner fa-spin"></i>
-            `;
-
-
-            if (card) {
-
-                card.style.opacity =
-                    "0.55";
-
-                card.style.pointerEvents =
-                    "none";
-            }
-
-
             await deleteDesign(
-                design
+                designId
             );
 
 
@@ -1636,30 +2217,14 @@ const DVDesigns = (() => {
             );
 
 
+            renderMyDesigns();
+
         } catch (error) {
 
             console.error(
-                "Delete error:",
+                "Delete design error:",
                 error
             );
-
-
-            if (card) {
-
-                card.style.opacity =
-                    "";
-
-                card.style.pointerEvents =
-                    "";
-            }
-
-
-            button.disabled =
-                false;
-
-
-            button.innerHTML =
-                originalHTML;
 
 
             showToast(
@@ -1673,416 +2238,632 @@ const DVDesigns = (() => {
 
 
     /* =====================================================
-       SETUP SEARCH & FILTER
+       RENDER MY DESIGNS
        ===================================================== */
 
-    function setupControls() {
+    function renderMyDesigns() {
 
-        const search =
-            $("#designSearch");
-
-
-        const category =
-            $("#designCategoryFilter");
+        const container =
+            $("#myDesignsGrid");
 
 
-        search?.addEventListener(
-            "input",
-            event => {
-
-                searchDesigns(
-                    event.target.value
-                );
-
-            }
-        );
-
-
-        category?.addEventListener(
-            "change",
-            event => {
-
-                filterByCategory(
-                    event.target.value
-                );
-
-            }
-        );
-    }
-
-
-    /* =====================================================
-       SUBMIT PAGE FORM
-       ===================================================== */
-
-    function setupSubmitForm() {
-
-        const form =
-            $("#designSubmitForm");
-
-
-        if (!form) {
+        if (!container) {
 
             return;
         }
 
 
-        const imageInput =
-            $("#designImageInput");
+        container.innerHTML =
+            "";
 
 
-        const titleInput =
-            $("#designTitle");
+        if (
+            !state.designs.length
+        ) {
 
+            container.innerHTML = `
 
-        const descriptionInput =
-            $("#designDescription");
+                <div
+                    class="designs-empty"
+                    style="
+                        grid-column:1/-1;
+                        text-align:center;
+                        padding:50px 20px;
+                    "
+                >
 
+                    <i
+                        class="fa-solid fa-palette"
+                        style="
+                            font-size:28px;
+                            color:#c4b5fd;
+                            margin-bottom:12px;
+                        "
+                    ></i>
 
-        const categoryInput =
-            $("#designCategory");
 
+                    <h3>
+                        No designs yet
+                    </h3>
 
-        const tagsInput =
-            $("#designTags");
 
+                    <p>
+                        Your creative journey starts here.
+                    </p>
 
-        const publishButton =
-            $("#publishDesignButton");
 
+                    <a
+                        href="../submit.html"
+                        class="btn btn-primary btn-small"
+                    >
+                        Upload Design
+                    </a>
 
-        form.addEventListener(
-            "submit",
-            async event => {
+                </div>
 
-                event.preventDefault();
-
-
-                if (
-                    state.submitting
-                ) {
-
-                    return;
-                }
-
-
-                const file =
-                    imageInput
-                        ?.files?.[0];
-
-
-                const title =
-                    titleInput
-                        ?.value ||
-                    "";
-
-
-                const description =
-                    descriptionInput
-                        ?.value ||
-                    "";
-
-
-                const category =
-                    categoryInput
-                        ?.value ||
-                    "";
-
-
-                /*
-                 * The submit page stores tags
-                 * as JSON in the hidden input.
-                 */
-
-                let tags =
-                    [];
-
-
-                try {
-
-                    const raw =
-                        tagsInput
-                            ?.value ||
-                        "[]";
-
-
-                    const parsed =
-                        JSON.parse(
-                            raw
-                        );
-
-
-                    if (
-                        Array.isArray(
-                            parsed
-                        )
-                    ) {
-
-                        tags =
-                            parsed
-                                .map(
-                                    tag =>
-                                        String(
-                                            tag
-                                        )
-                                        .trim()
-                                        .toLowerCase()
-                                )
-                                .filter(
-                                    Boolean
-                                );
-                    }
-
-                } catch {
-
-                    tags = [];
-                }
-
-
-                const visibility =
-                    form.querySelector(
-                        'input[name="visibility"]:checked'
-                    );
-
-
-                const isPublic =
-                    visibility?.value !==
-                    "private";
-
-
-                try {
-
-                    setSubmitLoading(
-                        publishButton,
-                        true
-                    );
-
-
-                    const design =
-                        await publishDesign({
-
-                            file,
-
-                            title,
-
-                            description,
-
-                            category,
-
-                            tags,
-
-                            isPublic
-
-                        });
-
-
-                    showSubmitSuccess();
-
-
-                    /*
-                     * After success, take the
-                     * designer to their designs.
-                     */
-
-                    setTimeout(
-                        () => {
-
-                            window.location.href =
-                                "dashboard/my-designs.html";
-
-                        },
-                        1000
-                    );
-
-
-                } catch (error) {
-
-                    console.error(
-                        "Publish design error:",
-                        error
-                    );
-
-
-                    showSubmitError(
-                        getDesignErrorMessage(
-                            error
-                        )
-                    );
-
-
-                } finally {
-
-                    setSubmitLoading(
-                        publishButton,
-                        false
-                    );
-                }
-            }
-        );
-    }
-
-
-    /* =====================================================
-       SUBMIT BUTTON LOADING
-       ===================================================== */
-
-    function setSubmitLoading(
-        button,
-        loading
-    ) {
-
-        if (!button) {
-
-            return;
-        }
-
-
-        if (loading) {
-
-            if (
-                !button.dataset.originalText
-            ) {
-
-                button.dataset.originalText =
-                    button.innerHTML;
-            }
-
-
-            button.disabled =
-                true;
-
-
-            button.innerHTML = `
-                <i class="fa-solid fa-spinner fa-spin"></i>
-                &nbsp;
-                Publishing...
             `;
 
-        } else {
 
-            button.disabled =
-                false;
-
-
-            button.innerHTML =
-                button.dataset.originalText ||
-                `
-                    <i class="fa-solid fa-rocket"></i>
-                    Publish Design
-                `;
+            return;
         }
+
+
+        state.designs.forEach(
+            design => {
+
+                container.appendChild(
+                    createDesignCard(
+                        design
+                    )
+                );
+
+            }
+        );
     }
 
 
     /* =====================================================
-       SUBMIT SUCCESS
+       CREATE DESIGN CARD
        ===================================================== */
 
-    function showSubmitSuccess() {
+    function createDesignCard(
+        design
+    ) {
 
-        showToast(
-            "Design published successfully! 🎨",
-            "success"
-        );
-
-
-        const form =
-            $("#designSubmitForm");
+        const article =
+            document.createElement(
+                "article"
+            );
 
 
-        if (form) {
+        article.className =
+            "design-card";
 
-            form.classList.add(
-                "submission-success"
+
+        article.dataset.designId =
+            design.id;
+
+
+        const image =
+            design.image_url
+                ? `
+                    <img
+                        src="${escapeAttribute(
+                            design.image_url
+                        )}"
+                        alt="${escapeAttribute(
+                            design.title
+                        )}"
+                        loading="lazy"
+                    >
+                `
+                : `
+                    <div
+                        style="
+                            width:100%;
+                            height:100%;
+                            display:grid;
+                            place-items:center;
+                            background:linear-gradient(
+                                135deg,
+                                #120825,
+                                #153b75
+                            );
+                            color:#c4b5fd;
+                        "
+                    >
+                        <i
+                            class="fa-solid fa-palette"
+                        ></i>
+                    </div>
+                `;
+
+
+        article.innerHTML = `
+
+            <div
+                class="design-card-image"
+            >
+
+                ${image}
+
+            </div>
+
+
+            <div
+                class="design-card-body"
+            >
+
+                <h3>
+                    ${escapeHTML(
+                        design.title ||
+                        "Untitled Design"
+                    )}
+                </h3>
+
+
+                <span>
+                    ${escapeHTML(
+                        formatCategory(
+                            design.category
+                        )
+                    )}
+                </span>
+
+
+                <div
+                    style="
+                        display:flex;
+                        gap:7px;
+                        margin-top:10px;
+                    "
+                >
+
+                    <a
+                        href="../design.html?id=${encodeURIComponent(
+                            design.id
+                        )}"
+                        class="btn btn-secondary btn-small"
+                    >
+
+                        View
+
+                    </a>
+
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary btn-small"
+                        data-delete-design="${escapeAttribute(
+                            design.id
+                        )}"
+                    >
+
+                        Delete
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
+
+
+        article
+            .querySelector(
+                "[data-delete-design]"
+            )
+            ?.addEventListener(
+                "click",
+                () => {
+
+                    handleDelete(
+                        design.id
+                    );
+
+                }
+            );
+
+
+        return article;
+    }
+
+
+    /* =====================================================
+       ERROR MESSAGE
+       ===================================================== */
+
+    function getDesignErrorMessage(
+        error
+    ) {
+
+        if (!error) {
+
+            return (
+                "Unable to complete that action."
             );
         }
+
+
+        const message =
+            String(
+                error.message ||
+                error
+            );
+
+
+        const lower =
+            message.toLowerCase();
+
+
+        if (
+            lower.includes(
+                "row-level security"
+            )
+        ) {
+
+            return (
+                "Supabase blocked this action. Please check your account permissions."
+            );
+        }
+
+
+        if (
+            lower.includes(
+                "foreign key"
+            )
+        ) {
+
+            return (
+                "The referenced account or record could not be found."
+            );
+        }
+
+
+        if (
+            lower.includes(
+                "bucket"
+            ) &&
+            lower.includes(
+                "not found"
+            )
+        ) {
+
+            return (
+                "The designs Storage bucket was not found."
+            );
+        }
+
+
+        if (
+            lower.includes(
+                "duplicate"
+            )
+        ) {
+
+            return (
+                "A design with these values already exists."
+            );
+        }
+
+
+        if (
+            lower.includes(
+                "network"
+            )
+        ) {
+
+            return (
+                "Network error. Please check your connection."
+            );
+        }
+
+
+        return message;
     }
 
 
     /* =====================================================
-       SUBMIT ERROR
+       TOAST
        ===================================================== */
 
-    function showSubmitError(
-        message
+    function showToast(
+        message,
+        type = "info"
     ) {
 
-        showToast(
-            message,
-            "error"
+        let container =
+            document.querySelector(
+                ".design-toast-container"
+            );
+
+
+        if (!container) {
+
+            container =
+                document.createElement(
+                    "div"
+                );
+
+
+            container.className =
+                "design-toast-container";
+
+
+            container.style.cssText = `
+                position:fixed;
+                right:18px;
+                bottom:18px;
+                z-index:4000;
+                display:flex;
+                flex-direction:column;
+                gap:8px;
+                max-width:min(
+                    390px,
+                    calc(100vw - 36px)
+                );
+            `;
+
+
+            document.body.appendChild(
+                container
+            );
+        }
+
+
+        const toast =
+            document.createElement(
+                "div"
+            );
+
+
+        const icon =
+            type === "success"
+                ? "fa-check"
+                : type === "error"
+                    ? "fa-triangle-exclamation"
+                    : "fa-info-circle";
+
+
+        const color =
+            type === "success"
+                ? "#86efac"
+                : type === "error"
+                    ? "#fca5a5"
+                    : "#c4b5fd";
+
+
+        toast.style.cssText = `
+            display:flex;
+            align-items:center;
+            gap:10px;
+            padding:13px 14px;
+            border:1px solid rgba(255,255,255,.10);
+            border-radius:13px;
+            background:rgba(10,10,16,.95);
+            color:white;
+            box-shadow:0 20px 50px rgba(0,0,0,.35);
+            backdrop-filter:blur(18px);
+            font:10px/1.5 Inter,sans-serif;
+        `;
+
+
+        toast.innerHTML = `
+
+            <i
+                class="fa-solid ${icon}"
+                style="
+                    color:${color};
+                "
+            ></i>
+
+            <span>
+                ${escapeHTML(
+                    message
+                )}
+            </span>
+
+        `;
+
+
+        container.appendChild(
+            toast
+        );
+
+
+        setTimeout(
+            () => {
+
+                toast.remove();
+
+            },
+            4000
         );
     }
 
 
     /* =====================================================
-       OPEN DESIGN
+       FORMATTERS
        ===================================================== */
 
-    function openDesign(
-        design
+    function formatCategory(
+        category
     ) {
 
-        window.location.href =
-            `../design.html?id=${encodeURIComponent(
-                design.id
-            )}`;
-    }
+        const map = {
 
+            branding:
+                "Branding",
 
-    /* =====================================================
-       EDIT DESIGN
-       ===================================================== */
+            poster:
+                "Poster",
 
-    function editDesign(
-        design
-    ) {
+            "ui-ux":
+                "UI / UX",
 
-        window.location.href =
-            `../submit.html?edit=${encodeURIComponent(
-                design.id
-            )}`;
-    }
+            illustration:
+                "Illustration",
 
+            logo:
+                "Logo",
 
-    /* =====================================================
-       PUBLIC STORAGE URL
-       ===================================================== */
+            motion:
+                "Motion",
 
-    function getPublicImageUrl(
-        filePath
-    ) {
+            other:
+                "Other"
 
-        const supabase =
-            getSupabase();
-
-
-        if (!supabase) {
-
-            return null;
-        }
-
-
-        const {
-            data
-        } =
-            supabase
-                .storage
-                .from("designs")
-                .getPublicUrl(
-                    filePath
-                );
+        };
 
 
         return (
-            data?.publicUrl ||
-            null
+            map[category] ||
+            "Other"
         );
     }
 
 
-    /* =====================================================
-       EXTRACT STORAGE PATH
-       ===================================================== */
+    function formatBytes(
+        bytes
+    ) {
+
+        if (
+            !Number.isFinite(
+                bytes
+            ) ||
+            bytes <= 0
+        ) {
+
+            return "0 Bytes";
+        }
+
+
+        const units = [
+
+            "Bytes",
+
+            "KB",
+
+            "MB",
+
+            "GB"
+
+        ];
+
+
+        const index =
+            Math.min(
+                Math.floor(
+                    Math.log(bytes) /
+                    Math.log(1024)
+                ),
+                units.length - 1
+            );
+
+
+        return `${(
+            bytes /
+            Math.pow(
+                1024,
+                index
+            )
+        ).toFixed(
+            index === 0
+                ? 0
+                : 2
+        )} ${units[index]}`;
+    }
+
+
+    function getFileExtension(
+        file
+    ) {
+
+        const extension =
+            file.name
+                .split(".")
+                .pop()
+                .toLowerCase();
+
+
+        const allowed = [
+
+            "jpg",
+
+            "jpeg",
+
+            "png",
+
+            "webp",
+
+            "gif"
+
+        ];
+
+
+        if (
+            allowed.includes(
+                extension
+            )
+        ) {
+
+            return extension;
+        }
+
+
+        const mimeMap = {
+
+            "image/jpeg":
+                "jpg",
+
+            "image/png":
+                "png",
+
+            "image/webp":
+                "webp",
+
+            "image/gif":
+                "gif"
+
+        };
+
+
+        return (
+            mimeMap[
+                file.type
+            ] ||
+            "jpg"
+        );
+    }
+
+
+    function generateId() {
+
+        if (
+            typeof crypto !==
+            "undefined" &&
+            typeof crypto.randomUUID ===
+            "function"
+        ) {
+
+            return crypto.randomUUID();
+        }
+
+
+        return (
+            Date.now()
+                .toString(36) +
+            "-" +
+            Math.random()
+                .toString(36)
+                .substring(
+                    2,
+                    10
+                )
+        );
+    }
+
 
     function extractStoragePath(
         url,
@@ -2146,676 +2927,13 @@ const DVDesigns = (() => {
 
 
             return decodeURIComponent(
-                path
-                    .split("?")[0]
+                path.split("?")[0]
             );
 
         } catch {
 
             return null;
         }
-    }
-
-
-    /* =====================================================
-       LOADING
-       ===================================================== */
-
-    function showLoading() {
-
-        const loading =
-            $("#designsLoading");
-
-
-        const grid =
-            $("#designsGrid");
-
-
-        const empty =
-            $("#designsEmpty");
-
-
-        loading?.removeAttribute(
-            "hidden"
-        );
-
-
-        if (grid) {
-
-            grid.hidden =
-                true;
-        }
-
-
-        empty?.classList.remove(
-            "visible"
-        );
-    }
-
-
-    function hideLoading() {
-
-        const loading =
-            $("#designsLoading");
-
-
-        loading?.setAttribute(
-            "hidden",
-            ""
-        );
-    }
-
-
-    /* =====================================================
-       EMPTY STATE
-       ===================================================== */
-
-    function showEmptyState() {
-
-        const empty =
-            $("#designsEmpty");
-
-
-        if (!empty) {
-            return;
-        }
-
-
-        empty.classList.add(
-            "visible"
-        );
-
-
-        empty.style.display =
-            "flex";
-    }
-
-
-    function hideEmptyState() {
-
-        const empty =
-            $("#designsEmpty");
-
-
-        if (!empty) {
-            return;
-        }
-
-
-        empty.classList.remove(
-            "visible"
-        );
-
-
-        empty.style.display =
-            "";
-    }
-
-
-    /* =====================================================
-       ERROR STATE
-       ===================================================== */
-
-    function showError(
-        message
-    ) {
-
-        hideLoading();
-
-
-        const grid =
-            $("#designsGrid");
-
-
-        if (!grid) {
-            return;
-        }
-
-
-        grid.innerHTML = `
-
-            <div
-                class="designs-empty visible"
-                style="
-                    display:flex;
-                    grid-column:1/-1;
-                "
-            >
-
-                <div
-                    class="designs-empty-icon"
-                >
-
-                    <i
-                        class="fa-solid fa-triangle-exclamation"
-                    ></i>
-
-                </div>
-
-
-                <h2>
-                    Something went wrong
-                </h2>
-
-
-                <p>
-                    ${escapeHTML(
-                        message
-                    )}
-                </p>
-
-
-                <button
-                    type="button"
-                    class="btn btn-primary"
-                    id="retryDesignsButton"
-                >
-
-                    <i
-                        class="fa-solid fa-rotate"
-                    ></i>
-
-                    Try Again
-
-                </button>
-
-            </div>
-
-        `;
-
-
-        grid.hidden =
-            false;
-
-
-        $("#retryDesignsButton")
-            ?.addEventListener(
-                "click",
-                () => {
-
-                    loadDesigns();
-
-                }
-            );
-    }
-
-
-    /* =====================================================
-       TOAST
-       ===================================================== */
-
-    function showToast(
-        message,
-        type = "info"
-    ) {
-
-        let container =
-            $(".toast-container");
-
-
-        if (!container) {
-
-            container =
-                document.createElement(
-                    "div"
-                );
-
-
-            container.className =
-                "toast-container";
-
-
-            document.body.appendChild(
-                container
-            );
-        }
-
-
-        const toast =
-            document.createElement(
-                "div"
-            );
-
-
-        toast.className =
-            `toast toast-${type}`;
-
-
-        const icon =
-            type === "success"
-                ? "fa-check"
-                : type === "error"
-                    ? "fa-triangle-exclamation"
-                    : "fa-info";
-
-
-        toast.innerHTML = `
-
-            <div class="toast-icon">
-
-                <i
-                    class="fa-solid ${icon}"
-                ></i>
-
-            </div>
-
-
-            <div class="toast-body">
-
-                <div class="toast-message">
-
-                    ${escapeHTML(
-                        message
-                    )}
-
-                </div>
-
-            </div>
-
-        `;
-
-
-        container.appendChild(
-            toast
-        );
-
-
-        requestAnimationFrame(
-            () => {
-
-                toast.classList.add(
-                    "show"
-                );
-
-            }
-        );
-
-
-        setTimeout(
-            () => {
-
-                toast.classList.remove(
-                    "show"
-                );
-
-
-                setTimeout(
-                    () => {
-
-                        toast.remove();
-
-                    },
-                    300
-                );
-
-            },
-            3500
-        );
-    }
-
-
-    /* =====================================================
-       ERROR MESSAGES
-       ===================================================== */
-
-    function getDesignErrorMessage(
-        error
-    ) {
-
-        if (!error) {
-
-            return (
-                "Unable to complete that action."
-            );
-        }
-
-
-        const message =
-            String(
-                error.message ||
-                error
-            );
-
-
-        const lower =
-            message.toLowerCase();
-
-
-        if (
-            lower.includes(
-                "row-level security"
-            )
-        ) {
-
-            return (
-                "DESIGNVERSE blocked that action because you don't have permission."
-            );
-        }
-
-
-        if (
-            lower.includes(
-                "network"
-            )
-        ) {
-
-            return (
-                "Network error. Please check your connection."
-            );
-        }
-
-
-        if (
-            lower.includes(
-                "bucket"
-            ) &&
-            lower.includes(
-                "not found"
-            )
-        ) {
-
-            return (
-                "The DESIGNVERSE designs storage bucket could not be found."
-            );
-        }
-
-
-        if (
-            lower.includes(
-                "duplicate"
-            )
-        ) {
-
-            return (
-                "A design with that information already exists."
-            );
-        }
-
-
-        if (
-            lower.includes(
-                "payload too large"
-            )
-        ) {
-
-            return (
-                "The selected image is too large."
-            );
-        }
-
-
-        return message;
-    }
-
-
-    /* =====================================================
-       NUMBER FORMATTING
-       ===================================================== */
-
-    function formatNumber(
-        number
-    ) {
-
-        return new Intl.NumberFormat(
-            "en-US"
-        ).format(
-            Number(number) || 0
-        );
-    }
-
-
-    function formatCompactNumber(
-        number
-    ) {
-
-        return new Intl.NumberFormat(
-            "en-US",
-            {
-                notation:
-                    "compact",
-
-                maximumFractionDigits:
-                    1
-            }
-        ).format(
-            Number(number) || 0
-        );
-    }
-
-
-    /* =====================================================
-       CATEGORY
-       ===================================================== */
-
-    function formatCategory(
-        category
-    ) {
-
-        if (!category) {
-
-            return "Other";
-        }
-
-
-        const map = {
-
-            "ui-ux":
-                "UI / UX",
-
-            branding:
-                "Branding",
-
-            poster:
-                "Poster",
-
-            illustration:
-                "Illustration",
-
-            logo:
-                "Logo",
-
-            motion:
-                "Motion",
-
-            other:
-                "Other"
-
-        };
-
-
-        if (
-            map[category]
-        ) {
-
-            return map[category];
-        }
-
-
-        return String(
-            category
-        )
-        .replace(
-            /[-_]/g,
-            " "
-        )
-        .replace(
-            /\b\w/g,
-            char =>
-                char.toUpperCase()
-        );
-    }
-
-
-    /* =====================================================
-       UTILITIES
-       ===================================================== */
-
-    function setText(
-        selector,
-        value
-    ) {
-
-        const element =
-            $(selector);
-
-
-        if (element) {
-
-            element.textContent =
-                value;
-        }
-    }
-
-
-    function escapeHTML(
-        value
-    ) {
-
-        const element =
-            document.createElement(
-                "div"
-            );
-
-
-        element.textContent =
-            String(
-                value ?? ""
-            );
-
-
-        return element.innerHTML;
-    }
-
-
-    function escapeAttribute(
-        value
-    ) {
-
-        return escapeHTML(
-            value
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-    }
-
-
-    function getFileExtension(
-        file
-    ) {
-
-        const extension =
-            file.name
-                .split(".")
-                .pop()
-                .toLowerCase();
-
-
-        const allowed = [
-            "jpg",
-            "jpeg",
-            "png",
-            "webp",
-            "gif"
-        ];
-
-
-        if (
-            allowed.includes(
-                extension
-            )
-        ) {
-
-            return extension;
-        }
-
-
-        /*
-         * Use a sensible extension
-         * fallback based on MIME.
-         */
-
-        const mimeMap = {
-
-            "image/jpeg":
-                "jpg",
-
-            "image/png":
-                "png",
-
-            "image/webp":
-                "webp",
-
-            "image/gif":
-                "gif"
-
-        };
-
-
-        return (
-            mimeMap[
-                file.type
-            ] ||
-            "jpg"
-        );
-    }
-
-
-    function generateId() {
-
-        if (
-            crypto &&
-            typeof crypto.randomUUID ===
-            "function"
-        ) {
-
-            return crypto.randomUUID();
-        }
-
-
-        return (
-            Date.now()
-            .toString(36) +
-            "_" +
-            Math.random()
-                .toString(36)
-                .substring(2, 10)
-        );
-    }
-
-
-    function truncateTitle(
-        text,
-        length
-    ) {
-
-        const value =
-            String(
-                text || ""
-            );
-
-
-        if (
-            value.length <=
-            length
-        ) {
-
-            return value;
-        }
-
-
-        return (
-            value.substring(
-                0,
-                length
-            ) +
-            "..."
-        );
     }
 
 
@@ -2833,18 +2951,26 @@ const DVDesigns = (() => {
         }
 
 
-        const isDesignsPage =
-            !!$("#designsGrid") ||
-            !!$("#designsLoading");
-
+        /*
+         * Only initialize on pages that actually
+         * contain design-management elements.
+         */
 
         const isSubmitPage =
-            !!$("#designSubmitForm");
+            Boolean(
+                $("#designSubmitForm")
+            );
+
+
+        const isDesignsPage =
+            Boolean(
+                $("#myDesignsGrid")
+            );
 
 
         if (
-            !isDesignsPage &&
-            !isSubmitPage
+            !isSubmitPage &&
+            !isDesignsPage
         ) {
 
             return;
@@ -2856,28 +2982,80 @@ const DVDesigns = (() => {
 
 
         /*
-         * Submit page only needs upload
-         * functionality.
+         * Only load the form logic when the
+         * normal design upload form exists.
          */
 
-        if (isSubmitPage) {
+        if (
+            isSubmitPage
+        ) {
 
-            setupSubmitForm();
+            await getCurrentUser();
+
+            setupImagePreview();
+
+            setupForm();
+
         }
 
 
         /*
-         * My Designs page needs database
-         * loading + search + filters.
+         * My Designs page.
          */
 
-        if (isDesignsPage) {
+        if (
+            isDesignsPage
+        ) {
 
-            setupControls();
+            try {
 
-            await loadDesigns();
+                await getCurrentUser();
+
+                await loadMyDesigns();
+
+                renderMyDesigns();
+
+            } catch (error) {
+
+                console.error(
+                    "Unable to load My Designs:",
+                    error
+                );
+
+                showToast(
+                    getDesignErrorMessage(
+                        error
+                    ),
+                    "error"
+                );
+            }
         }
     }
+
+
+    /* =====================================================
+       CLEANUP
+       ===================================================== */
+
+    window.addEventListener(
+        "pagehide",
+        () => {
+
+            if (
+                state.imageObjectUrl
+            ) {
+
+                URL.revokeObjectURL(
+                    state.imageObjectUrl
+                );
+
+
+                state.imageObjectUrl =
+                    null;
+            }
+
+        }
+    );
 
 
     /* =====================================================
@@ -2890,29 +3068,27 @@ const DVDesigns = (() => {
 
         init,
 
-        loadDesigns,
+        getCurrentUser,
 
-        renderDesigns,
+        loadMyDesigns,
 
-        updateStats,
+        loadDesign,
 
-        searchDesigns,
+        createDesign,
 
-        filterByCategory,
-
-        validateDesignFile,
-
-        uploadDesignFile,
-
-        createDesignRecord,
-
-        publishDesign,
+        updateDesign,
 
         deleteDesign,
 
-        getPublicImageUrl,
+        uploadDesignImage,
 
-        getCurrentUser
+        renderMyDesigns,
+
+        validateImageFile,
+
+        validateDesignData,
+
+        isChallengeMode
 
     };
 
@@ -2928,7 +3104,7 @@ window.DVDesigns =
 
 
 /* =========================================================
-   DOM READY
+   START
    ========================================================= */
 
 document.addEventListener(
@@ -2942,5 +3118,5 @@ document.addEventListener(
 
 
 /* =========================================================
-   DESIGNVERSE DESIGNS SYSTEM COMPLETE
+   DESIGNVERSE DESIGN SYSTEM COMPLETE
    ========================================================= */
