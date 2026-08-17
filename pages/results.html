@@ -1,0 +1,2142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <!-- =====================================================
+         DESIGNVERSE
+         Challenge Results
+         ===================================================== -->
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#050508"
+    >
+
+    <meta
+        name="description"
+        content="View the final results and winners of a DESIGNVERSE challenge."
+    >
+
+    <title>Challenge Results — DESIGNVERSE</title>
+
+
+    <!-- =====================================================
+         FONTS
+         ===================================================== -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         ICONS
+         ===================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+
+    <!-- =====================================================
+         DESIGNVERSE CSS
+         ===================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/components.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/animations.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/responsive.css"
+    >
+
+
+    <!-- =====================================================
+         RESULTS PAGE STYLES
+         ===================================================== -->
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        .results-page {
+            min-height: 100vh;
+            padding-top: 82px;
+        }
+
+        .results-main {
+            padding: 30px 20px 80px;
+        }
+
+        .results-container {
+            width: min(100%, 1280px);
+            margin-inline: auto;
+        }
+
+
+        /* =================================================
+           BREADCRUMB
+           ================================================= */
+
+        .results-breadcrumb {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 7px;
+
+            margin-bottom: 18px;
+
+            color: var(--text-muted);
+            font-size: 9px;
+        }
+
+        .results-breadcrumb a {
+            color: var(--text-muted);
+            transition: color 180ms ease;
+        }
+
+        .results-breadcrumb a:hover {
+            color: white;
+        }
+
+        .results-breadcrumb i {
+            font-size: 7px;
+            opacity: .45;
+        }
+
+
+        /* =================================================
+           HERO
+           ================================================= */
+
+        .results-hero {
+            position: relative;
+            overflow: hidden;
+
+            margin-bottom: 20px;
+            padding: 42px;
+
+            border:
+                1px solid
+                rgba(245,158,11,.18);
+
+            border-radius: 26px;
+
+            background:
+                radial-gradient(
+                    circle at 50% 0%,
+                    rgba(245,158,11,.20),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 85% 40%,
+                    rgba(124,58,237,.20),
+                    transparent 32%
+                ),
+                linear-gradient(
+                    135deg,
+                    rgba(255,255,255,.055),
+                    rgba(255,255,255,.015)
+                );
+
+            box-shadow:
+                0 30px 90px
+                rgba(0,0,0,.28);
+
+            text-align: center;
+        }
+
+        .results-hero-orb {
+            position: absolute;
+
+            border:
+                1px solid
+                rgba(245,158,11,.10);
+
+            border-radius: 50%;
+
+            pointer-events: none;
+        }
+
+        .results-hero-orb.one {
+            width: 390px;
+            height: 390px;
+
+            top: -220px;
+            left: 50%;
+
+            transform: translateX(-50%);
+        }
+
+        .results-eyebrow {
+            position: relative;
+            z-index: 2;
+
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            margin-bottom: 12px;
+
+            color: #fcd34d;
+
+            font-size: 9px;
+            font-weight: 800;
+
+            letter-spacing: .16em;
+            text-transform: uppercase;
+        }
+
+        .results-eyebrow i {
+            color: #f59e0b;
+        }
+
+        .results-hero h1 {
+            position: relative;
+            z-index: 2;
+
+            margin: 0 0 10px;
+
+            color: white;
+
+            font-family:
+                "Space Grotesk",
+                sans-serif;
+
+            font-size:
+                clamp(
+                    36px,
+                    6vw,
+                    68px
+                );
+
+            line-height: .92;
+            letter-spacing: -.08em;
+        }
+
+        .results-hero h1 span {
+            background: var(--gradient-main);
+
+            -webkit-background-clip: text;
+            background-clip: text;
+
+            color: transparent;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .results-hero-description {
+            position: relative;
+            z-index: 2;
+
+            max-width: 700px;
+            margin: 0 auto;
+
+            color: var(--text-secondary);
+
+            font-size: 11px;
+            line-height: 1.75;
+        }
+
+
+        /* =================================================
+           CHALLENGE INFO
+           ================================================= */
+
+        .results-challenge-info {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+
+            gap: 8px;
+
+            margin-top: 18px;
+        }
+
+        .results-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+
+            padding: 8px 11px;
+
+            border:
+                1px solid
+                rgba(255,255,255,.10);
+
+            border-radius: 999px;
+
+            background:
+                rgba(5,5,8,.40);
+
+            color:
+                rgba(255,255,255,.80);
+
+            font-size: 8px;
+            font-weight: 700;
+        }
+
+        .results-pill.completed {
+            color: #c4b5fd;
+
+            border-color:
+                rgba(124,58,237,.20);
+
+            background:
+                rgba(124,58,237,.06);
+        }
+
+
+        /* =================================================
+           STATS
+           ================================================= */
+
+        .results-stats {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, minmax(0,1fr));
+
+            gap: 10px;
+
+            margin-bottom: 22px;
+        }
+
+        .results-stat {
+            padding: 16px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius: 15px;
+
+            background:
+                rgba(255,255,255,.03);
+        }
+
+        .results-stat strong {
+            display: block;
+
+            margin-bottom: 4px;
+
+            color: white;
+
+            font-family:
+                "Space Grotesk",
+                sans-serif;
+
+            font-size: 23px;
+            line-height: 1;
+
+            letter-spacing: -.05em;
+        }
+
+        .results-stat span {
+            color: var(--text-muted);
+
+            font-size: 7px;
+            font-weight: 700;
+
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+
+        /* =================================================
+           WINNER AREA
+           ================================================= */
+
+        .winner-section {
+            margin-bottom: 22px;
+        }
+
+        .winner-section-heading {
+            margin-bottom: 14px;
+        }
+
+        .winner-section-heading h2 {
+            margin: 0 0 4px;
+
+            color: white;
+
+            font-size: 22px;
+            letter-spacing: -.04em;
+        }
+
+        .winner-section-heading p {
+            margin: 0;
+
+            color: var(--text-muted);
+            font-size: 8px;
+        }
+
+
+        /* =================================================
+           WINNER CARD
+           ================================================= */
+
+        .winner-card {
+            position: relative;
+            overflow: hidden;
+
+            display: grid;
+
+            grid-template-columns:
+                minmax(0,1.1fr)
+                minmax(280px,.9fr);
+
+            gap: 0;
+
+            min-height: 400px;
+
+            border:
+                1px solid
+                rgba(245,158,11,.24);
+
+            border-radius: 24px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(245,158,11,.08),
+                    rgba(124,58,237,.06)
+                );
+
+            box-shadow:
+                0 25px 80px
+                rgba(0,0,0,.24);
+        }
+
+        .winner-image {
+            position: relative;
+            overflow: hidden;
+
+            min-height: 400px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #120825,
+                    #153b75
+                );
+        }
+
+        .winner-image img {
+            width: 100%;
+            height: 100%;
+
+            display: block;
+
+            object-fit: cover;
+        }
+
+        .winner-image-placeholder {
+            width: 100%;
+            height: 100%;
+
+            min-height: 400px;
+
+            display: grid;
+            place-items: center;
+
+            background:
+                radial-gradient(
+                    circle at 50% 20%,
+                    rgba(245,158,11,.25),
+                    transparent 30%
+                ),
+                linear-gradient(
+                    135deg,
+                    #120825,
+                    #153b75
+                );
+
+            color: #fcd34d;
+
+            font-size: 45px;
+        }
+
+        .winner-badge {
+            position: absolute;
+
+            top: 16px;
+            left: 16px;
+
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            padding: 8px 11px;
+
+            border:
+                1px solid
+                rgba(245,158,11,.30);
+
+            border-radius: 10px;
+
+            background:
+                rgba(5,5,8,.78);
+
+            backdrop-filter: blur(14px);
+
+            color: #fcd34d;
+
+            font-size: 8px;
+            font-weight: 800;
+
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+
+        /* =================================================
+           WINNER DETAILS
+           ================================================= */
+
+        .winner-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            padding: 32px;
+        }
+
+        .winner-medal {
+            margin-bottom: 9px;
+
+            font-size: 34px;
+            line-height: 1;
+        }
+
+        .winner-kicker {
+            margin-bottom: 7px;
+
+            color: #fcd34d;
+
+            font-size: 8px;
+            font-weight: 800;
+
+            letter-spacing: .14em;
+            text-transform: uppercase;
+        }
+
+        .winner-title {
+            margin: 0 0 7px;
+
+            color: white;
+
+            font-family:
+                "Space Grotesk",
+                sans-serif;
+
+            font-size:
+                clamp(
+                    27px,
+                    4vw,
+                    43px
+                );
+
+            line-height: .98;
+            letter-spacing: -.06em;
+        }
+
+        .winner-description {
+            margin: 0 0 18px;
+
+            color: var(--text-secondary);
+
+            font-size: 10px;
+            line-height: 1.7;
+        }
+
+        .winner-score {
+            display: flex;
+            align-items: flex-end;
+            gap: 7px;
+
+            margin-bottom: 19px;
+        }
+
+        .winner-score strong {
+            color: white;
+
+            font-family:
+                "Space Grotesk",
+                sans-serif;
+
+            font-size: 32px;
+            line-height: .9;
+        }
+
+        .winner-score span {
+            margin-bottom: 3px;
+
+            color: #c4b5fd;
+
+            font-size: 8px;
+            font-weight: 700;
+        }
+
+        .winner-meta {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2,minmax(0,1fr));
+
+            gap: 8px;
+
+            margin-bottom: 18px;
+        }
+
+        .winner-meta-item {
+            padding: 10px;
+
+            border:
+                1px solid
+                rgba(255,255,255,.07);
+
+            border-radius: 10px;
+
+            background:
+                rgba(255,255,255,.025);
+        }
+
+        .winner-meta-item span {
+            display: block;
+
+            margin-bottom: 4px;
+
+            color: var(--text-muted);
+
+            font-size: 7px;
+            text-transform: uppercase;
+        }
+
+        .winner-meta-item strong {
+            color: white;
+
+            font-size: 9px;
+        }
+
+        .winner-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+
+        /* =================================================
+           PODIUM
+           ================================================= */
+
+        .results-podium-section {
+            margin-bottom: 22px;
+        }
+
+        .results-section-heading {
+            margin-bottom: 13px;
+        }
+
+        .results-section-heading h2 {
+            margin: 0 0 4px;
+
+            color: white;
+
+            font-size: 21px;
+            letter-spacing: -.04em;
+        }
+
+        .results-section-heading p {
+            margin: 0;
+
+            color: var(--text-muted);
+
+            font-size: 8px;
+        }
+
+        .results-podium {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3,minmax(0,1fr));
+
+            gap: 11px;
+        }
+
+        .results-podium-card {
+            position: relative;
+
+            padding: 18px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius: 18px;
+
+            background:
+                rgba(255,255,255,.03);
+
+            text-align: center;
+        }
+
+        .results-podium-card.first {
+            border-color:
+                rgba(245,158,11,.24);
+
+            background:
+                rgba(245,158,11,.045);
+        }
+
+        .results-podium-card.second {
+            border-color:
+                rgba(203,213,225,.17);
+        }
+
+        .results-podium-card.third {
+            border-color:
+                rgba(180,83,9,.18);
+        }
+
+        .results-podium-rank {
+            margin-bottom: 9px;
+
+            font-size: 25px;
+        }
+
+        .results-podium-image {
+            width: 82px;
+            height: 82px;
+
+            margin:
+                0 auto 10px;
+
+            overflow: hidden;
+
+            border-radius: 15px;
+
+            background:
+                #09090f;
+
+            border:
+                1px solid
+                rgba(255,255,255,.10);
+        }
+
+        .results-podium-image img {
+            width: 100%;
+            height: 100%;
+
+            display: block;
+
+            object-fit: cover;
+        }
+
+        .results-podium-placeholder {
+            width: 100%;
+            height: 100%;
+
+            display: grid;
+            place-items: center;
+
+            color: #c4b5fd;
+        }
+
+        .results-podium-title {
+            display: block;
+
+            margin-bottom: 4px;
+
+            overflow: hidden;
+
+            color: white;
+
+            font-size: 10px;
+            font-weight: 700;
+
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .results-podium-score {
+            color: #c4b5fd;
+
+            font-size: 8px;
+            font-weight: 700;
+        }
+
+
+        /* =================================================
+           FULL RESULTS
+           ================================================= */
+
+        .results-list-section {
+            margin-top: 23px;
+        }
+
+        .results-list {
+            display:
+                flex;
+
+            flex-direction:
+                column;
+
+            gap: 8px;
+        }
+
+        .results-row {
+            display: grid;
+
+            grid-template-columns:
+                65px
+                minmax(0,1fr)
+                105px
+                auto;
+
+            align-items: center;
+
+            gap: 12px;
+
+            padding: 10px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius: 14px;
+
+            background:
+                rgba(255,255,255,.025);
+        }
+
+        .results-row-rank {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            min-height: 40px;
+
+            color: #d4d4d8;
+
+            font-family:
+                "Space Grotesk",
+                sans-serif;
+
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .results-row-design {
+            min-width: 0;
+
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+        }
+
+        .results-row-image {
+            width: 58px;
+            height: 46px;
+
+            flex-shrink: 0;
+
+            overflow: hidden;
+
+            border-radius: 9px;
+
+            background: #09090f;
+        }
+
+        .results-row-image img {
+            width: 100%;
+            height: 100%;
+
+            display: block;
+
+            object-fit: cover;
+        }
+
+        .results-row-image-placeholder {
+            width: 100%;
+            height: 100%;
+
+            display: grid;
+            place-items: center;
+
+            color: #c4b5fd;
+        }
+
+        .results-row-info {
+            min-width: 0;
+        }
+
+        .results-row-info h3 {
+            margin:
+                0 0 3px;
+
+            overflow: hidden;
+
+            color: white;
+
+            font-size: 11px;
+
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .results-row-info span {
+            color: var(--text-muted);
+            font-size: 8px;
+        }
+
+        .results-row-score {
+            display: flex;
+            align-items: flex-end;
+            flex-direction: column;
+        }
+
+        .results-row-score strong {
+            color: white;
+
+            font-family:
+                "Space Grotesk",
+                sans-serif;
+
+            font-size: 17px;
+            line-height: 1;
+        }
+
+        .results-row-score span {
+            margin-top: 3px;
+
+            color: #c4b5fd;
+
+            font-size: 7px;
+            font-weight: 700;
+
+            text-transform: uppercase;
+        }
+
+
+        /* =================================================
+           LOADING
+           ================================================= */
+
+        .results-loading {
+            min-height: 450px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            flex-direction: column;
+
+            gap: 10px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius: 20px;
+
+            background:
+                rgba(255,255,255,.025);
+
+            color: var(--text-muted);
+
+            font-size: 9px;
+        }
+
+        .results-loading i {
+            color: #c4b5fd;
+            font-size: 23px;
+        }
+
+
+        /* =================================================
+           ERROR
+           ================================================= */
+
+        .results-error {
+            display: none;
+
+            min-height: 420px;
+
+            align-items: center;
+            justify-content: center;
+
+            flex-direction: column;
+
+            padding: 40px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius: 20px;
+
+            text-align: center;
+        }
+
+        .results-error.visible {
+            display: flex;
+        }
+
+        .results-error-icon {
+            width: 64px;
+            height: 64px;
+
+            display: grid;
+            place-items: center;
+
+            margin-bottom: 14px;
+
+            border-radius: 18px;
+
+            background:
+                rgba(239,68,68,.08);
+
+            color: #fca5a5;
+
+            font-size: 22px;
+        }
+
+        .results-error h2 {
+            margin: 0 0 7px;
+
+            color: white;
+
+            font-size: 21px;
+        }
+
+        .results-error p {
+            max-width: 440px;
+
+            margin: 0 0 17px;
+
+            color: var(--text-muted);
+
+            font-size: 9px;
+            line-height: 1.6;
+        }
+
+
+        /* =================================================
+           RESPONSIVE
+           ================================================= */
+
+        @media (max-width: 950px) {
+
+            .winner-card {
+                grid-template-columns: 1fr;
+            }
+
+            .winner-image,
+            .winner-image-placeholder {
+                min-height: 350px;
+            }
+
+            .results-row {
+                grid-template-columns:
+                    55px
+                    minmax(0,1fr)
+                    90px
+                    auto;
+            }
+        }
+
+
+        @media (max-width: 760px) {
+
+            .results-stats {
+                grid-template-columns:
+                    repeat(2,minmax(0,1fr));
+            }
+
+            .results-podium {
+                grid-template-columns:
+                    1fr;
+            }
+
+            .results-podium-card.first {
+                order: -1;
+            }
+        }
+
+
+        @media (max-width: 600px) {
+
+            .results-main {
+                padding:
+                    22px 14px 60px;
+            }
+
+            .results-hero {
+                padding:
+                    30px 20px;
+            }
+
+            .winner-details {
+                padding:
+                    24px 20px;
+            }
+
+            .winner-image,
+            .winner-image-placeholder {
+                min-height: 290px;
+            }
+        }
+
+
+        @media (max-width: 500px) {
+
+            .results-stats {
+                gap: 8px;
+            }
+
+            .results-stat {
+                padding: 13px;
+            }
+
+            .results-stat strong {
+                font-size: 20px;
+            }
+
+            .results-row {
+                grid-template-columns:
+                    48px
+                    minmax(0,1fr)
+                    70px;
+            }
+
+            .results-row
+            .btn {
+                grid-column: 2 / -1;
+                justify-self: start;
+            }
+
+            .winner-meta {
+                grid-template-columns:
+                    1fr;
+            }
+        }
+
+
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration:
+                    .01ms !important;
+
+                animation-iteration-count:
+                    1 !important;
+
+                transition-duration:
+                    .01ms !important;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body data-results-page="true">
+
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <header
+        class="site-header"
+        id="site-header"
+    >
+
+        <nav class="navbar container">
+
+            <a
+                href="../index.html"
+                class="brand"
+                aria-label="DESIGNVERSE Home"
+            >
+
+                <div class="brand-icon">
+                    <span>DV</span>
+                </div>
+
+                <div class="brand-text">
+
+                    <span class="brand-name">
+                        DESIGNVERSE
+                    </span>
+
+                    <span class="brand-subtitle">
+                        BY BESTB DESIGNS
+                    </span>
+
+                </div>
+
+            </a>
+
+
+            <div class="desktop-nav">
+
+                <a href="explore.html">
+                    Explore
+                </a>
+
+                <a href="challenges.html">
+                    Challenges
+                </a>
+
+                <a
+                    href="leaderboard.html"
+                    class="active"
+                >
+                    Leaderboard
+                </a>
+
+                <a href="designers.html">
+                    Designers
+                </a>
+
+            </div>
+
+
+            <div class="nav-actions">
+
+                <a
+                    href="dashboard/dashboard.html"
+                    class="btn btn-secondary btn-small"
+                >
+
+                    <i
+                        class="fa-solid fa-chart-pie"
+                    ></i>
+
+                    Dashboard
+
+                </a>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+
+    <!-- =====================================================
+         PAGE
+         ===================================================== -->
+
+    <main class="results-page">
+
+        <div class="results-main">
+
+            <div class="results-container">
+
+
+                <!-- =========================================
+                     BREADCRUMB
+                     ========================================= -->
+
+                <nav
+                    class="results-breadcrumb"
+                    aria-label="Breadcrumb"
+                >
+
+                    <a href="challenges.html">
+                        Challenges
+                    </a>
+
+                    <i
+                        class="fa-solid fa-chevron-right"
+                    ></i>
+
+                    <a
+                        href="leaderboard.html"
+                        id="resultsLeaderboardLink"
+                    >
+                        Leaderboard
+                    </a>
+
+                    <i
+                        class="fa-solid fa-chevron-right"
+                    ></i>
+
+                    <span id="resultsBreadcrumb">
+                        Results
+                    </span>
+
+                </nav>
+
+
+                <!-- =========================================
+                     HERO
+                     ========================================= -->
+
+                <section
+                    class="results-hero"
+                >
+
+                    <div
+                        class="results-hero-orb one"
+                    ></div>
+
+
+                    <div
+                        class="results-eyebrow"
+                    >
+
+                        <i
+                            class="fa-solid fa-trophy"
+                        ></i>
+
+                        CHALLENGE COMPLETE
+
+                    </div>
+
+
+                    <h1>
+
+                        The results
+                        <span>are in.</span>
+
+                    </h1>
+
+
+                    <p
+                        class="results-hero-description"
+                        id="resultsHeroDescription"
+                    >
+
+                        See who came out on top,
+                        celebrate the winning designs,
+                        and explore the final rankings.
+
+                    </p>
+
+
+                    <div
+                        class="results-challenge-info"
+                    >
+
+                        <span
+                            class="results-pill"
+                        >
+
+                            <i
+                                class="fa-solid fa-trophy"
+                            ></i>
+
+                            <span
+                                id="resultsChallengeTitle"
+                            >
+                                Loading challenge...
+                            </span>
+
+                        </span>
+
+
+                        <span
+                            class="results-pill completed"
+                        >
+
+                            <i
+                                class="fa-solid fa-flag-checkered"
+                            ></i>
+
+                            <span>
+                                Completed
+                            </span>
+
+                        </span>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =========================================
+                     STATS
+                     ========================================= -->
+
+                <section
+                    class="results-stats"
+                >
+
+                    <article
+                        class="results-stat"
+                    >
+
+                        <strong
+                            id="resultsSubmissionCount"
+                        >
+                            0
+                        </strong>
+
+                        <span>
+                            Entries
+                        </span>
+
+                    </article>
+
+
+                    <article
+                        class="results-stat"
+                    >
+
+                        <strong
+                            id="resultsDesignerCount"
+                        >
+                            0
+                        </strong>
+
+                        <span>
+                            Designers
+                        </span>
+
+                    </article>
+
+
+                    <article
+                        class="results-stat"
+                    >
+
+                        <strong
+                            id="resultsVoteCount"
+                        >
+                            0
+                        </strong>
+
+                        <span>
+                            Votes
+                        </span>
+
+                    </article>
+
+
+                    <article
+                        class="results-stat"
+                    >
+
+                        <strong
+                            id="resultsTopScore"
+                        >
+                            0
+                        </strong>
+
+                        <span>
+                            Winning Score
+                        </span>
+
+                    </article>
+
+                </section>
+
+
+                <!-- =========================================
+                     ERROR
+                     ========================================= -->
+
+                <section
+                    class="results-error"
+                    id="resultsError"
+                >
+
+                    <div
+                        class="results-error-icon"
+                    >
+
+                        <i
+                            class="fa-solid fa-triangle-exclamation"
+                        ></i>
+
+                    </div>
+
+
+                    <h2>
+                        Results unavailable
+                    </h2>
+
+
+                    <p
+                        id="resultsErrorMessage"
+                    >
+
+                        We couldn't load the final results.
+
+                    </p>
+
+
+                    <a
+                        href="challenges.html"
+                        class="btn btn-primary"
+                    >
+
+                        <i
+                            class="fa-solid fa-arrow-left"
+                        ></i>
+
+                        Back to Challenges
+
+                    </a>
+
+                </section>
+
+
+                <!-- =========================================
+                     RESULTS CONTENT
+                     ========================================= -->
+
+                <div
+                    id="resultsContent"
+                >
+
+
+                    <!-- =====================================
+                         WINNER
+                         ===================================== -->
+
+                    <section
+                        class="winner-section"
+                    >
+
+                        <div
+                            class="winner-section-heading"
+                        >
+
+                            <h2>
+                                🏆 Champion
+                            </h2>
+
+                            <p>
+                                The highest-scoring entry.
+                            </p>
+
+                        </div>
+
+
+                        <article
+                            class="winner-card"
+                            id="winnerCard"
+                        >
+
+                            <div
+                                class="winner-image"
+                                id="winnerImage"
+                            >
+
+                                <div
+                                    class="winner-image-placeholder"
+                                >
+
+                                    <i
+                                        class="fa-solid fa-spinner fa-spin"
+                                    ></i>
+
+                                </div>
+
+                            </div>
+
+
+                            <div
+                                class="winner-details"
+                            >
+
+                                <div
+                                    class="winner-medal"
+                                >
+                                    🥇
+                                </div>
+
+
+                                <div
+                                    class="winner-kicker"
+                                >
+                                    1ST PLACE
+                                </div>
+
+
+                                <h2
+                                    class="winner-title"
+                                    id="winnerTitle"
+                                >
+                                    Loading winner...
+                                </h2>
+
+
+                                <p
+                                    class="winner-description"
+                                    id="winnerDescription"
+                                >
+                                    Loading final result...
+                                </p>
+
+
+                                <div
+                                    class="winner-score"
+                                >
+
+                                    <strong
+                                        id="winnerScore"
+                                    >
+                                        0
+                                    </strong>
+
+                                    <span>
+                                        votes
+                                    </span>
+
+                                </div>
+
+
+                                <div
+                                    class="winner-meta"
+                                >
+
+                                    <div
+                                        class="winner-meta-item"
+                                    >
+
+                                        <span>
+                                            Category
+                                        </span>
+
+                                        <strong
+                                            id="winnerCategory"
+                                        >
+                                            —
+                                        </strong>
+
+                                    </div>
+
+
+                                    <div
+                                        class="winner-meta-item"
+                                    >
+
+                                        <span>
+                                            Prize
+                                        </span>
+
+                                        <strong
+                                            id="winnerPrize"
+                                        >
+                                            —
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    class="winner-actions"
+                                >
+
+                                    <a
+                                        href="#"
+                                        class="btn btn-primary btn-small"
+                                        id="winnerDesignLink"
+                                    >
+
+                                        View Winning Design
+
+                                        <i
+                                            class="fa-solid fa-arrow-right"
+                                        ></i>
+
+                                    </a>
+
+
+                                    <a
+                                        href="#resultsRanking"
+                                        class="btn btn-secondary btn-small"
+                                    >
+
+                                        Full Rankings
+
+                                        <i
+                                            class="fa-solid fa-list-ol"
+                                        ></i>
+
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+                    </section>
+
+
+                    <!-- =====================================
+                         PODIUM
+                         ===================================== -->
+
+                    <section
+                        class="results-podium-section"
+                    >
+
+                        <div
+                            class="results-section-heading"
+                        >
+
+                            <h2>
+                                Top 3
+                            </h2>
+
+                            <p>
+                                The designers who made the podium.
+                            </p>
+
+                        </div>
+
+
+                        <div
+                            class="results-podium"
+                        >
+
+                            <article
+                                class="results-podium-card second"
+                                id="resultsSecond"
+                            >
+
+                                <div
+                                    class="results-podium-rank"
+                                >
+                                    🥈
+                                </div>
+
+
+                                <div
+                                    class="results-podium-image"
+                                >
+
+                                    <div
+                                        class="results-podium-placeholder"
+                                    >
+
+                                        <i
+                                            class="fa-solid fa-spinner fa-spin"
+                                        ></i>
+
+                                    </div>
+
+                                </div>
+
+
+                                <strong
+                                    class="results-podium-title"
+                                >
+                                    Loading...
+                                </strong>
+
+
+                                <span
+                                    class="results-podium-score"
+                                >
+                                    —
+                                </span>
+
+                            </article>
+
+
+                            <article
+                                class="results-podium-card first"
+                                id="resultsFirst"
+                            >
+
+                                <div
+                                    class="results-podium-rank"
+                                >
+                                    🥇
+                                </div>
+
+
+                                <div
+                                    class="results-podium-image"
+                                >
+
+                                    <div
+                                        class="results-podium-placeholder"
+                                    >
+
+                                        <i
+                                            class="fa-solid fa-spinner fa-spin"
+                                        ></i>
+
+                                    </div>
+
+                                </div>
+
+
+                                <strong
+                                    class="results-podium-title"
+                                >
+                                    Loading...
+                                </strong>
+
+
+                                <span
+                                    class="results-podium-score"
+                                >
+                                    —
+                                </span>
+
+                            </article>
+
+
+                            <article
+                                class="results-podium-card third"
+                                id="resultsThird"
+                            >
+
+                                <div
+                                    class="results-podium-rank"
+                                >
+                                    🥉
+                                </div>
+
+
+                                <div
+                                    class="results-podium-image"
+                                >
+
+                                    <div
+                                        class="results-podium-placeholder"
+                                    >
+
+                                        <i
+                                            class="fa-solid fa-spinner fa-spin"
+                                        ></i>
+
+                                    </div>
+
+                                </div>
+
+
+                                <strong
+                                    class="results-podium-title"
+                                >
+                                    Loading...
+                                </strong>
+
+
+                                <span
+                                    class="results-podium-score"
+                                >
+                                    —
+                                </span>
+
+                            </article>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- =====================================
+                         FULL RANKINGS
+                         ===================================== -->
+
+                    <section
+                        class="results-list-section"
+                        id="resultsRanking"
+                    >
+
+                        <div
+                            class="results-section-heading"
+                        >
+
+                            <h2>
+                                Final Rankings
+                            </h2>
+
+                            <p>
+                                Every submission ranked by its final vote score.
+                            </p>
+
+                        </div>
+
+
+                        <div
+                            class="results-list"
+                            id="resultsList"
+                        >
+
+                            <div
+                                class="results-loading"
+                            >
+
+                                <i
+                                    class="fa-solid fa-spinner fa-spin"
+                                ></i>
+
+                                Loading final rankings...
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+         ===================================================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+    <script
+        src="../js/utils.js"
+    ></script>
+
+    <script
+        src="../js/supabase.js"
+    ></script>
+
+    <script
+        src="../js/auth.js"
+    ></script>
+
+    <script
+        src="../js/leaderboard.js"
+    ></script>
+
+    <script
+        src="../js/results.js"
+    ></script>
+
+    <script
+        src="../js/navigation.js"
+    ></script>
+
+
+    <!-- =====================================================
+         PAGE UI
+         ===================================================== -->
+
+    <script>
+
+        "use strict";
+
+
+        const resultsParams =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        const resultsChallengeId =
+            resultsParams.get(
+                "challenge"
+            ) ||
+            resultsParams.get(
+                "challenge_id"
+            );
+
+
+        const resultsChallengeSlug =
+            resultsParams.get(
+                "slug"
+            );
+
+
+        /*
+         * Results require a specific challenge.
+         */
+
+        if (
+            !resultsChallengeId &&
+            !resultsChallengeSlug
+        ) {
+
+            const error =
+                document.getElementById(
+                    "resultsError"
+                );
+
+
+            const content =
+                document.getElementById(
+                    "resultsContent"
+                );
+
+
+            error?.classList.add(
+                "visible"
+            );
+
+
+            content?.setAttribute(
+                "hidden",
+                ""
+            );
+
+
+            const message =
+                document.getElementById(
+                    "resultsErrorMessage"
+                );
+
+
+            if (message) {
+
+                message.textContent =
+                    "No challenge was specified. Open results from a completed challenge.";
+
+            }
+
+        }
+
+
+        /*
+         * Keep the challenge leaderboard link
+         * attached to the same challenge.
+         */
+
+        if (
+            resultsChallengeId
+        ) {
+
+            const leaderboardLink =
+                document.getElementById(
+                    "resultsLeaderboardLink"
+                );
+
+
+            if (leaderboardLink) {
+
+                leaderboardLink.href =
+                    `leaderboard.html?challenge=${encodeURIComponent(
+                        resultsChallengeId
+                    )}`;
+            }
+        }
+
+
+        /*
+         * results.js owns the actual data loading
+         * and rendering.
+         *
+         * This fallback only reports a missing script
+         * so the page doesn't silently fail.
+         */
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            () => {
+
+                setTimeout(
+                    () => {
+
+                        if (
+                            !window.DVResults
+                        ) {
+
+                            const error =
+                                document.getElementById(
+                                    "resultsError"
+                                );
+
+
+                            const content =
+                                document.getElementById(
+                                    "resultsContent"
+                                );
+
+
+                            error?.classList.add(
+                                "visible"
+                            );
+
+
+                            content?.setAttribute(
+                                "hidden",
+                                ""
+                            );
+
+
+                            const message =
+                                document.getElementById(
+                                    "resultsErrorMessage"
+                                );
+
+
+                            if (message) {
+
+                                message.textContent =
+                                    "The results system has not been connected yet.";
+
+                            }
+
+                        }
+
+                    },
+                    900
+                );
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>

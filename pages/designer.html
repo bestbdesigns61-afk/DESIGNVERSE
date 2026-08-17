@@ -1,0 +1,3734 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <!-- =====================================================
+         DESIGNVERSE — PUBLIC DESIGNER PROFILE
+         ===================================================== -->
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#050508"
+    >
+
+    <meta
+        name="description"
+        content="View a designer's profile, work, achievements and challenge history on DESIGNVERSE."
+    >
+
+    <title>Designer — DESIGNVERSE</title>
+
+
+    <!-- =====================================================
+         FONTS
+         ===================================================== -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         ICONS
+         ===================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+
+    <!-- =====================================================
+         DESIGNVERSE CSS
+         ===================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/components.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/animations.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/responsive.css"
+    >
+
+
+    <!-- =====================================================
+         PAGE STYLES
+         ===================================================== -->
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            margin: 0;
+        }
+
+
+        .designer-page {
+            min-height: 100vh;
+            padding-top: 82px;
+        }
+
+
+        .designer-main {
+            padding:
+                30px 20px 80px;
+        }
+
+
+        .designer-container {
+            width:
+                min(100%, 1260px);
+
+            margin-inline:
+                auto;
+        }
+
+
+        /* =================================================
+           BREADCRUMB
+           ================================================= */
+
+        .designer-breadcrumb {
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            flex-wrap:
+                wrap;
+
+            gap:
+                7px;
+
+            margin-bottom:
+                18px;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                9px;
+        }
+
+
+        .designer-breadcrumb a {
+            color:
+                var(--text-muted);
+
+            transition:
+                color 180ms ease;
+        }
+
+
+        .designer-breadcrumb a:hover {
+            color:
+                white;
+        }
+
+
+        .designer-breadcrumb i {
+            font-size:
+                7px;
+
+            opacity:
+                .45;
+        }
+
+
+        /* =================================================
+           LOADING
+           ================================================= */
+
+        .designer-loading {
+            min-height:
+                450px;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            flex-direction:
+                column;
+
+            gap:
+                9px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:
+                20px;
+
+            background:
+                rgba(255,255,255,.025);
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                9px;
+        }
+
+
+        .designer-loading i {
+            color:
+                #c4b5fd;
+
+            font-size:
+                23px;
+        }
+
+
+        /* =================================================
+           ERROR
+           ================================================= */
+
+        .designer-error {
+            display:
+                none;
+
+            min-height:
+                420px;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            flex-direction:
+                column;
+
+            padding:
+                40px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:
+                20px;
+
+            text-align:
+                center;
+        }
+
+
+        .designer-error.visible {
+            display:
+                flex;
+        }
+
+
+        .designer-error-icon {
+            width:
+                64px;
+
+            height:
+                64px;
+
+            display:
+                grid;
+
+            place-items:
+                center;
+
+            margin-bottom:
+                14px;
+
+            border-radius:
+                18px;
+
+            background:
+                rgba(239,68,68,.08);
+
+            color:
+                #fca5a5;
+
+            font-size:
+                22px;
+        }
+
+
+        .designer-error h2 {
+            margin:
+                0 0 7px;
+
+            color:
+                white;
+
+            font-size:
+                21px;
+        }
+
+
+        .designer-error p {
+            max-width:
+                440px;
+
+            margin:
+                0 0 17px;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                9px;
+
+            line-height:
+                1.6;
+        }
+
+
+        /* =================================================
+           PROFILE HERO
+           ================================================= */
+
+        .designer-hero {
+            position:
+                relative;
+
+            overflow:
+                hidden;
+
+            margin-bottom:
+                20px;
+
+            border:
+                1px solid
+                rgba(168,85,247,.18);
+
+            border-radius:
+                25px;
+
+            background:
+                radial-gradient(
+                    circle at 88% 15%,
+                    rgba(168,85,247,.23),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at 12% 100%,
+                    rgba(37,99,235,.18),
+                    transparent 35%
+                ),
+                linear-gradient(
+                    135deg,
+                    rgba(255,255,255,.055),
+                    rgba(255,255,255,.015)
+                );
+
+            box-shadow:
+                0 30px 80px
+                rgba(0,0,0,.24);
+        }
+
+
+        .designer-cover {
+            height:
+                170px;
+
+            position:
+                relative;
+
+            background:
+                radial-gradient(
+                    circle at 75% 20%,
+                    rgba(168,85,247,.32),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 20% 90%,
+                    rgba(37,99,235,.22),
+                    transparent 35%
+                ),
+                linear-gradient(
+                    135deg,
+                    #090912,
+                    #111127
+                );
+        }
+
+
+        .designer-cover::before,
+        .designer-cover::after {
+            content:
+                "";
+
+            position:
+                absolute;
+
+            border:
+                1px solid
+                rgba(168,85,247,.10);
+
+            border-radius:
+                50%;
+
+            pointer-events:
+                none;
+        }
+
+
+        .designer-cover::before {
+            width:
+                330px;
+
+            height:
+                330px;
+
+            right:
+                -100px;
+
+            top:
+                -175px;
+        }
+
+
+        .designer-cover::after {
+            width:
+                180px;
+
+            height:
+                180px;
+
+            right:
+                40px;
+
+            top:
+                15px;
+        }
+
+
+        .designer-profile-content {
+            display:
+                grid;
+
+            grid-template-columns:
+                auto
+                minmax(0,1fr)
+                auto;
+
+            align-items:
+                end;
+
+            gap:
+                20px;
+
+            padding:
+                0 25px 24px;
+        }
+
+
+        /* =================================================
+           AVATAR
+           ================================================= */
+
+        .designer-profile-avatar {
+            width:
+                116px;
+
+            height:
+                116px;
+
+            margin-top:
+                -52px;
+
+            overflow:
+                hidden;
+
+            border:
+                4px solid
+                #09090f;
+
+            border-radius:
+                31px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #120825,
+                    #153b75
+                );
+
+            box-shadow:
+                0 20px 45px
+                rgba(0,0,0,.35);
+
+            position:
+                relative;
+
+            z-index:
+                3;
+        }
+
+
+        .designer-profile-avatar img {
+            width:
+                100%;
+
+            height:
+                100%;
+
+            display:
+                block;
+
+            object-fit:
+                cover;
+        }
+
+
+        .designer-avatar-fallback {
+            width:
+                100%;
+
+            height:
+                100%;
+
+            display:
+                grid;
+
+            place-items:
+                center;
+
+            color:
+                #c4b5fd;
+
+            font-size:
+                32px;
+        }
+
+
+        /* =================================================
+           PROFILE INFO
+           ================================================= */
+
+        .designer-profile-info {
+            min-width:
+                0;
+        }
+
+
+        .designer-profile-role {
+            display:
+                inline-flex;
+
+            align-items:
+                center;
+
+            gap:
+                6px;
+
+            margin-bottom:
+                7px;
+
+            color:
+                #c4b5fd;
+
+            font-size:
+                8px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                .12em;
+
+            text-transform:
+                uppercase;
+        }
+
+
+        .designer-profile-role i {
+            color:
+                #a855f7;
+        }
+
+
+        .designer-profile-name {
+            margin:
+                0 0 4px;
+
+            overflow:
+                hidden;
+
+            color:
+                white;
+
+            font-family:
+                "Space Grotesk",
+                sans-serif;
+
+            font-size:
+                clamp(
+                    28px,
+                    4vw,
+                    43px
+                );
+
+            line-height:
+                .96;
+
+            letter-spacing:
+                -.065em;
+
+            text-overflow:
+                ellipsis;
+
+            white-space:
+                nowrap;
+        }
+
+
+        .designer-profile-username {
+            display:
+                block;
+
+            margin-bottom:
+                8px;
+
+            color:
+                #c4b5fd;
+
+            font-size:
+                9px;
+
+            font-weight:
+                600;
+        }
+
+
+        .designer-profile-bio {
+            max-width:
+                650px;
+
+            margin:
+                0;
+
+            color:
+                var(--text-secondary);
+
+            font-size:
+                10px;
+
+            line-height:
+                1.65;
+        }
+
+
+        .designer-profile-meta {
+            display:
+                flex;
+
+            flex-wrap:
+                wrap;
+
+            gap:
+                8px;
+
+            margin-top:
+                11px;
+        }
+
+
+        .designer-meta-item {
+            display:
+                inline-flex;
+
+            align-items:
+                center;
+
+            gap:
+                6px;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                8px;
+        }
+
+
+        .designer-meta-item i {
+            color:
+                #a855f7;
+        }
+
+
+        .designer-meta-item a {
+            color:
+                #c4b5fd;
+        }
+
+
+        /* =================================================
+           ACTIONS
+           ================================================= */
+
+        .designer-profile-actions {
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            gap:
+                8px;
+
+            padding-bottom:
+                2px;
+        }
+
+
+        /* =================================================
+           STATS
+           ================================================= */
+
+        .designer-stats {
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(
+                    5,
+                    minmax(0,1fr)
+                );
+
+            gap:
+                9px;
+
+            margin-bottom:
+                20px;
+        }
+
+
+        .designer-stat {
+            padding:
+                15px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:
+                14px;
+
+            background:
+                rgba(255,255,255,.03);
+        }
+
+
+        .designer-stat strong {
+            display:
+                block;
+
+            margin-bottom:
+                4px;
+
+            color:
+                white;
+
+            font-family:
+                "Space Grotesk",
+                sans-serif;
+
+            font-size:
+                20px;
+
+            line-height:
+                1;
+
+            letter-spacing:
+                -.05em;
+        }
+
+
+        .designer-stat span {
+            color:
+                var(--text-muted);
+
+            font-size:
+                6px;
+
+            font-weight:
+                700;
+
+            letter-spacing:
+                .08em;
+
+            text-transform:
+                uppercase;
+        }
+
+
+        /* =================================================
+           CONTENT GRID
+           ================================================= */
+
+        .designer-content-grid {
+            display:
+                grid;
+
+            grid-template-columns:
+                minmax(0,1fr)
+                290px;
+
+            gap:
+                18px;
+
+            align-items:
+                start;
+        }
+
+
+        /* =================================================
+           CARD
+           ================================================= */
+
+        .designer-card {
+            padding:
+                20px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:
+                19px;
+
+            background:
+                rgba(255,255,255,.03);
+        }
+
+
+        .designer-card + .designer-card {
+            margin-top:
+                18px;
+        }
+
+
+        .designer-card-heading {
+            display:
+                flex;
+
+            align-items:
+                flex-end;
+
+            justify-content:
+                space-between;
+
+            gap:
+                10px;
+
+            margin-bottom:
+                14px;
+        }
+
+
+        .designer-card-heading h2 {
+            margin:
+                0 0 4px;
+
+            color:
+                white;
+
+            font-size:
+                19px;
+
+            letter-spacing:
+                -.04em;
+        }
+
+
+        .designer-card-heading p {
+            margin:
+                0;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                8px;
+        }
+
+
+        /* =================================================
+           DESIGNS
+           ================================================= */
+
+        .designer-designs-grid {
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(
+                    2,
+                    minmax(0,1fr)
+                );
+
+            gap:
+                11px;
+        }
+
+
+        .designer-design-card {
+            overflow:
+                hidden;
+
+            border:
+                1px solid
+                rgba(255,255,255,.07);
+
+            border-radius:
+                14px;
+
+            background:
+                rgba(255,255,255,.025);
+
+            transition:
+                transform 180ms ease,
+                border-color 180ms ease;
+        }
+
+
+        .designer-design-card:hover {
+            transform:
+                translateY(-2px);
+
+            border-color:
+                rgba(168,85,247,.28);
+        }
+
+
+        .designer-design-image {
+            display:
+                block;
+
+            aspect-ratio:
+                4 / 3;
+
+            overflow:
+                hidden;
+
+            background:
+                #09090f;
+        }
+
+
+        .designer-design-image img {
+            width:
+                100%;
+
+            height:
+                100%;
+
+            display:
+                block;
+
+            object-fit:
+                cover;
+
+            transition:
+                transform 300ms ease;
+        }
+
+
+        .designer-design-card:hover
+        .designer-design-image img {
+            transform:
+                scale(1.035);
+        }
+
+
+        .designer-design-info {
+            padding:
+                10px;
+        }
+
+
+        .designer-design-info h3 {
+            margin:
+                0 0 3px;
+
+            overflow:
+                hidden;
+
+            color:
+                white;
+
+            font-size:
+                10px;
+
+            text-overflow:
+                ellipsis;
+
+            white-space:
+                nowrap;
+        }
+
+
+        .designer-design-info span {
+            color:
+                var(--text-muted);
+
+            font-size:
+                7px;
+        }
+
+
+        /* =================================================
+           CHALLENGE HISTORY
+           ================================================= */
+
+        .challenge-history-list {
+            display:
+                flex;
+
+            flex-direction:
+                column;
+
+            gap:
+                8px;
+        }
+
+
+        .challenge-history-item {
+            display:
+                grid;
+
+            grid-template-columns:
+                50px
+                minmax(0,1fr)
+                auto;
+
+            align-items:
+                center;
+
+            gap:
+                10px;
+
+            padding:
+                9px;
+
+            border:
+                1px solid
+                rgba(255,255,255,.07);
+
+            border-radius:
+                11px;
+
+            background:
+                rgba(255,255,255,.02);
+        }
+
+
+        .challenge-history-image {
+            width:
+                50px;
+
+            height:
+                40px;
+
+            overflow:
+                hidden;
+
+            border-radius:
+                8px;
+
+            background:
+                #09090f;
+        }
+
+
+        .challenge-history-image img {
+            width:
+                100%;
+
+            height:
+                100%;
+
+            display:
+                block;
+
+            object-fit:
+                cover;
+        }
+
+
+        .challenge-history-info {
+            min-width:
+                0;
+        }
+
+
+        .challenge-history-info strong {
+            display:
+                block;
+
+            margin-bottom:
+                3px;
+
+            overflow:
+                hidden;
+
+            color:
+                white;
+
+            font-size:
+                9px;
+
+            text-overflow:
+                ellipsis;
+
+            white-space:
+                nowrap;
+        }
+
+
+        .challenge-history-info span {
+            color:
+                var(--text-muted);
+
+            font-size:
+                7px;
+        }
+
+
+        .challenge-history-result {
+            min-width:
+                48px;
+
+            text-align:
+                right;
+        }
+
+
+        .history-rank {
+            display:
+                block;
+
+            color:
+                #c4b5fd;
+
+            font-family:
+                "Space Grotesk",
+                sans-serif;
+
+            font-size:
+                11px;
+
+            font-weight:
+                700;
+        }
+
+
+        .history-score {
+            display:
+                block;
+
+            margin-top:
+                2px;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                7px;
+        }
+
+
+        .history-win {
+            color:
+                #fcd34d;
+        }
+
+
+        /* =================================================
+           SIDEBAR
+           ================================================= */
+
+        .about-list {
+            display:
+                flex;
+
+            flex-direction:
+                column;
+
+            gap:
+                10px;
+        }
+
+
+        .about-item {
+            display:
+                flex;
+
+            align-items:
+                flex-start;
+
+            gap:
+                9px;
+        }
+
+
+        .about-item-icon {
+            width:
+                30px;
+
+            height:
+                30px;
+
+            flex-shrink:
+                0;
+
+            display:
+                grid;
+
+            place-items:
+                center;
+
+            border-radius:
+                9px;
+
+            background:
+                rgba(124,58,237,.10);
+
+            color:
+                #c4b5fd;
+        }
+
+
+        .about-item-text {
+            min-width:
+                0;
+        }
+
+
+        .about-item-text span {
+            display:
+                block;
+
+            margin-bottom:
+                3px;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                7px;
+
+            text-transform:
+                uppercase;
+        }
+
+
+        .about-item-text strong {
+            display:
+                block;
+
+            overflow:
+                hidden;
+
+            color:
+                white;
+
+            font-size:
+                9px;
+
+            text-overflow:
+                ellipsis;
+        }
+
+
+        /* =================================================
+           EMPTY
+           ================================================= */
+
+        .designer-empty {
+            display:
+                none;
+
+            grid-column:
+                1 / -1;
+
+            min-height:
+                280px;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            flex-direction:
+                column;
+
+            padding:
+                30px;
+
+            border:
+                1px dashed
+                var(--border-light);
+
+            border-radius:
+                15px;
+
+            text-align:
+                center;
+        }
+
+
+        .designer-empty.visible {
+            display:
+                flex;
+        }
+
+
+        .designer-empty i {
+            margin-bottom:
+                12px;
+
+            color:
+                #c4b5fd;
+
+            font-size:
+                25px;
+        }
+
+
+        .designer-empty h3 {
+            margin:
+                0 0 6px;
+
+            color:
+                white;
+
+            font-size:
+                16px;
+        }
+
+
+        .designer-empty p {
+            margin:
+                0;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                8px;
+        }
+
+
+        /* =================================================
+           RESPONSIVE
+           ================================================= */
+
+        @media (max-width: 1000px) {
+
+            .designer-content-grid {
+                grid-template-columns:
+                    1fr;
+            }
+
+
+            .designer-sidebar {
+                order:
+                    2;
+            }
+        }
+
+
+        @media (max-width: 850px) {
+
+            .designer-profile-content {
+                grid-template-columns:
+                    auto
+                    minmax(0,1fr);
+            }
+
+
+            .designer-profile-actions {
+                grid-column:
+                    1 / -1;
+
+                padding-top:
+                    2px;
+            }
+
+
+            .designer-stats {
+                grid-template-columns:
+                    repeat(
+                        3,
+                        minmax(0,1fr)
+                    );
+            }
+        }
+
+
+        @media (max-width: 650px) {
+
+            .designer-main {
+                padding:
+                    22px 14px 60px;
+            }
+
+
+            .designer-cover {
+                height:
+                    135px;
+            }
+
+
+            .designer-profile-content {
+                grid-template-columns:
+                    1fr;
+
+                align-items:
+                    start;
+
+                gap:
+                    12px;
+
+                padding:
+                    0 17px 19px;
+            }
+
+
+            .designer-profile-avatar {
+                width:
+                    95px;
+
+                height:
+                    95px;
+
+                margin-top:
+                    -42px;
+
+                border-radius:
+                    25px;
+            }
+
+
+            .designer-profile-name {
+                font-size:
+                    30px;
+            }
+
+
+            .designer-stats {
+                grid-template-columns:
+                    repeat(
+                        2,
+                        minmax(0,1fr)
+                    );
+            }
+
+
+            .designer-designs-grid {
+                grid-template-columns:
+                    repeat(
+                        2,
+                        minmax(0,1fr)
+                    );
+            }
+        }
+
+
+        @media (max-width: 420px) {
+
+            .designer-main {
+                padding:
+                    18px 11px 50px;
+            }
+
+
+            .designer-profile-name {
+                font-size:
+                    27px;
+            }
+
+
+            .designer-card {
+                padding:
+                    15px;
+            }
+
+
+            .challenge-history-item {
+                grid-template-columns:
+                    44px
+                    minmax(0,1fr)
+                    42px;
+            }
+
+
+            .challenge-history-image {
+                width:
+                    44px;
+
+                height:
+                    36px;
+            }
+        }
+
+
+        @media (hover: none) and (pointer: coarse) {
+
+            .designer-design-card:hover {
+                transform:
+                    none;
+            }
+
+
+            .designer-design-card:hover
+            .designer-design-image img {
+                transform:
+                    none;
+            }
+        }
+
+
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+
+                animation-duration:
+                    .01ms !important;
+
+                animation-iteration-count:
+                    1 !important;
+
+                transition-duration:
+                    .01ms !important;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body data-profile-page="true">
+
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <header
+        class="site-header"
+        id="site-header"
+    >
+
+        <nav class="navbar container">
+
+            <a
+                href="../index.html"
+                class="brand"
+                aria-label="DESIGNVERSE Home"
+            >
+
+                <div class="brand-icon">
+                    <span>DV</span>
+                </div>
+
+
+                <div class="brand-text">
+
+                    <span class="brand-name">
+                        DESIGNVERSE
+                    </span>
+
+                    <span class="brand-subtitle">
+                        BY BESTB DESIGNS
+                    </span>
+
+                </div>
+
+            </a>
+
+
+            <div class="desktop-nav">
+
+                <a href="explore.html">
+                    Explore
+                </a>
+
+
+                <a href="challenges.html">
+                    Challenges
+                </a>
+
+
+                <a href="leaderboard.html">
+                    Leaderboard
+                </a>
+
+
+                <a
+                    href="designers.html"
+                    class="active"
+                >
+                    Designers
+                </a>
+
+            </div>
+
+
+            <div class="nav-actions">
+
+                <a
+                    href="dashboard/dashboard.html"
+                    class="btn btn-secondary btn-small"
+                >
+
+                    <i
+                        class="fa-solid fa-chart-pie"
+                    ></i>
+
+                    Dashboard
+
+                </a>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+
+    <!-- =====================================================
+         PAGE
+         ===================================================== -->
+
+    <main class="designer-page">
+
+        <div class="designer-main">
+
+            <div class="designer-container">
+
+
+                <!-- =========================================
+                     BREADCRUMB
+                     ========================================= -->
+
+                <nav
+                    class="designer-breadcrumb"
+                    aria-label="Breadcrumb"
+                >
+
+                    <a href="designers.html">
+                        Designers
+                    </a>
+
+
+                    <i
+                        class="fa-solid fa-chevron-right"
+                    ></i>
+
+
+                    <span
+                        id="designerBreadcrumb"
+                    >
+                        Designer
+                    </span>
+
+                </nav>
+
+
+                <!-- =========================================
+                     LOADING
+                     ========================================= -->
+
+                <section
+                    class="designer-loading"
+                    id="designerLoading"
+                >
+
+                    <i
+                        class="fa-solid fa-spinner fa-spin"
+                    ></i>
+
+                    Loading designer profile...
+
+                </section>
+
+
+                <!-- =========================================
+                     ERROR
+                     ========================================= -->
+
+                <section
+                    class="designer-error"
+                    id="designerError"
+                >
+
+                    <div
+                        class="designer-error-icon"
+                    >
+
+                        <i
+                            class="fa-solid fa-user-slash"
+                        ></i>
+
+                    </div>
+
+
+                    <h2>
+                        Designer not found
+                    </h2>
+
+
+                    <p
+                        id="designerErrorMessage"
+                    >
+
+                        We couldn't find this designer.
+
+                    </p>
+
+
+                    <a
+                        href="designers.html"
+                        class="btn btn-primary"
+                    >
+
+                        <i
+                            class="fa-solid fa-arrow-left"
+                        ></i>
+
+                        Back to Designers
+
+                    </a>
+
+                </section>
+
+
+                <!-- =========================================
+                     CONTENT
+                     ========================================= -->
+
+                <div
+                    id="designerContent"
+                    hidden
+                >
+
+
+                    <!-- =====================================
+                         PROFILE HERO
+                         ===================================== -->
+
+                    <section
+                        class="designer-hero"
+                    >
+
+                        <div
+                            class="designer-cover"
+                        ></div>
+
+
+                        <div
+                            class="designer-profile-content"
+                        >
+
+                            <!-- AVATAR -->
+
+                            <div
+                                class="designer-profile-avatar"
+                            >
+
+                                <div
+                                    class="designer-avatar-fallback"
+                                    id="designerAvatarFallback"
+                                >
+
+                                    <i
+                                        class="fa-solid fa-user"
+                                    ></i>
+
+                                </div>
+
+
+                                <img
+                                    id="designerAvatar"
+                                    alt=""
+                                    hidden
+                                >
+
+                            </div>
+
+
+                            <!-- INFO -->
+
+                            <div
+                                class="designer-profile-info"
+                            >
+
+                                <div
+                                    class="designer-profile-role"
+                                >
+
+                                    <i
+                                        class="fa-solid fa-wand-magic-sparkles"
+                                    ></i>
+
+                                    <span
+                                        id="designerRole"
+                                    >
+                                        Designer
+                                    </span>
+
+                                </div>
+
+
+                                <h1
+                                    class="designer-profile-name"
+                                    id="designerName"
+                                >
+                                    Designer
+                                </h1>
+
+
+                                <span
+                                    class="designer-profile-username"
+                                    id="designerUsername"
+                                >
+                                    @username
+                                </span>
+
+
+                                <p
+                                    class="designer-profile-bio"
+                                    id="designerBio"
+                                >
+                                    Designer on DESIGNVERSE.
+                                </p>
+
+
+                                <div
+                                    class="designer-profile-meta"
+                                >
+
+                                    <span
+                                        class="designer-meta-item"
+                                        id="designerLocationItem"
+                                        hidden
+                                    >
+
+                                        <i
+                                            class="fa-solid fa-location-dot"
+                                        ></i>
+
+                                        <span
+                                            id="designerLocation"
+                                        ></span>
+
+                                    </span>
+
+
+                                    <span
+                                        class="designer-meta-item"
+                                        id="designerWebsiteItem"
+                                        hidden
+                                    >
+
+                                        <i
+                                            class="fa-solid fa-link"
+                                        ></i>
+
+                                        <a
+                                            id="designerWebsite"
+                                            href="#"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            Website
+                                        </a>
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- ACTIONS -->
+
+                            <div
+                                class="designer-profile-actions"
+                            >
+
+                                <button
+                                    type="button"
+                                    class="btn btn-primary btn-small"
+                                    id="followDesignerButton"
+                                    data-follow-designer
+                                >
+
+                                    <i
+                                        class="fa-solid fa-user-plus"
+                                    ></i>
+
+                                    Follow
+
+                                </button>
+
+
+                                <button
+                                    type="button"
+                                    class="btn btn-secondary btn-small"
+                                    id="shareDesignerButton"
+                                >
+
+                                    <i
+                                        class="fa-solid fa-share-nodes"
+                                    ></i>
+
+                                    Share
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- =====================================
+                         STATS
+                         ===================================== -->
+
+                    <section
+                        class="designer-stats"
+                    >
+
+                        <article
+                            class="designer-stat"
+                        >
+
+                            <strong
+                                id="designerXP"
+                            >
+                                0
+                            </strong>
+
+                            <span>
+                                Points
+                            </span>
+
+                        </article>
+
+
+                        <article
+                            class="designer-stat"
+                        >
+
+                            <strong
+                                id="designerWins"
+                            >
+                                0
+                            </strong>
+
+                            <span>
+                                Wins
+                            </span>
+
+                        </article>
+
+
+                        <article
+                            class="designer-stat"
+                        >
+
+                            <strong
+                                id="designerVotes"
+                            >
+                                0
+                            </strong>
+
+                            <span>
+                                Votes
+                            </span>
+
+                        </article>
+
+
+                        <article
+                            class="designer-stat"
+                        >
+
+                            <strong
+                                id="designerFollowers"
+                            >
+                                0
+                            </strong>
+
+                            <span>
+                                Followers
+                            </span>
+
+                        </article>
+
+
+                        <article
+                            class="designer-stat"
+                        >
+
+                            <strong
+                                id="designerFollowing"
+                            >
+                                0
+                            </strong>
+
+                            <span>
+                                Following
+                            </span>
+
+                        </article>
+
+                    </section>
+
+
+                    <!-- =====================================
+                         CONTENT GRID
+                         ===================================== -->
+
+                    <div
+                        class="designer-content-grid"
+                    >
+
+
+                        <!-- =================================
+                             MAIN COLUMN
+                             ================================= -->
+
+                        <div>
+
+
+                            <!-- =================================
+                                 DESIGNS
+                                 ================================= -->
+
+                            <section
+                                class="designer-card"
+                            >
+
+                                <div
+                                    class="designer-card-heading"
+                                >
+
+                                    <div>
+
+                                        <h2>
+                                            Public Designs
+                                        </h2>
+
+                                        <p>
+                                            Work published to the DESIGNVERSE.
+                                        </p>
+
+                                    </div>
+
+
+                                    <span
+                                        class="designer-meta-item"
+                                    >
+
+                                        <i
+                                            class="fa-solid fa-palette"
+                                        ></i>
+
+                                        <span
+                                            id="designerDesignCount"
+                                        >
+                                            0
+                                        </span>
+
+                                    </span>
+
+                                </div>
+
+
+                                <div
+                                    class="designer-designs-grid"
+                                    id="designerDesignsGrid"
+                                ></div>
+
+
+                                <div
+                                    class="designer-empty"
+                                    id="designerDesignsEmpty"
+                                >
+
+                                    <i
+                                        class="fa-solid fa-palette"
+                                    ></i>
+
+
+                                    <h3>
+                                        No public designs yet
+                                    </h3>
+
+
+                                    <p>
+                                        This designer hasn't published
+                                        any public designs.
+                                    </p>
+
+                                </div>
+
+                            </section>
+
+
+                            <!-- =================================
+                                 CHALLENGE HISTORY
+                                 ================================= -->
+
+                            <section
+                                class="designer-card"
+                            >
+
+                                <div
+                                    class="designer-card-heading"
+                                >
+
+                                    <div>
+
+                                        <h2>
+                                            Challenge History
+                                        </h2>
+
+                                        <p>
+                                            Competitions this designer has entered.
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    class="challenge-history-list"
+                                    id="challengeHistoryList"
+                                ></div>
+
+
+                                <div
+                                    class="designer-empty"
+                                    id="challengeHistoryEmpty"
+                                >
+
+                                    <i
+                                        class="fa-solid fa-trophy"
+                                    ></i>
+
+
+                                    <h3>
+                                        No challenge history
+                                    </h3>
+
+
+                                    <p>
+                                        This designer hasn't entered a challenge yet.
+                                    </p>
+
+                                </div>
+
+                            </section>
+
+                        </div>
+
+
+                        <!-- =================================
+                             SIDEBAR
+                             ================================= -->
+
+                        <aside
+                            class="designer-sidebar"
+                        >
+
+                            <section
+                                class="designer-card"
+                            >
+
+                                <div
+                                    class="designer-card-heading"
+                                >
+
+                                    <div>
+
+                                        <h2>
+                                            About
+                                        </h2>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    class="about-list"
+                                >
+
+                                    <div
+                                        class="about-item"
+                                        id="aboutRole"
+                                    >
+
+                                        <div
+                                            class="about-item-icon"
+                                        >
+
+                                            <i
+                                                class="fa-solid fa-user-pen"
+                                            ></i>
+
+                                        </div>
+
+
+                                        <div
+                                            class="about-item-text"
+                                        >
+
+                                            <span>
+                                                Role
+                                            </span>
+
+                                            <strong
+                                                id="aboutRoleText"
+                                            >
+                                                —
+                                            </strong>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div
+                                        class="about-item"
+                                        id="aboutLocation"
+                                    >
+
+                                        <div
+                                            class="about-item-icon"
+                                        >
+
+                                            <i
+                                                class="fa-solid fa-location-dot"
+                                            ></i>
+
+                                        </div>
+
+
+                                        <div
+                                            class="about-item-text"
+                                        >
+
+                                            <span>
+                                                Location
+                                            </span>
+
+                                            <strong
+                                                id="aboutLocationText"
+                                            >
+                                                —
+                                            </strong>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div
+                                        class="about-item"
+                                        id="aboutJoined"
+                                    >
+
+                                        <div
+                                            class="about-item-icon"
+                                        >
+
+                                            <i
+                                                class="fa-solid fa-calendar"
+                                            ></i>
+
+                                        </div>
+
+
+                                        <div
+                                            class="about-item-text"
+                                        >
+
+                                            <span>
+                                                Joined
+                                            </span>
+
+                                            <strong
+                                                id="aboutJoinedText"
+                                            >
+                                                —
+                                            </strong>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div
+                                        class="about-item"
+                                        id="aboutPoints"
+                                    >
+
+                                        <div
+                                            class="about-item-icon"
+                                        >
+
+                                            <i
+                                                class="fa-solid fa-bolt"
+                                            ></i>
+
+                                        </div>
+
+
+                                        <div
+                                            class="about-item-text"
+                                        >
+
+                                            <span>
+                                                Points
+                                            </span>
+
+                                            <strong
+                                                id="aboutPointsText"
+                                            >
+                                                0
+                                            </strong>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </section>
+
+
+                            <section
+                                class="designer-card"
+                            >
+
+                                <div
+                                    class="designer-card-heading"
+                                >
+
+                                    <div>
+
+                                        <h2>
+                                            Explore
+                                        </h2>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    style="
+                                        display:flex;
+                                        flex-direction:column;
+                                        gap:7px;
+                                    "
+                                >
+
+                                    <a
+                                        href="designers.html"
+                                        class="btn btn-secondary btn-small"
+                                    >
+
+                                        <i
+                                            class="fa-solid fa-users"
+                                        ></i>
+
+                                        More Designers
+
+                                    </a>
+
+
+                                    <a
+                                        href="challenges.html"
+                                        class="btn btn-secondary btn-small"
+                                    >
+
+                                        <i
+                                            class="fa-solid fa-trophy"
+                                        ></i>
+
+                                        Challenges
+
+                                    </a>
+
+
+                                    <a
+                                        href="leaderboard.html"
+                                        class="btn btn-secondary btn-small"
+                                    >
+
+                                        <i
+                                            class="fa-solid fa-ranking-star"
+                                        ></i>
+
+                                        Leaderboard
+
+                                    </a>
+
+                                </div>
+
+                            </section>
+
+                        </aside>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         SCRIPTS
+         ===================================================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+
+    <script
+        src="../js/utils.js"
+    ></script>
+
+
+    <script
+        src="../js/supabase.js"
+    ></script>
+
+
+    <script
+        src="../js/auth.js"
+    ></script>
+
+
+    <script
+        src="../js/profile.js"
+    ></script>
+
+
+    <script
+        src="../js/follows.js"
+    ></script>
+
+
+    <script
+        src="../js/navigation.js"
+    ></script>
+
+
+    <!-- =====================================================
+         PAGE LOGIC
+         ===================================================== -->
+
+    <script>
+
+        "use strict";
+
+
+        /* =================================================
+           HELPERS
+           ================================================= */
+
+        function $designerPage(
+            selector
+        ) {
+
+            return document.querySelector(
+                selector
+            );
+        }
+
+
+        function setText(
+            selector,
+            value
+        ) {
+
+            const element =
+                $designerPage(
+                    selector
+                );
+
+
+            if (element) {
+
+                element.textContent =
+                    value ?? "";
+            }
+        }
+
+
+        function formatNumber(
+            value
+        ) {
+
+            return new Intl.NumberFormat(
+                "en-US"
+            ).format(
+                Number(value) || 0
+            );
+        }
+
+
+        function escapeHTML(
+            value
+        ) {
+
+            const element =
+                document.createElement(
+                    "div"
+                );
+
+
+            element.textContent =
+                String(
+                    value ?? ""
+                );
+
+
+            return element.innerHTML;
+        }
+
+
+        function escapeAttribute(
+            value
+        ) {
+
+            return escapeHTML(
+                value
+            )
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+            .replace(
+                /'/g,
+                "&#039;"
+            );
+        }
+
+
+        function formatCategory(
+            category
+        ) {
+
+            const map = {
+
+                branding:
+                    "Branding",
+
+                poster:
+                    "Poster",
+
+                "ui-ux":
+                    "UI / UX",
+
+                illustration:
+                    "Illustration",
+
+                logo:
+                    "Logo",
+
+                motion:
+                    "Motion",
+
+                other:
+                    "Other"
+
+            };
+
+
+            return (
+                map[category] ||
+                "Other"
+            );
+        }
+
+
+        function formatDate(
+            value
+        ) {
+
+            if (!value) {
+
+                return "—";
+            }
+
+
+            const date =
+                new Date(
+                    value
+                );
+
+
+            if (
+                Number.isNaN(
+                    date.getTime()
+                )
+            ) {
+
+                return "—";
+            }
+
+
+            return date.toLocaleDateString(
+                undefined,
+                {
+                    month:
+                        "short",
+
+                    year:
+                        "numeric"
+                }
+            );
+        }
+
+
+        function getDesignerIdentifier() {
+
+            const params =
+                new URLSearchParams(
+                    window.location.search
+                );
+
+
+            return {
+
+                username:
+                    params.get(
+                        "username"
+                    ),
+
+                id:
+                    params.get(
+                        "id"
+                    )
+
+            };
+        }
+
+
+        /* =================================================
+           INITIALIZE
+           ================================================= */
+
+        async function initializeDesignerPage() {
+
+            const identifier =
+                getDesignerIdentifier();
+
+
+            if (
+                !identifier.username &&
+                !identifier.id
+            ) {
+
+                showDesignerError(
+                    "No designer was specified."
+                );
+
+
+                return;
+            }
+
+
+            try {
+
+                if (
+                    !window.DVProfile
+                ) {
+
+                    throw new Error(
+                        "Profile system is unavailable."
+                    );
+                }
+
+
+                let complete;
+
+
+                /*
+                 * Load directly by ID.
+                 */
+
+                if (
+                    identifier.id
+                ) {
+
+                    complete =
+                        await window.DVProfile
+                            .loadCompleteProfile(
+                                identifier.id
+                            );
+
+                }
+
+
+                /*
+                 * Load by username.
+                 */
+
+                else {
+
+                    const profile =
+                        await window.DVProfile
+                            .getProfileByUsername(
+                                identifier.username
+                            );
+
+
+                    await window.DVProfile
+                        .loadUserDesigns(
+                            profile.id
+                        );
+
+
+                    await window.DVProfile
+                        .loadUserSubmissions(
+                            profile.id
+                        );
+
+
+                    await window.DVProfile
+                        .loadStatistics(
+                            profile.id
+                        );
+
+
+                    complete = {
+
+                        profile,
+
+                        designs:
+                            window.DVProfile
+                                .state
+                                .designs,
+
+                        submissions:
+                            window.DVProfile
+                                .state
+                                .submissions,
+
+                        statistics:
+                            window.DVProfile
+                                .state
+                                .statistics
+
+                    };
+                }
+
+
+                renderDesignerPage(
+                    complete
+                );
+
+
+                showDesignerContent();
+
+
+            } catch (error) {
+
+                console.error(
+                    "DESIGNVERSE designer page error:",
+                    error
+                );
+
+
+                showDesignerError(
+                    error?.message ||
+                    "We couldn't load this designer."
+                );
+            }
+        }
+
+
+        /* =================================================
+           RENDER PROFILE
+           ================================================= */
+
+        function renderDesignerPage(
+            data
+        ) {
+
+            const profile =
+                data.profile;
+
+
+            const designs =
+                data.designs ||
+                [];
+
+
+            const submissions =
+                data.submissions ||
+                [];
+
+
+            const stats =
+                data.statistics ||
+                {};
+
+
+            if (!profile) {
+
+                throw new Error(
+                    "Designer profile not found."
+                );
+            }
+
+
+            document.title =
+                `${profile.display_name || profile.username} — DESIGNVERSE`;
+
+
+            setText(
+                "#designerBreadcrumb",
+                profile.display_name ||
+                `@${profile.username}`
+            );
+
+
+            setText(
+                "#designerName",
+                profile.display_name ||
+                profile.username ||
+                "Designer"
+            );
+
+
+            setText(
+                "#designerUsername",
+                profile.username
+                    ? `@${profile.username}`
+                    : ""
+            );
+
+
+            setText(
+                "#designerBio",
+                profile.bio ||
+                "Designer on DESIGNVERSE."
+            );
+
+
+            setText(
+                "#designerRole",
+                profile.role ||
+                "Designer"
+            );
+
+
+            setText(
+                "#designerLocation",
+                profile.location ||
+                ""
+            );
+
+
+            setText(
+                "#designerXP",
+                formatNumber(
+                    stats.points
+                )
+            );
+
+
+            setText(
+                "#designerWins",
+                formatNumber(
+                    stats.wins
+                )
+            );
+
+
+            setText(
+                "#designerVotes",
+                formatNumber(
+                    stats.votes
+                )
+            );
+
+
+            setText(
+                "#designerFollowers",
+                formatNumber(
+                    stats.followers
+                )
+            );
+
+
+            setText(
+                "#designerFollowing",
+                formatNumber(
+                    stats.following
+                )
+            );
+
+
+            setText(
+                "#designerDesignCount",
+                formatNumber(
+                    designs.length
+                )
+            );
+
+
+            setText(
+                "#aboutRoleText",
+                profile.role ||
+                "Designer"
+            );
+
+
+            setText(
+                "#aboutLocationText",
+                profile.location ||
+                "Not specified"
+            );
+
+
+            setText(
+                "#aboutJoinedText",
+                formatDate(
+                    profile.created_at
+                )
+            );
+
+
+            setText(
+                "#aboutPointsText",
+                formatNumber(
+                    stats.points
+                )
+            );
+
+
+            renderAvatar(
+                profile.avatar_url,
+                profile.display_name ||
+                profile.username
+            );
+
+
+            renderWebsite(
+                profile.website_url
+            );
+
+
+            renderLocation(
+                profile.location
+            );
+
+
+            renderDesigns(
+                designs
+            );
+
+
+            renderChallengeHistory(
+                submissions
+            );
+        }
+
+
+        /* =================================================
+           AVATAR
+           ================================================= */
+
+        function renderAvatar(
+            avatarUrl,
+            name
+        ) {
+
+            const image =
+                $designerPage(
+                    "#designerAvatar"
+                );
+
+
+            const fallback =
+                $designerPage(
+                    "#designerAvatarFallback"
+                );
+
+
+            if (
+                avatarUrl &&
+                image
+            ) {
+
+                image.src =
+                    avatarUrl;
+
+                image.alt =
+                    `${name || "Designer"} avatar`;
+
+                image.hidden =
+                    false;
+
+
+                if (fallback) {
+
+                    fallback.hidden =
+                        true;
+                }
+
+            } else {
+
+                if (image) {
+
+                    image.hidden =
+                        true;
+                }
+
+
+                if (fallback) {
+
+                    fallback.hidden =
+                        false;
+                }
+            }
+        }
+
+
+        /* =================================================
+           WEBSITE
+           ================================================= */
+
+        function renderWebsite(
+            websiteUrl
+        ) {
+
+            const item =
+                $designerPage(
+                    "#designerWebsiteItem"
+                );
+
+
+            const link =
+                $designerPage(
+                    "#designerWebsite"
+                );
+
+
+            if (
+                websiteUrl &&
+                link
+            ) {
+
+                link.href =
+                    websiteUrl;
+
+
+                try {
+
+                    link.textContent =
+                        new URL(
+                            websiteUrl
+                        )
+                        .hostname
+                        .replace(
+                            /^www\./,
+                            ""
+                        );
+
+                } catch {
+
+                    link.textContent =
+                        websiteUrl;
+                }
+
+
+                item?.removeAttribute(
+                    "hidden"
+                );
+
+            } else {
+
+                item?.setAttribute(
+                    "hidden",
+                    ""
+                );
+            }
+        }
+
+
+        /* =================================================
+           LOCATION
+           ================================================= */
+
+        function renderLocation(
+            location
+        ) {
+
+            const item =
+                $designerPage(
+                    "#designerLocationItem"
+                );
+
+
+            if (
+                location
+            ) {
+
+                item?.removeAttribute(
+                    "hidden"
+                );
+
+            } else {
+
+                item?.setAttribute(
+                    "hidden",
+                    ""
+                );
+            }
+        }
+
+
+        /* =================================================
+           DESIGNS
+           ================================================= */
+
+        function renderDesigns(
+            designs
+        ) {
+
+            const grid =
+                $designerPage(
+                    "#designerDesignsGrid"
+                );
+
+
+            const empty =
+                $designerPage(
+                    "#designerDesignsEmpty"
+                );
+
+
+            if (!grid) {
+
+                return;
+            }
+
+
+            grid.innerHTML =
+                "";
+
+
+            if (
+                !designs.length
+            ) {
+
+                empty?.classList.add(
+                    "visible"
+                );
+
+
+                return;
+            }
+
+
+            empty?.classList.remove(
+                "visible"
+            );
+
+
+            designs.forEach(
+                design => {
+
+                    const card =
+                        document.createElement(
+                            "article"
+                        );
+
+
+                    card.className =
+                        "designer-design-card";
+
+
+                    const image =
+                        design.image_url ||
+                        design.thumbnail_url;
+
+
+                    card.innerHTML = `
+
+                        <a
+                            class="designer-design-image"
+                            href="design.html?id=${encodeURIComponent(
+                                design.id
+                            )}"
+                        >
+
+                            ${
+                                image
+                                    ? `
+                                        <img
+                                            src="${escapeAttribute(
+                                                image
+                                            )}"
+                                            alt="${escapeAttribute(
+                                                design.title ||
+                                                "Design"
+                                            )}"
+                                            loading="lazy"
+                                        >
+                                      `
+                                    : `
+                                        <div
+                                            style="
+                                                width:100%;
+                                                height:100%;
+                                                display:grid;
+                                                place-items:center;
+                                                background:linear-gradient(
+                                                    135deg,
+                                                    #120825,
+                                                    #153b75
+                                                );
+                                                color:#c4b5fd;
+                                            "
+                                        >
+
+                                            <i
+                                                class="fa-solid fa-palette"
+                                            ></i>
+
+                                        </div>
+                                      `
+                            }
+
+                        </a>
+
+
+                        <div
+                            class="designer-design-info"
+                        >
+
+                            <h3>
+                                ${escapeHTML(
+                                    design.title ||
+                                    "Untitled Design"
+                                )}
+                            </h3>
+
+
+                            <span>
+                                ${escapeHTML(
+                                    formatCategory(
+                                        design.category
+                                    )
+                                )}
+                            </span>
+
+                        </div>
+
+                    `;
+
+
+                    grid.appendChild(
+                        card
+                    );
+                }
+            );
+        }
+
+
+        /* =================================================
+           CHALLENGE HISTORY
+           ================================================= */
+
+        function renderChallengeHistory(
+            submissions
+        ) {
+
+            const list =
+                $designerPage(
+                    "#challengeHistoryList"
+                );
+
+
+            const empty =
+                $designerPage(
+                    "#challengeHistoryEmpty"
+                );
+
+
+            if (!list) {
+
+                return;
+            }
+
+
+            list.innerHTML =
+                "";
+
+
+            if (
+                !submissions.length
+            ) {
+
+                empty?.classList.add(
+                    "visible"
+                );
+
+
+                return;
+            }
+
+
+            empty?.classList.remove(
+                "visible"
+            );
+
+
+            submissions.forEach(
+                submission => {
+
+                    const challenge =
+                        submission.challenge ||
+                        {};
+
+
+                    const design =
+                        submission.design ||
+                        {};
+
+
+                    const item =
+                        document.createElement(
+                            "article"
+                        );
+
+
+                    item.className =
+                        "challenge-history-item";
+
+
+                    const image =
+                        design.image_url ||
+                        design.thumbnail_url;
+
+
+                    const rank =
+                        Number(
+                            submission.rank
+                        );
+
+
+                    const score =
+                        Number(
+                            submission.score
+                        );
+
+
+                    const rankText =
+                        rank === 1
+                            ? "🥇 #1"
+                            : rank > 0
+                                ? `#${rank}`
+                                : "Entered";
+
+
+                    item.innerHTML = `
+
+                        <div
+                            class="challenge-history-image"
+                        >
+
+                            ${
+                                image
+                                    ? `
+                                        <img
+                                            src="${escapeAttribute(
+                                                image
+                                            )}"
+                                            alt="${escapeAttribute(
+                                                design.title ||
+                                                "Design"
+                                            )}"
+                                            loading="lazy"
+                                        >
+                                      `
+                                    : `
+                                        <div
+                                            style="
+                                                width:100%;
+                                                height:100%;
+                                                display:grid;
+                                                place-items:center;
+                                                color:#c4b5fd;
+                                            "
+                                        >
+
+                                            <i
+                                                class="fa-solid fa-trophy"
+                                            ></i>
+
+                                        </div>
+                                      `
+                            }
+
+                        </div>
+
+
+                        <div
+                            class="challenge-history-info"
+                        >
+
+                            <strong>
+                                ${escapeHTML(
+                                    challenge.title ||
+                                    "Challenge"
+                                )}
+                            </strong>
+
+
+                            <span>
+                                ${escapeHTML(
+                                    design.title ||
+                                    "Design submission"
+                                )}
+                            </span>
+
+                        </div>
+
+
+                        <div
+                            class="challenge-history-result"
+                        >
+
+                            <span
+                                class="
+                                    history-rank
+                                    ${
+                                        rank === 1
+                                            ? "history-win"
+                                            : ""
+                                    }
+                                "
+                            >
+
+                                ${rankText}
+
+                            </span>
+
+
+                            ${
+                                Number.isFinite(
+                                    score
+                                )
+                                    ? `
+                                        <span
+                                            class="history-score"
+                                        >
+
+                                            ${formatNumber(
+                                                score
+                                            )}
+
+                                            pts
+
+                                        </span>
+                                      `
+                                    : ""
+                            }
+
+                        </div>
+
+                    `;
+
+
+                    list.appendChild(
+                        item
+                    );
+                }
+            );
+        }
+
+
+        /* =================================================
+           SHARE
+           ================================================= */
+
+        $designerPage(
+            "#shareDesignerButton"
+        )
+        ?.addEventListener(
+            "click",
+            async () => {
+
+                const url =
+                    window.location.href;
+
+
+                try {
+
+                    if (
+                        navigator.share
+                    ) {
+
+                        await navigator.share({
+
+                            title:
+                                document.title,
+
+                            url
+
+                        });
+
+
+                        return;
+                    }
+
+
+                    if (
+                        navigator.clipboard
+                    ) {
+
+                        await navigator.clipboard.writeText(
+                            url
+                        );
+
+
+                        showPageToast(
+                            "Profile link copied."
+                        );
+
+
+                        return;
+                    }
+
+
+                    showPageToast(
+                        "Copy this profile URL from your browser."
+                    );
+
+                } catch {
+
+                    showPageToast(
+                        "Copy this profile URL from your browser."
+                    );
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           TOAST
+           ================================================= */
+
+        function showPageToast(
+            message
+        ) {
+
+            let container =
+                document.querySelector(
+                    ".designer-page-toast"
+                );
+
+
+            if (!container) {
+
+                container =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                container.className =
+                    "designer-page-toast";
+
+
+                container.style.cssText = `
+                    position:fixed;
+                    right:18px;
+                    bottom:18px;
+                    z-index:5000;
+                    padding:12px 14px;
+                    border:1px solid rgba(255,255,255,.10);
+                    border-radius:12px;
+                    background:rgba(10,10,16,.96);
+                    color:white;
+                    box-shadow:0 20px 50px rgba(0,0,0,.35);
+                    backdrop-filter:blur(18px);
+                    font:10px/1.5 Inter,sans-serif;
+                `;
+
+
+                document.body.appendChild(
+                    container
+                );
+            }
+
+
+            container.textContent =
+                message;
+
+
+            clearTimeout(
+                container._timer
+            );
+
+
+            container._timer =
+                setTimeout(
+                    () => {
+
+                        container.remove();
+
+                    },
+                    3500
+                );
+        }
+
+
+        /* =================================================
+           SHOW CONTENT
+           ================================================= */
+
+        function showDesignerContent() {
+
+            $designerPage(
+                "#designerLoading"
+            )
+            ?.remove();
+
+
+            $designerPage(
+                "#designerContent"
+            ).hidden =
+                false;
+        }
+
+
+        /* =================================================
+           SHOW ERROR
+           ================================================= */
+
+        function showDesignerError(
+            message
+        ) {
+
+            $designerPage(
+                "#designerLoading"
+            )
+            ?.remove();
+
+
+            $designerPage(
+                "#designerContent"
+            )
+            ?.setAttribute(
+                "hidden",
+                ""
+            );
+
+
+            const error =
+                $designerPage(
+                    "#designerError"
+                );
+
+
+            error?.classList.add(
+                "visible"
+            );
+
+
+            setText(
+                "#designerErrorMessage",
+                message
+            );
+        }
+
+
+        /* =================================================
+           START
+           ================================================= */
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            () => {
+
+                initializeDesignerPage();
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>

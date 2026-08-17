@@ -1,6 +1,24 @@
 /* =========================================================
    DESIGNVERSE — PROFILE SYSTEM
-   profile.js
+   js/profile.js
+
+   Uses the ACTUAL profiles schema:
+
+   id
+   username
+   display_name
+   bio
+   avatar_url
+   website_url
+   location
+   role
+   total_points
+   total_votes
+   total_wins
+   followers_count
+   following_count
+   created_at
+   updated_at
    ========================================================= */
 
 "use strict";
@@ -8,33 +26,81 @@
 
 const DVProfile = (() => {
 
+    const state = {
+
+        initialized: false,
+
+        user: null,
+
+        profile: null,
+
+        publicProfile: null,
+
+        designs: [],
+
+        submissions: [],
+
+        statistics: {
+
+            designs: 0,
+
+            challenges: 0,
+
+            wins: 0,
+
+            votes: 0,
+
+            views: 0,
+
+            points: 0,
+
+            followers: 0,
+
+            following: 0
+
+        },
+
+        loading: false,
+
+        avatarObjectUrl: null
+
+    };
+
+
+    /* =====================================================
+       DOM
+       ===================================================== */
+
+    function $(selector) {
+
+        return document.querySelector(selector);
+    }
+
+
     /* =====================================================
        SUPABASE
        ===================================================== */
 
-    const getSupabase = () => {
+    function getSupabase() {
 
         if (!window.supabaseClient) {
+
             console.error(
-                "DESIGNVERSE: Supabase client not found."
+                "DESIGNVERSE: Supabase client is unavailable."
             );
 
             return null;
         }
 
         return window.supabaseClient;
-    };
+    }
 
 
     /* =====================================================
-       HELPERS
+       CURRENT USER
        ===================================================== */
 
-    const $ = (selector) =>
-        document.querySelector(selector);
-
-
-    const getUser = async () => {
+    async function getCurrentUser() {
 
         const supabase = getSupabase();
 
@@ -48,153 +114,246 @@ const DVProfile = (() => {
         } = await supabase.auth.getUser();
 
         if (error) {
-            console.error(
-                "Unable to get user:",
+
+            console.warn(
+                "DESIGNVERSE profile auth lookup:",
                 error
             );
 
             return null;
         }
 
-        return data.user || null;
-    };
+        state.user =
+            data?.user || null;
 
-
-    const getUserId = async () => {
-
-        const user = await getUser();
-
-        return user?.id || null;
-    };
+        return state.user;
+    }
 
 
     /* =====================================================
-       GET PROFILE
+       LOAD PROFILE BY ID
        ===================================================== */
 
-    const getProfile = async (
+    async function getProfile(
         userId = null
-    ) => {
+    ) {
 
         const supabase = getSupabase();
 
         if (!supabase) {
-            return null;
+
+            throw new Error(
+                "Supabase is unavailable."
+            );
         }
 
-        if (!userId) {
-            userId = await getUserId();
+
+        const currentUser =
+            state.user ||
+            await getCurrentUser();
+
+
+        const id =
+            userId ||
+            currentUser?.id;
+
+
+        if (!id) {
+
+            throw new Error(
+                "No user was specified."
+            );
         }
 
-        if (!userId) {
-            return null;
-        }
 
         const {
             data,
             error
         } = await supabase
             .from("profiles")
-            .select("*")
-            .eq("id", userId)
+            .select(`
+                id,
+                username,
+                display_name,
+                bio,
+                avatar_url,
+                website_url,
+                location,
+                role,
+                total_points,
+                total_votes,
+                total_wins,
+                followers_count,
+                following_count,
+                created_at,
+                updated_at
+            `)
+            .eq(
+                "id",
+                id
+            )
             .single();
+
 
         if (error) {
 
-            console.error(
-                "Profile fetch error:",
-                error
-            );
-
-            return null;
+            throw error;
         }
 
+
+        if (
+            state.user?.id === id
+        ) {
+
+            state.profile =
+                data;
+        }
+
+
+        state.publicProfile =
+            data;
+
+
         return data;
-    };
+    }
+
+
+    /* =====================================================
+       LOAD PROFILE BY USERNAME
+       ===================================================== */
+
+    async function getProfileByUsername(
+        username
+    ) {
+
+        const supabase = getSupabase();
+
+        if (!supabase) {
+
+            throw new Error(
+                "Supabase is unavailable."
+            );
+        }
+
+
+        const cleanUsername =
+            String(
+                username || ""
+            )
+            .trim()
+            .toLowerCase()
+            .replace(
+                /^@/,
+                ""
+            );
+
+
+        if (!cleanUsername) {
+
+            throw new Error(
+                "A username is required."
+            );
+        }
+
+
+        const {
+            data,
+            error
+        } = await supabase
+            .from("profiles")
+            .select(`
+                id,
+                username,
+                display_name,
+                bio,
+                avatar_url,
+                website_url,
+                location,
+                role,
+                total_points,
+                total_votes,
+                total_wins,
+                followers_count,
+                following_count,
+                created_at,
+                updated_at
+            `)
+            .eq(
+                "username",
+                cleanUsername
+            )
+            .single();
+
+
+        if (error) {
+
+            throw error;
+        }
+
+
+        state.publicProfile =
+            data;
+
+
+        return data;
+    }
 
 
     /* =====================================================
        UPDATE PROFILE
        ===================================================== */
 
-    const updateProfile = async ({
-        displayName,
+    async function updateProfile({
+
         username,
+
+        displayName,
+
         bio,
+
         websiteUrl,
+
         location
-    }) => {
+
+    }) {
 
         const supabase = getSupabase();
 
         if (!supabase) {
+
             throw new Error(
                 "Supabase is unavailable."
             );
         }
 
-        const userId =
-            await getUserId();
 
-        if (!userId) {
+        const user =
+            state.user ||
+            await getCurrentUser();
+
+
+        if (!user) {
+
             throw new Error(
-                "You must be logged in to update your profile."
+                "Please sign in to edit your profile."
             );
         }
 
 
-        const updates = {};
+        const validated =
+            validateProfileData({
 
+                username,
 
-        if (
-            typeof displayName ===
-            "string"
-        ) {
-            updates.display_name =
-                displayName.trim();
-        }
+                displayName,
 
+                bio,
 
-        if (
-            typeof username ===
-            "string"
-        ) {
-            updates.username =
-                username
-                    .trim()
-                    .toLowerCase();
-        }
+                websiteUrl,
 
+                location
 
-        if (
-            typeof bio ===
-            "string"
-        ) {
-            updates.bio =
-                bio.trim();
-        }
-
-
-        if (
-            typeof websiteUrl ===
-            "string"
-        ) {
-            updates.website_url =
-                websiteUrl.trim();
-        }
-
-
-        if (
-            typeof location ===
-            "string"
-        ) {
-            updates.location =
-                location.trim();
-        }
-
-
-        updates.updated_at =
-            new Date().toISOString();
+            });
 
 
         const {
@@ -202,72 +361,285 @@ const DVProfile = (() => {
             error
         } = await supabase
             .from("profiles")
-            .update(updates)
-            .eq("id", userId)
-            .select()
+            .update({
+
+                username:
+                    validated.username,
+
+                display_name:
+                    validated.displayName,
+
+                bio:
+                    validated.bio || null,
+
+                website_url:
+                    validated.websiteUrl || null,
+
+                location:
+                    validated.location || null,
+
+                updated_at:
+                    new Date()
+                        .toISOString()
+
+            })
+            .eq(
+                "id",
+                user.id
+            )
+            .select(`
+                id,
+                username,
+                display_name,
+                bio,
+                avatar_url,
+                website_url,
+                location,
+                role,
+                total_points,
+                total_votes,
+                total_wins,
+                followers_count,
+                following_count,
+                created_at,
+                updated_at
+            `)
             .single();
 
 
         if (error) {
 
-            console.error(
-                "Profile update error:",
-                error
-            );
+            const message =
+                String(
+                    error.message || ""
+                ).toLowerCase();
+
+
+            if (
+                message.includes("duplicate") &&
+                message.includes("username")
+            ) {
+
+                throw new Error(
+                    "That username is already taken."
+                );
+            }
+
+
+            if (
+                message.includes(
+                    "row-level security"
+                )
+            ) {
+
+                throw new Error(
+                    "You don't have permission to update this profile."
+                );
+            }
+
 
             throw error;
         }
 
 
+        state.profile =
+            data;
+
+        state.publicProfile =
+            data;
+
+
         return data;
-    };
+    }
 
 
     /* =====================================================
-       UPLOAD AVATAR
+       VALIDATION
        ===================================================== */
 
-    const uploadAvatar = async (
+    function validateProfileData({
+
+        username,
+
+        displayName,
+
+        bio,
+
+        websiteUrl,
+
+        location
+
+    }) {
+
+        let cleanUsername =
+            String(
+                username || ""
+            )
+            .trim()
+            .toLowerCase()
+            .replace(
+                /^@/,
+                ""
+            );
+
+
+        const cleanDisplayName =
+            String(
+                displayName || ""
+            ).trim();
+
+
+        const cleanBio =
+            String(
+                bio || ""
+            ).trim();
+
+
+        const cleanWebsiteUrl =
+            String(
+                websiteUrl || ""
+            ).trim();
+
+
+        const cleanLocation =
+            String(
+                location || ""
+            ).trim();
+
+
+        if (!cleanUsername) {
+
+            throw new Error(
+                "Please enter a username."
+            );
+        }
+
+
+        if (
+            !/^[a-z0-9_]{3,30}$/.test(
+                cleanUsername
+            )
+        ) {
+
+            throw new Error(
+                "Username must be 3–30 characters and use only letters, numbers and underscores."
+            );
+        }
+
+
+        if (
+            cleanDisplayName.length >
+            80
+        ) {
+
+            throw new Error(
+                "Display name must be 80 characters or fewer."
+            );
+        }
+
+
+        if (
+            cleanBio.length >
+            500
+        ) {
+
+            throw new Error(
+                "Bio must be 500 characters or fewer."
+            );
+        }
+
+
+        if (
+            cleanLocation.length >
+            80
+        ) {
+
+            throw new Error(
+                "Location must be 80 characters or fewer."
+            );
+        }
+
+
+        let normalizedWebsite =
+            cleanWebsiteUrl;
+
+
+        if (
+            normalizedWebsite &&
+            !/^https?:\/\//i.test(
+                normalizedWebsite
+            )
+        ) {
+
+            normalizedWebsite =
+                `https://${normalizedWebsite}`;
+        }
+
+
+        if (
+            normalizedWebsite
+        ) {
+
+            try {
+
+                new URL(
+                    normalizedWebsite
+                );
+
+            } catch {
+
+                throw new Error(
+                    "Please enter a valid website URL."
+                );
+            }
+        }
+
+
+        return {
+
+            username:
+                cleanUsername,
+
+            displayName:
+                cleanDisplayName,
+
+            bio:
+                cleanBio,
+
+            websiteUrl:
+                normalizedWebsite,
+
+            location:
+                cleanLocation
+
+        };
+    }
+
+
+    /* =====================================================
+       AVATAR
+       ===================================================== */
+
+    function validateAvatarFile(
         file
-    ) => {
-
-        const supabase =
-            getSupabase();
-
-        if (!supabase) {
-            throw new Error(
-                "Supabase is unavailable."
-            );
-        }
-
-
-        const userId =
-            await getUserId();
-
-
-        if (!userId) {
-            throw new Error(
-                "You must be logged in to upload an avatar."
-            );
-        }
-
+    ) {
 
         if (!file) {
+
             throw new Error(
-                "Please select an image."
+                "Please select an avatar image."
             );
         }
 
 
-        /* ---------------------------------------------
-           VALIDATE FILE TYPE
-           --------------------------------------------- */
-
         const allowedTypes = [
+
             "image/jpeg",
+
             "image/png",
-            "image/webp",
-            "image/gif"
+
+            "image/webp"
+
         ];
 
 
@@ -278,48 +650,58 @@ const DVProfile = (() => {
         ) {
 
             throw new Error(
-                "Please upload a JPG, PNG, WEBP or GIF image."
+                "Avatar must be JPG, PNG or WEBP."
             );
         }
-
-
-        /* ---------------------------------------------
-           VALIDATE SIZE
-           --------------------------------------------- */
-
-        const maxSize =
-            5 * 1024 * 1024;
 
 
         if (
             file.size >
-            maxSize
+            5 * 1024 * 1024
         ) {
 
             throw new Error(
-                "Avatar must be smaller than 5 MB."
+                "Avatar must be 5 MB or smaller."
+            );
+        }
+    }
+
+
+    async function uploadAvatar(
+        file
+    ) {
+
+        const supabase =
+            getSupabase();
+
+
+        const user =
+            state.user ||
+            await getCurrentUser();
+
+
+        if (!supabase || !user) {
+
+            throw new Error(
+                "Please sign in before uploading an avatar."
             );
         }
 
 
-        /* ---------------------------------------------
-           CREATE FILE PATH
-           --------------------------------------------- */
+        validateAvatarFile(
+            file
+        );
+
 
         const extension =
-            file.name
-                .split(".")
-                .pop()
-                .toLowerCase();
+            getFileExtension(
+                file
+            );
 
 
         const filePath =
-            `${userId}/profile-${Date.now()}.${extension}`;
+            `${user.id}/avatar.${extension}`;
 
-
-        /* ---------------------------------------------
-           UPLOAD
-           --------------------------------------------- */
 
         const {
             error: uploadError
@@ -330,238 +712,72 @@ const DVProfile = (() => {
                 filePath,
                 file,
                 {
+
                     cacheControl:
                         "3600",
 
                     upsert:
-                        false,
+                        true,
 
                     contentType:
                         file.type
+
                 }
             );
 
 
         if (uploadError) {
 
-            console.error(
-                "Avatar upload error:",
-                uploadError
-            );
-
             throw uploadError;
         }
 
 
-        /* ---------------------------------------------
-           GET PUBLIC URL
-           --------------------------------------------- */
-
         const {
-            data: publicData
-        } = supabase
-            .storage
-            .from("avatars")
-            .getPublicUrl(
-                filePath
+            data
+        } =
+            supabase
+                .storage
+                .from("avatars")
+                .getPublicUrl(
+                    filePath
+                );
+
+
+        if (
+            !data?.publicUrl
+        ) {
+
+            throw new Error(
+                "Unable to generate the avatar URL."
             );
+        }
 
 
         const avatarUrl =
-            publicData.publicUrl;
+            `${data.publicUrl}?v=${Date.now()}`;
 
-
-        /* ---------------------------------------------
-           SAVE URL TO PROFILE
-           --------------------------------------------- */
 
         const {
-            data: profile,
-            error: profileError
-        } = await supabase
-            .from("profiles")
-            .update({
-                avatar_url:
-                    avatarUrl,
-
-                updated_at:
-                    new Date().toISOString()
-            })
-            .eq("id", userId)
-            .select()
-            .single();
-
-
-        if (profileError) {
-
-            console.error(
-                "Avatar profile update error:",
-                profileError
-            );
-
-            throw profileError;
-        }
-
-
-        return {
-            url: avatarUrl,
-            path: filePath,
-            profile
-        };
-    };
-
-
-    /* =====================================================
-       DELETE AVATAR
-       ===================================================== */
-
-    const deleteAvatar = async (
-        avatarUrl = null
-    ) => {
-
-        const supabase =
-            getSupabase();
-
-        if (!supabase) {
-            throw new Error(
-                "Supabase is unavailable."
-            );
-        }
-
-
-        const userId =
-            await getUserId();
-
-
-        if (!userId) {
-            throw new Error(
-                "You must be logged in."
-            );
-        }
-
-
-        /*
-         * If no URL was supplied,
-         * get the current profile.
-         */
-
-        if (!avatarUrl) {
-
-            const profile =
-                await getProfile(
-                    userId
-                );
-
-            avatarUrl =
-                profile?.avatar_url;
-        }
-
-
-        if (avatarUrl) {
-
-            /*
-             * Extract the file path from
-             * the public Supabase URL.
-             */
-
-            const marker =
-                "/storage/v1/object/public/avatars/";
-
-
-            const index =
-                avatarUrl.indexOf(
-                    marker
-                );
-
-
-            if (index !== -1) {
-
-                const filePath =
-                    decodeURIComponent(
-                        avatarUrl.substring(
-                            index +
-                            marker.length
-                        )
-                    );
-
-
-                const {
-                    error
-                } = await supabase
-                    .storage
-                    .from("avatars")
-                    .remove([
-                        filePath
-                    ]);
-
-
-                if (error) {
-
-                    console.error(
-                        "Avatar delete error:",
-                        error
-                    );
-
-                    throw error;
-                }
-            }
-        }
-
-
-        /* ---------------------------------------------
-           Remove avatar URL
-           --------------------------------------------- */
-
-        const {
-            data,
+            data:
+                updatedProfile,
             error
-        } = await supabase
-            .from("profiles")
-            .update({
-                avatar_url: null,
-
-                updated_at:
-                    new Date().toISOString()
-            })
-            .eq("id", userId)
-            .select()
-            .single();
-
-
-        if (error) {
-            throw error;
-        }
-
-
-        return data;
-    };
-
-
-    /* =====================================================
-       GET DESIGNER PROFILE
-       ===================================================== */
-
-    const getDesigner =
-        async (username) => {
-
-            const supabase =
-                getSupabase();
-
-            if (!supabase) {
-                return null;
-            }
-
-
-            if (!username) {
-                return null;
-            }
-
-
-            const {
-                data,
-                error
-            } = await supabase
+        } =
+            await supabase
                 .from("profiles")
+                .update({
+
+                    avatar_url:
+                        avatarUrl,
+
+                    updated_at:
+                        new Date()
+                            .toISOString()
+
+                })
+                .eq(
+                    "id",
+                    user.id
+                )
                 .select(`
                     id,
                     username,
@@ -576,61 +792,179 @@ const DVProfile = (() => {
                     total_wins,
                     followers_count,
                     following_count,
-                    created_at
+                    created_at,
+                    updated_at
                 `)
-                .eq(
-                    "username",
-                    username
-                        .trim()
-                        .toLowerCase()
-                )
                 .single();
 
 
-            if (error) {
+        if (error) {
 
-                console.error(
-                    "Designer profile error:",
-                    error
-                );
-
-                return null;
-            }
+            throw error;
+        }
 
 
-            return data;
-        };
+        state.profile =
+            updatedProfile;
+
+        state.publicProfile =
+            updatedProfile;
+
+
+        return updatedProfile;
+    }
+
+
+    async function removeAvatar() {
+
+        const supabase =
+            getSupabase();
+
+
+        const user =
+            state.user ||
+            await getCurrentUser();
+
+
+        if (!supabase || !user) {
+
+            throw new Error(
+                "Please sign in."
+            );
+        }
+
+
+        /*
+         * Remove the common avatar formats.
+         */
+
+        await supabase
+            .storage
+            .from("avatars")
+            .remove([
+                `${user.id}/avatar.jpg`,
+                `${user.id}/avatar.png`,
+                `${user.id}/avatar.webp`
+            ]);
+
+
+        const {
+            data,
+            error
+        } =
+            await supabase
+                .from("profiles")
+                .update({
+
+                    avatar_url:
+                        null,
+
+                    updated_at:
+                        new Date()
+                            .toISOString()
+
+                })
+                .eq(
+                    "id",
+                    user.id
+                )
+                .select(`
+                    id,
+                    username,
+                    display_name,
+                    bio,
+                    avatar_url,
+                    website_url,
+                    location,
+                    role,
+                    total_points,
+                    total_votes,
+                    total_wins,
+                    followers_count,
+                    following_count,
+                    created_at,
+                    updated_at
+                `)
+                .single();
+
+
+        if (error) {
+
+            throw error;
+        }
+
+
+        state.profile =
+            data;
+
+        state.publicProfile =
+            data;
+
+
+        return data;
+    }
 
 
     /* =====================================================
-       GET DESIGNER'S DESIGNS
+       DESIGNS
        ===================================================== */
 
-    const getDesignerDesigns =
-        async (userId) => {
+    async function loadUserDesigns(
+        userId
+    ) {
 
-            const supabase =
-                getSupabase();
-
-            if (!supabase) {
-                return [];
-            }
+        const supabase =
+            getSupabase();
 
 
-            if (!userId) {
-                return [];
-            }
+        if (!supabase) {
+
+            throw new Error(
+                "Supabase is unavailable."
+            );
+        }
 
 
-            const {
-                data,
-                error
-            } = await supabase
+        const id =
+            userId ||
+            state.publicProfile?.id ||
+            state.profile?.id ||
+            state.user?.id;
+
+
+        if (!id) {
+
+            throw new Error(
+                "No designer was specified."
+            );
+        }
+
+
+        const {
+            data,
+            error
+        } =
+            await supabase
                 .from("designs")
-                .select("*")
+                .select(`
+                    id,
+                    designer_id,
+                    title,
+                    description,
+                    category,
+                    image_url,
+                    thumbnail_url,
+                    tags,
+                    views,
+                    likes_count,
+                    votes_count,
+                    is_public,
+                    created_at,
+                    updated_at
+                `)
                 .eq(
                     "designer_id",
-                    userId
+                    id
                 )
                 .eq(
                     "is_public",
@@ -645,928 +979,1563 @@ const DVProfile = (() => {
                 );
 
 
-            if (error) {
+        if (error) {
 
-                console.error(
-                    "Designer designs error:",
-                    error
-                );
-
-                return [];
-            }
+            throw error;
+        }
 
 
-            return data || [];
-        };
+        state.designs =
+            data || [];
+
+
+        return state.designs;
+    }
 
 
     /* =====================================================
-       FOLLOW USER
+       SUBMISSIONS
        ===================================================== */
 
-    const followUser =
-        async (followingId) => {
+    async function loadUserSubmissions(
+        userId
+    ) {
 
-            const supabase =
-                getSupabase();
+        const supabase =
+            getSupabase();
 
-            if (!supabase) {
-                throw new Error(
-                    "Supabase is unavailable."
+
+        if (!supabase) {
+
+            throw new Error(
+                "Supabase is unavailable."
+            );
+        }
+
+
+        const id =
+            userId ||
+            state.publicProfile?.id ||
+            state.profile?.id ||
+            state.user?.id;
+
+
+        if (!id) {
+
+            throw new Error(
+                "No designer was specified."
+            );
+        }
+
+
+        const {
+            data,
+            error
+        } =
+            await supabase
+                .from("submissions")
+                .select(`
+                    id,
+                    challenge_id,
+                    design_id,
+                    designer_id,
+                    status,
+                    score,
+                    rank,
+                    submitted_at,
+                    updated_at,
+                    design:designs (
+                        id,
+                        title,
+                        image_url,
+                        thumbnail_url,
+                        category
+                    ),
+                    challenge:challenges (
+                        id,
+                        title,
+                        slug,
+                        prize,
+                        points,
+                        ends_at,
+                        voting_ends_at,
+                        status
+                    )
+                `)
+                .eq(
+                    "designer_id",
+                    id
+                )
+                .order(
+                    "submitted_at",
+                    {
+                        ascending:
+                            false
+                    }
                 );
-            }
 
 
-            const followerId =
-                await getUserId();
+        if (error) {
+
+            throw error;
+        }
 
 
-            if (!followerId) {
-                throw new Error(
-                    "Please log in first."
-                );
-            }
+        state.submissions =
+            data || [];
 
 
-            if (
-                followerId ===
-                followingId
-            ) {
+        return state.submissions;
+    }
 
-                throw new Error(
-                    "You cannot follow yourself."
-                );
-            }
 
+    /* =====================================================
+       STATISTICS
+       ===================================================== */
+
+    async function loadStatistics(
+        userId
+    ) {
+
+        const id =
+            userId ||
+            state.publicProfile?.id ||
+            state.profile?.id ||
+            state.user?.id;
+
+
+        if (!id) {
+
+            throw new Error(
+                "No designer was specified."
+            );
+        }
+
+
+        /*
+         * We deliberately use the counters in
+         * profiles as the primary source.
+         */
+
+        const profile =
+            state.publicProfile ||
+            state.profile ||
+            await getProfile(
+                id
+            );
+
+
+        /*
+         * Design count.
+         */
+
+        const supabase =
+            getSupabase();
+
+
+        let designCount =
+            0;
+
+
+        let views =
+            0;
+
+
+        if (supabase) {
 
             const {
-                data,
-                error
-            } = await supabase
-                .from("follows")
-                .insert({
-
-                    follower_id:
-                        followerId,
-
-                    following_id:
-                        followingId
-
-                })
-                .select()
-                .single();
-
-
-            if (error) {
-
-                if (
-                    error.code ===
-                    "23505"
-                ) {
-
-                    throw new Error(
-                        "You already follow this designer."
+                count
+            } =
+                await supabase
+                    .from("designs")
+                    .select(
+                        "id",
+                        {
+                            count:
+                                "exact",
+                            head:
+                                true
+                        }
+                    )
+                    .eq(
+                        "designer_id",
+                        id
+                    )
+                    .eq(
+                        "is_public",
+                        true
                     );
-                }
-
-                throw error;
-            }
 
 
-            return data;
-        };
-
-
-    /* =====================================================
-       UNFOLLOW USER
-       ===================================================== */
-
-    const unfollowUser =
-        async (followingId) => {
-
-            const supabase =
-                getSupabase();
-
-            if (!supabase) {
-                throw new Error(
-                    "Supabase is unavailable."
-                );
-            }
-
-
-            const followerId =
-                await getUserId();
-
-
-            if (!followerId) {
-                throw new Error(
-                    "Please log in first."
-                );
-            }
+            designCount =
+                count || 0;
 
 
             const {
-                error
-            } = await supabase
-                .from("follows")
-                .delete()
-                .eq(
-                    "follower_id",
-                    followerId
+                data:
+                    viewRows
+            } =
+                await supabase
+                    .from("designs")
+                    .select(
+                        "views"
+                    )
+                    .eq(
+                        "designer_id",
+                        id
+                    )
+                    .eq(
+                        "is_public",
+                        true
+                    );
+
+
+            views =
+                (
+                    viewRows || []
                 )
-                .eq(
-                    "following_id",
-                    followingId
+                .reduce(
+                    (
+                        total,
+                        row
+                    ) =>
+                        total +
+                        Number(
+                            row.views || 0
+                        ),
+                    0
                 );
+        }
 
 
-            if (error) {
-                throw error;
-            }
+        state.statistics = {
 
+            designs:
+                designCount,
 
-            return true;
+            challenges:
+                state.submissions.length,
+
+            wins:
+                Number(
+                    profile.total_wins ||
+                    0
+                ),
+
+            votes:
+                Number(
+                    profile.total_votes ||
+                    0
+                ),
+
+            views,
+
+            points:
+                Number(
+                    profile.total_points ||
+                    0
+                ),
+
+            followers:
+                Number(
+                    profile.followers_count ||
+                    0
+                ),
+
+            following:
+                Number(
+                    profile.following_count ||
+                    0
+                )
+
         };
 
 
-    /* =====================================================
-       CHECK FOLLOW STATUS
-       ===================================================== */
-
-    const isFollowing =
-        async (followingId) => {
-
-            const supabase =
-                getSupabase();
-
-            if (!supabase) {
-                return false;
-            }
-
-
-            const followerId =
-                await getUserId();
-
-
-            if (!followerId) {
-                return false;
-            }
-
-
-            const {
-                data,
-                error
-            } = await supabase
-                .from("follows")
-                .select("id")
-                .eq(
-                    "follower_id",
-                    followerId
-                )
-                .eq(
-                    "following_id",
-                    followingId
-                )
-                .maybeSingle();
-
-
-            if (error) {
-
-                console.error(
-                    "Follow status error:",
-                    error
-                );
-
-                return false;
-            }
-
-
-            return !!data;
-        };
+        return state.statistics;
+    }
 
 
     /* =====================================================
-       UPDATE FOLLOW COUNTS
+       COMPLETE PROFILE
        ===================================================== */
 
-    const getFollowCounts =
-        async (userId) => {
+    async function loadCompleteProfile(
+        userId
+    ) {
 
-            const supabase =
-                getSupabase();
-
-            if (!supabase) {
-                return {
-                    followers: 0,
-                    following: 0
-                };
-            }
+        state.loading =
+            true;
 
 
-            const {
-                count: followers
-            } = await supabase
-                .from("follows")
-                .select(
-                    "*",
-                    {
-                        count: "exact",
-                        head: true
-                    }
-                )
-                .eq(
-                    "following_id",
+        try {
+
+            const profile =
+                await getProfile(
                     userId
                 );
 
 
-            const {
-                count: following
-            } = await supabase
-                .from("follows")
-                .select(
-                    "*",
-                    {
-                        count: "exact",
-                        head: true
-                    }
-                )
-                .eq(
-                    "follower_id",
-                    userId
-                );
+            await loadUserDesigns(
+                profile.id
+            );
+
+
+            await loadUserSubmissions(
+                profile.id
+            );
+
+
+            await loadStatistics(
+                profile.id
+            );
 
 
             return {
 
-                followers:
-                    followers || 0,
+                profile,
 
-                following:
-                    following || 0
+                designs:
+                    state.designs,
 
-            };
-        };
+                submissions:
+                    state.submissions,
 
-
-    /* =====================================================
-       UPDATE PROFILE COUNTS
-       ===================================================== */
-
-    const refreshFollowCounts =
-        async () => {
-
-            const supabase =
-                getSupabase();
-
-            if (!supabase) {
-                return null;
-            }
-
-
-            const userId =
-                await getUserId();
-
-
-            if (!userId) {
-                return null;
-            }
-
-
-            const counts =
-                await getFollowCounts(
-                    userId
-                );
-
-
-            const {
-                data,
-                error
-            } = await supabase
-                .from("profiles")
-                .update({
-
-                    followers_count:
-                        counts.followers,
-
-                    following_count:
-                        counts.following,
-
-                    updated_at:
-                        new Date().toISOString()
-
-                })
-                .eq(
-                    "id",
-                    userId
-                )
-                .select()
-                .single();
-
-
-            if (error) {
-                throw error;
-            }
-
-
-            return data;
-        };
-
-
-    /* =====================================================
-       LOAD CURRENT PROFILE INTO PAGE
-       ===================================================== */
-
-    const loadCurrentProfile =
-        async () => {
-
-            const profile =
-                await getProfile();
-
-
-            if (!profile) {
-                return null;
-            }
-
-
-            /*
-             * These IDs/classes can be used
-             * on dashboard/profile pages.
-             */
-
-            const elements = {
-
-                displayName:
-                    document.querySelectorAll(
-                        "[data-profile='display-name']"
-                    ),
-
-                username:
-                    document.querySelectorAll(
-                        "[data-profile='username']"
-                    ),
-
-                bio:
-                    document.querySelectorAll(
-                        "[data-profile='bio']"
-                    ),
-
-                avatar:
-                    document.querySelectorAll(
-                        "[data-profile='avatar']"
-                    ),
-
-                location:
-                    document.querySelectorAll(
-                        "[data-profile='location']"
-                    ),
-
-                website:
-                    document.querySelectorAll(
-                        "[data-profile='website']"
-                    ),
-
-                points:
-                    document.querySelectorAll(
-                        "[data-profile='points']"
-                    ),
-
-                wins:
-                    document.querySelectorAll(
-                        "[data-profile='wins']"
-                    ),
-
-                votes:
-                    document.querySelectorAll(
-                        "[data-profile='votes']"
-                    ),
-
-                followers:
-                    document.querySelectorAll(
-                        "[data-profile='followers']"
-                    ),
-
-                following:
-                    document.querySelectorAll(
-                        "[data-profile='following']"
-                    )
+                statistics:
+                    state.statistics
 
             };
 
+        } finally {
 
-            elements.displayName
-                .forEach(
-                    element => {
-
-                        element.textContent =
-                            profile.display_name ||
-                            "DESIGNVERSE User";
-                    }
-                );
-
-
-            elements.username
-                .forEach(
-                    element => {
-
-                        element.textContent =
-                            profile.username
-                                ? `@${profile.username}`
-                                : "";
-                    }
-                );
-
-
-            elements.bio
-                .forEach(
-                    element => {
-
-                        element.textContent =
-                            profile.bio || "";
-                    }
-                );
-
-
-            elements.location
-                .forEach(
-                    element => {
-
-                        element.textContent =
-                            profile.location || "";
-                    }
-                );
-
-
-            elements.points
-                .forEach(
-                    element => {
-
-                        element.textContent =
-                            profile.total_points || 0;
-                    }
-                );
-
-
-            elements.wins
-                .forEach(
-                    element => {
-
-                        element.textContent =
-                            profile.total_wins || 0;
-                    }
-                );
-
-
-            elements.votes
-                .forEach(
-                    element => {
-
-                        element.textContent =
-                            profile.total_votes || 0;
-                    }
-                );
-
-
-            elements.followers
-                .forEach(
-                    element => {
-
-                        element.textContent =
-                            profile.followers_count || 0;
-                    }
-                );
-
-
-            elements.following
-                .forEach(
-                    element => {
-
-                        element.textContent =
-                            profile.following_count || 0;
-                    }
-                );
-
-
-            elements.avatar
-                .forEach(
-                    element => {
-
-                        if (
-                            profile.avatar_url
-                        ) {
-
-                            element.src =
-                                profile.avatar_url;
-
-                            element.alt =
-                                profile.display_name ||
-                                "Designer";
-
-                        }
-
-                    }
-                );
-
-
-            elements.website
-                .forEach(
-                    element => {
-
-                        if (
-                            profile.website_url
-                        ) {
-
-                            element.href =
-                                profile.website_url;
-
-                            element.textContent =
-                                profile.website_url;
-
-                        }
-
-                    }
-                );
-
-
-            return profile;
-        };
+            state.loading =
+                false;
+        }
+    }
 
 
     /* =====================================================
-       PROFILE FORM
+       PUBLIC PROFILE RENDER
        ===================================================== */
 
-    const setupProfileForm =
-        () => {
+    function renderPublicProfile() {
 
-            const form =
-                $("#profileForm");
+        const profile =
+            state.publicProfile;
 
 
-            if (!form) {
-                return;
+        if (!profile) {
+
+            return;
+        }
+
+
+        const stats =
+            state.statistics;
+
+
+        setText(
+            "#designerName",
+            profile.display_name ||
+            profile.username ||
+            "Designer"
+        );
+
+
+        setText(
+            "#designerUsername",
+            profile.username
+                ? `@${profile.username}`
+                : ""
+        );
+
+
+        setText(
+            "#designerBio",
+            profile.bio ||
+            "Designer on DESIGNVERSE."
+        );
+
+
+        setText(
+            "#designerLocation",
+            profile.location ||
+            ""
+        );
+
+
+        setText(
+            "#designerDesignCount",
+            formatNumber(
+                stats.designs
+            )
+        );
+
+
+        setText(
+            "#designerChallengeCount",
+            formatNumber(
+                stats.challenges
+            )
+        );
+
+
+        setText(
+            "#designerWins",
+            formatNumber(
+                stats.wins
+            )
+        );
+
+
+        setText(
+            "#designerVotes",
+            formatNumber(
+                stats.votes
+            )
+        );
+
+
+        setText(
+            "#designerXP",
+            formatNumber(
+                stats.points
+            )
+        );
+
+
+        setText(
+            "#designerFollowers",
+            formatNumber(
+                stats.followers
+            )
+        );
+
+
+        setText(
+            "#designerFollowing",
+            formatNumber(
+                stats.following
+            )
+        );
+
+
+        setProfileAvatar(
+            profile.avatar_url
+        );
+
+
+        const website =
+            $("#designerWebsite");
+
+
+        if (website) {
+
+            if (
+                profile.website_url
+            ) {
+
+                website.href =
+                    profile.website_url;
+
+                website.textContent =
+                    cleanWebsiteDisplay(
+                        profile.website_url
+                    );
+
+                website.hidden =
+                    false;
+
+            } else {
+
+                website.hidden =
+                    true;
             }
+        }
 
 
-            form.addEventListener(
-                "submit",
-                async event => {
-
-                    event.preventDefault();
+        renderDesignerDesigns();
+    }
 
 
-                    const button =
-                        form.querySelector(
-                            "button[type='submit']"
-                        );
+    /* =====================================================
+       DESIGN GRID
+       ===================================================== */
+
+    function renderDesignerDesigns() {
+
+        const container =
+            $("#designerDesignsGrid");
 
 
-                    const originalText =
-                        button?.innerHTML;
+        if (!container) {
+
+            return;
+        }
 
 
-                    try {
+        container.innerHTML =
+            "";
 
-                        if (button) {
 
-                            button.disabled =
-                                true;
+        if (
+            !state.designs.length
+        ) {
 
-                            button.innerHTML = `
-                                <i class="fa-solid fa-spinner fa-spin"></i>
-                                Saving...
-                            `;
+            container.innerHTML = `
+
+                <div
+                    style="
+                        grid-column:1/-1;
+                        padding:45px 20px;
+                        text-align:center;
+                    "
+                >
+
+                    <i
+                        class="fa-solid fa-palette"
+                        style="
+                            display:block;
+                            margin-bottom:12px;
+                            color:#c4b5fd;
+                            font-size:26px;
+                        "
+                    ></i>
+
+
+                    <h3
+                        style="
+                            margin:0 0 6px;
+                            color:white;
+                        "
+                    >
+                        No public designs yet
+                    </h3>
+
+
+                    <p
+                        style="
+                            margin:0;
+                            color:#71717a;
+                            font-size:9px;
+                        "
+                    >
+                        This designer hasn't published
+                        any public designs yet.
+                    </p>
+
+                </div>
+
+            `;
+
+
+            return;
+        }
+
+
+        state.designs.forEach(
+            design => {
+
+                const article =
+                    document.createElement(
+                        "article"
+                    );
+
+
+                article.innerHTML = `
+
+                    <a
+                        href="design.html?id=${encodeURIComponent(
+                            design.id
+                        )}"
+                    >
+
+                        ${
+                            design.image_url
+                                ? `
+                                    <img
+                                        src="${escapeAttribute(
+                                            design.image_url
+                                        )}"
+                                        alt="${escapeAttribute(
+                                            design.title ||
+                                            "Design"
+                                        )}"
+                                        loading="lazy"
+                                    >
+                                  `
+                                : `
+                                    <div
+                                        style="
+                                            aspect-ratio:1;
+                                            display:grid;
+                                            place-items:center;
+                                            background:linear-gradient(
+                                                135deg,
+                                                #120825,
+                                                #153b75
+                                            );
+                                            color:#c4b5fd;
+                                        "
+                                    >
+                                        <i
+                                            class="fa-solid fa-palette"
+                                        ></i>
+                                    </div>
+                                  `
                         }
 
-
-                        const profile =
-                            await updateProfile({
-
-                                displayName:
-                                    $("#displayName")
-                                        ?.value || "",
-
-                                username:
-                                    $("#username")
-                                        ?.value || "",
-
-                                bio:
-                                    $("#bio")
-                                        ?.value || "",
-
-                                websiteUrl:
-                                    $("#websiteUrl")
-                                        ?.value || "",
-
-                                location:
-                                    $("#location")
-                                        ?.value || ""
-
-                            });
+                    </a>
 
 
-                        showProfileMessage(
-                            "Profile updated successfully!",
-                            "success"
-                        );
+                    <h3>
+                        ${escapeHTML(
+                            design.title ||
+                            "Untitled Design"
+                        )}
+                    </h3>
 
 
-                        await loadCurrentProfile();
+                    <span>
+                        ${escapeHTML(
+                            formatCategory(
+                                design.category
+                            )
+                        )}
+                    </span>
+
+                `;
 
 
-                    } catch (error) {
+                container.appendChild(
+                    article
+                );
 
-                        console.error(
-                            "Profile form error:",
-                            error
-                        );
-
-
-                        showProfileMessage(
-                            getErrorMessage(
-                                error
-                            ),
-                            "error"
-                        );
-
-
-                    } finally {
-
-                        if (button) {
-
-                            button.disabled =
-                                false;
-
-                            button.innerHTML =
-                                originalText ||
-                                "Save Changes";
-                        }
-
-                    }
-
-                }
-            );
-        };
+            }
+        );
+    }
 
 
     /* =====================================================
        AVATAR FORM
        ===================================================== */
 
-    const setupAvatarUpload =
-        () => {
+    function setupAvatarForm() {
 
-            const input =
-                $("#avatarInput");
-
-
-            const form =
-                $("#avatarForm");
+        const input =
+            $("#avatarInput");
 
 
-            if (!input) {
-                return;
-            }
+        if (!input) {
+
+            return;
+        }
 
 
-            const upload = async (
-                file
-            ) => {
+        input.addEventListener(
+            "change",
+            async () => {
+
+                const file =
+                    input.files?.[0];
+
+
+                if (!file) {
+
+                    return;
+                }
+
 
                 try {
 
-                    const result =
-                        await uploadAvatar(
-                            file
+                    validateAvatarFile(
+                        file
+                    );
+
+
+                    await uploadAvatar(
+                        file
+                    );
+
+
+                    setProfileAvatar(
+                        state.profile?.avatar_url
+                    );
+
+
+                    showToast(
+                        "Avatar updated successfully.",
+                        "success"
+                    );
+
+                } catch (error) {
+
+                    showToast(
+                        getProfileErrorMessage(
+                            error
+                        ),
+                        "error"
+                    );
+                }
+
+            }
+        );
+
+
+        $("#removeAvatarButton")
+            ?.addEventListener(
+                "click",
+                async () => {
+
+                    try {
+
+                        await removeAvatar();
+
+
+                        setProfileAvatar(
+                            null
                         );
 
 
-                    const preview =
-                        document.querySelector(
-                            "[data-profile='avatar']"
+                        showToast(
+                            "Avatar removed.",
+                            "success"
                         );
 
+                    } catch (error) {
 
-                    if (preview) {
-
-                        preview.src =
-                            result.url;
+                        showToast(
+                            getProfileErrorMessage(
+                                error
+                            ),
+                            "error"
+                        );
                     }
+                }
+            );
+    }
 
 
-                    showProfileMessage(
-                        "Profile picture updated!",
+    /* =====================================================
+       PROFILE FORM
+       ===================================================== */
+
+    function setupProfileForm() {
+
+        const form =
+            $("#profileForm");
+
+
+        if (!form) {
+
+            return;
+        }
+
+
+        form.addEventListener(
+            "submit",
+            async event => {
+
+                event.preventDefault();
+
+
+                const button =
+                    form.querySelector(
+                        '[type="submit"]'
+                    );
+
+
+                try {
+
+                    setButtonLoading(
+                        button,
+                        true
+                    );
+
+
+                    const profile =
+                        await updateProfile({
+
+                            username:
+                                $("#username")
+                                    ?.value,
+
+                            displayName:
+                                $("#displayName")
+                                    ?.value,
+
+                            bio:
+                                $("#bio")
+                                    ?.value,
+
+                            websiteUrl:
+                                $("#websiteUrl")
+                                    ?.value,
+
+                            location:
+                                $("#location")
+                                    ?.value
+
+                        });
+
+
+                    fillProfileForm(
+                        profile
+                    );
+
+
+                    showToast(
+                        "Profile updated successfully.",
                         "success"
                     );
 
 
                 } catch (error) {
 
-                    console.error(
-                        "Avatar error:",
-                        error
-                    );
-
-
-                    showProfileMessage(
-                        getErrorMessage(
+                    showToast(
+                        getProfileErrorMessage(
                             error
                         ),
                         "error"
                     );
 
+                } finally {
+
+                    setButtonLoading(
+                        button,
+                        false
+                    );
                 }
 
-            };
+            }
+        );
+    }
 
 
-            input.addEventListener(
-                "change",
-                event => {
+    function fillProfileForm(
+        profile
+    ) {
 
-                    const file =
-                        event.target.files?.[0];
+        if (!profile) {
+
+            return;
+        }
 
 
-                    if (file) {
-                        upload(file);
+        setValue(
+            "#username",
+            profile.username
+        );
+
+
+        setValue(
+            "#displayName",
+            profile.display_name
+        );
+
+
+        setValue(
+            "#bio",
+            profile.bio
+        );
+
+
+        setValue(
+            "#websiteUrl",
+            profile.website_url
+        );
+
+
+        setValue(
+            "#location",
+            profile.location
+        );
+
+
+        setProfileAvatar(
+            profile.avatar_url
+        );
+    }
+
+
+    /* =====================================================
+       AVATAR UI
+       ===================================================== */
+
+    function setProfileAvatar(
+        avatarUrl
+    ) {
+
+        document
+            .querySelectorAll(
+                "#profileAvatar, #avatarPreview, #designerAvatar, [data-profile-avatar]"
+            )
+            .forEach(
+                element => {
+
+                    if (
+                        element.tagName ===
+                        "IMG"
+                    ) {
+
+                        if (
+                            avatarUrl
+                        ) {
+
+                            element.src =
+                                avatarUrl;
+
+                            element.hidden =
+                                false;
+
+                        } else {
+
+                            element.removeAttribute(
+                                "src"
+                            );
+                        }
                     }
-
                 }
+            );
+    }
+
+
+    /* =====================================================
+       HELPERS
+       ===================================================== */
+
+    function setText(
+        selector,
+        value
+    ) {
+
+        const element =
+            $(selector);
+
+
+        if (element) {
+
+            element.textContent =
+                value ?? "";
+        }
+    }
+
+
+    function setValue(
+        selector,
+        value
+    ) {
+
+        const element =
+            $(selector);
+
+
+        if (
+            element &&
+            "value" in element
+        ) {
+
+            element.value =
+                value || "";
+        }
+    }
+
+
+    function setButtonLoading(
+        button,
+        loading
+    ) {
+
+        if (!button) {
+
+            return;
+        }
+
+
+        if (loading) {
+
+            if (
+                !button.dataset.originalHtml
+            ) {
+
+                button.dataset.originalHtml =
+                    button.innerHTML;
+            }
+
+
+            button.disabled =
+                true;
+
+
+            button.innerHTML = `
+
+                <i
+                    class="fa-solid fa-spinner fa-spin"
+                ></i>
+
+                Saving...
+
+            `;
+
+        } else {
+
+            button.disabled =
+                false;
+
+
+            button.innerHTML =
+                button.dataset.originalHtml ||
+                "Save";
+        }
+    }
+
+
+    function formatNumber(
+        value
+    ) {
+
+        return new Intl.NumberFormat(
+            "en-US"
+        ).format(
+            Number(value) || 0
+        );
+    }
+
+
+    function formatCategory(
+        category
+    ) {
+
+        const map = {
+
+            branding:
+                "Branding",
+
+            poster:
+                "Poster",
+
+            "ui-ux":
+                "UI / UX",
+
+            illustration:
+                "Illustration",
+
+            logo:
+                "Logo",
+
+            motion:
+                "Motion",
+
+            other:
+                "Other"
+
+        };
+
+
+        return (
+            map[category] ||
+            "Other"
+        );
+    }
+
+
+    function cleanWebsiteDisplay(
+        url
+    ) {
+
+        try {
+
+            return new URL(
+                url
+            )
+            .hostname
+            .replace(
+                /^www\./,
+                ""
+            );
+
+        } catch {
+
+            return String(
+                url || ""
+            )
+            .replace(
+                /^https?:\/\//,
+                ""
+            )
+            .replace(
+                /^www\./,
+                ""
+            )
+            .replace(
+                /\/$/,
+                ""
+            );
+        }
+    }
+
+
+    function getFileExtension(
+        file
+    ) {
+
+        const extension =
+            file.name
+                .split(".")
+                .pop()
+                .toLowerCase();
+
+
+        const map = {
+
+            jpg:
+                "jpg",
+
+            jpeg:
+                "jpg",
+
+            png:
+                "png",
+
+            webp:
+                "webp"
+
+        };
+
+
+        return (
+            map[extension] ||
+            "jpg"
+        );
+    }
+
+
+    function escapeHTML(
+        value
+    ) {
+
+        const element =
+            document.createElement(
+                "div"
             );
 
 
-            if (form) {
-
-                form.addEventListener(
-                    "submit",
-                    event => {
-
-                        event.preventDefault();
-
-                        const file =
-                            input.files?.[0];
+        element.textContent =
+            String(
+                value ??
+                ""
+            );
 
 
-                        if (file) {
-                            upload(file);
-                        }
-
-                    }
-                );
-
-            }
-
-        };
+        return element.innerHTML;
+    }
 
 
-    /* =====================================================
-       ERROR HANDLER
-       ===================================================== */
+    function escapeAttribute(
+        value
+    ) {
 
-    const getErrorMessage =
-        error => {
+        return escapeHTML(
+            value
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+    }
 
-            if (!error) {
 
-                return "Something went wrong.";
-            }
+    function getProfileErrorMessage(
+        error
+    ) {
+
+        if (!error) {
+
+            return (
+                "Unable to complete that action."
+            );
+        }
 
 
-            const message =
+        const message =
+            String(
                 error.message ||
-                String(error);
+                error
+            );
 
 
-            if (
-                message.includes(
-                    "duplicate key"
-                )
-            ) {
-
-                return "That username is already taken.";
-            }
+        const lower =
+            message.toLowerCase();
 
 
-            if (
-                message.includes(
-                    "row-level security"
-                )
-            ) {
+        if (
+            lower.includes(
+                "duplicate"
+            ) &&
+            lower.includes(
+                "username"
+            )
+        ) {
 
-                return "You don't have permission to perform this action.";
-            }
-
-
-            if (
-                message.includes(
-                    "not found"
-                )
-            ) {
-
-                return "The requested profile could not be found.";
-            }
+            return (
+                "That username is already taken."
+            );
+        }
 
 
-            return message;
-        };
+        if (
+            lower.includes(
+                "row-level security"
+            )
+        ) {
+
+            return (
+                "Supabase blocked this profile action because of your permissions."
+            );
+        }
+
+
+        if (
+            lower.includes(
+                "bucket"
+            ) &&
+            lower.includes(
+                "not found"
+            )
+        ) {
+
+            return (
+                "The avatars Storage bucket could not be found."
+            );
+        }
+
+
+        return message;
+    }
 
 
     /* =====================================================
-       MESSAGE
+       TOAST
        ===================================================== */
 
-    const showProfileMessage =
-        (
-            message,
-            type = "success"
-        ) => {
+    function showToast(
+        message,
+        type = "info"
+    ) {
 
-            let container =
-                document.querySelector(
-                    "[data-profile-message]"
+        let container =
+            document.querySelector(
+                ".profile-toast-container"
+            );
+
+
+        if (!container) {
+
+            container =
+                document.createElement(
+                    "div"
                 );
-
-
-            if (!container) {
-
-                container =
-                    document.createElement(
-                        "div"
-                    );
-
-                container.setAttribute(
-                    "data-profile-message",
-                    ""
-                );
-
-                document.body.prepend(
-                    container
-                );
-            }
-
-
-            container.textContent =
-                message;
 
 
             container.className =
-                `profile-message ${type}`;
+                "profile-toast-container";
 
 
-            setTimeout(
-                () => {
+            container.style.cssText = `
+                position:fixed;
+                right:18px;
+                bottom:18px;
+                z-index:5000;
+                display:flex;
+                flex-direction:column;
+                gap:8px;
+                max-width:min(
+                    390px,
+                    calc(100vw - 36px)
+                );
+            `;
 
-                    container.classList.add(
-                        "hidden"
-                    );
 
-                },
-                4000
+            document.body.appendChild(
+                container
+            );
+        }
+
+
+        const toast =
+            document.createElement(
+                "div"
             );
 
-        };
+
+        const icon =
+            type === "success"
+                ? "fa-check"
+                : type === "error"
+                    ? "fa-triangle-exclamation"
+                    : "fa-info-circle";
+
+
+        const color =
+            type === "success"
+                ? "#86efac"
+                : type === "error"
+                    ? "#fca5a5"
+                    : "#c4b5fd";
+
+
+        toast.style.cssText = `
+            display:flex;
+            align-items:center;
+            gap:10px;
+            padding:13px 14px;
+            border:1px solid rgba(255,255,255,.10);
+            border-radius:13px;
+            background:rgba(10,10,16,.96);
+            color:white;
+            box-shadow:0 20px 50px rgba(0,0,0,.35);
+            backdrop-filter:blur(18px);
+            font:10px/1.5 Inter,sans-serif;
+        `;
+
+
+        toast.innerHTML = `
+
+            <i
+                class="fa-solid ${icon}"
+                style="
+                    color:${color};
+                "
+            ></i>
+
+            <span>
+                ${escapeHTML(
+                    message
+                )}
+            </span>
+
+        `;
+
+
+        container.appendChild(
+            toast
+        );
+
+
+        setTimeout(
+            () => {
+
+                toast.remove();
+
+            },
+            4000
+        );
+    }
 
 
     /* =====================================================
        INITIALIZE
        ===================================================== */
 
-    const init =
-        async () => {
+    async function init() {
+
+        if (
+            state.initialized
+        ) {
+
+            return;
+        }
+
+
+        const hasProfileForm =
+            Boolean(
+                $("#profileForm")
+            );
+
+
+        const hasAvatarInput =
+            Boolean(
+                $("#avatarInput")
+            );
+
+
+        const isPublicProfile =
+            Boolean(
+                document.body.dataset.profilePage ||
+                $("#designerDesignsGrid") ||
+                $("#designerName")
+            );
+
+
+        if (
+            !hasProfileForm &&
+            !hasAvatarInput &&
+            !isPublicProfile
+        ) {
+
+            return;
+        }
+
+
+        state.initialized =
+            true;
+
+
+        try {
+
+            await getCurrentUser();
+
 
             /*
-             * Only load the profile when
-             * a profile-related page is open.
+             * Public designer profile.
              */
 
-            const hasProfileElements =
-                document.querySelector(
-                    "[data-profile], #profileForm, #avatarInput"
+            if (
+                isPublicProfile
+            ) {
+
+                const params =
+                    new URLSearchParams(
+                        window.location.search
+                    );
+
+
+                const profileId =
+                    params.get(
+                        "id"
+                    );
+
+
+                const username =
+                    params.get(
+                        "username"
+                    );
+
+
+                if (
+                    profileId
+                ) {
+
+                    await loadCompleteProfile(
+                        profileId
+                    );
+
+                } else if (
+                    username
+                ) {
+
+                    const profile =
+                        await getProfileByUsername(
+                            username
+                        );
+
+
+                    await loadUserDesigns(
+                        profile.id
+                    );
+
+
+                    await loadUserSubmissions(
+                        profile.id
+                    );
+
+
+                    await loadStatistics(
+                        profile.id
+                    );
+
+                } else if (
+                    state.user
+                ) {
+
+                    await loadCompleteProfile(
+                        state.user.id
+                    );
+                }
+
+
+                renderPublicProfile();
+            }
+
+
+            /*
+             * Settings/profile editing.
+             */
+
+            if (
+                hasProfileForm ||
+                hasAvatarInput
+            ) {
+
+                if (
+                    !state.user
+                ) {
+
+                    throw new Error(
+                        "Please sign in to manage your profile."
+                    );
+                }
+
+
+                state.profile =
+                    await getProfile(
+                        state.user.id
+                    );
+
+
+                fillProfileForm(
+                    state.profile
                 );
 
 
-            if (!hasProfileElements) {
-                return;
+                setupProfileForm();
+
+                setupAvatarForm();
             }
 
 
-            const user =
-                await getUser();
+        } catch (error) {
+
+            console.error(
+                "DESIGNVERSE profile initialization error:",
+                error
+            );
 
 
-            if (!user) {
-                return;
+            showToast(
+                getProfileErrorMessage(
+                    error
+                ),
+                "error"
+            );
+        }
+    }
+
+
+    /* =====================================================
+       CLEANUP
+       ===================================================== */
+
+    window.addEventListener(
+        "pagehide",
+        () => {
+
+            if (
+                state.avatarObjectUrl
+            ) {
+
+                URL.revokeObjectURL(
+                    state.avatarObjectUrl
+                );
+
+                state.avatarObjectUrl =
+                    null;
             }
-
-
-            await loadCurrentProfile();
-
-            setupProfileForm();
-
-            setupAvatarUpload();
-
-        };
+        }
+    );
 
 
     /* =====================================================
@@ -1575,35 +2544,47 @@ const DVProfile = (() => {
 
     return {
 
+        state,
+
+        init,
+
+        getCurrentUser,
+
         getProfile,
+
+        getProfileByUsername,
 
         updateProfile,
 
         uploadAvatar,
 
-        deleteAvatar,
+        removeAvatar,
 
-        getDesigner,
+        loadUserDesigns,
 
-        getDesignerDesigns,
+        loadUserSubmissions,
 
-        followUser,
+        loadStatistics,
 
-        unfollowUser,
+        loadCompleteProfile,
 
-        isFollowing,
+        renderPublicProfile,
 
-        getFollowCounts,
+        validateProfileData,
 
-        refreshFollowCounts,
-
-        loadCurrentProfile,
-
-        init
+        validateAvatarFile
 
     };
 
 })();
+
+
+/* =========================================================
+   GLOBAL
+   ========================================================= */
+
+window.DVProfile =
+    DVProfile;
 
 
 /* =========================================================
@@ -1618,10 +2599,3 @@ document.addEventListener(
 
     }
 );
-
-
-/* =========================================================
-   GLOBAL ACCESS
-   ========================================================= */
-
-window.DVProfile = DVProfile;

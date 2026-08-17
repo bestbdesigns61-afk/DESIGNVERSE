@@ -1,0 +1,2424 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <!-- =====================================================
+         DESIGNVERSE
+         Challenge Voting
+         ===================================================== -->
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#050508"
+    >
+
+    <meta
+        name="description"
+        content="Vote for your favorite DESIGNVERSE challenge submissions."
+    >
+
+    <title>Vote — DESIGNVERSE</title>
+
+
+    <!-- =====================================================
+         FONTS
+         ===================================================== -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         ICONS
+         ===================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+
+    <!-- =====================================================
+         DESIGNVERSE CSS
+         ===================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/components.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/animations.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/responsive.css"
+    >
+
+
+    <!-- =====================================================
+         VOTING PAGE STYLES
+         ===================================================== -->
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            margin: 0;
+        }
+
+
+        /* =================================================
+           PAGE
+           ================================================= */
+
+        .voting-page {
+            min-height: 100vh;
+            padding-top: 82px;
+        }
+
+
+        .voting-main {
+            padding:
+                30px 20px 80px;
+        }
+
+
+        .voting-container {
+            width:
+                min(100%, 1280px);
+
+            margin-inline: auto;
+        }
+
+
+        /* =================================================
+           BREADCRUMB
+           ================================================= */
+
+        .voting-breadcrumb {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 7px;
+
+            margin-bottom: 18px;
+
+            color:
+                var(--text-muted);
+
+            font-size: 9px;
+        }
+
+
+        .voting-breadcrumb a {
+            color:
+                var(--text-muted);
+
+            transition:
+                color 180ms ease;
+        }
+
+
+        .voting-breadcrumb a:hover {
+            color: white;
+        }
+
+
+        .voting-breadcrumb i {
+            font-size: 7px;
+            opacity: .45;
+        }
+
+
+        /* =================================================
+           HERO
+           ================================================= */
+
+        .voting-hero {
+            position: relative;
+
+            overflow: hidden;
+
+            margin-bottom: 20px;
+
+            padding:
+                34px;
+
+            border:
+                1px solid
+                rgba(168,85,247,.20);
+
+            border-radius:
+                24px;
+
+            background:
+                radial-gradient(
+                    circle at 85% 20%,
+                    rgba(168,85,247,.27),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at 12% 90%,
+                    rgba(37,99,235,.18),
+                    transparent 35%
+                ),
+                linear-gradient(
+                    135deg,
+                    rgba(255,255,255,.055),
+                    rgba(255,255,255,.018)
+                );
+
+            box-shadow:
+                0 30px 80px
+                rgba(0,0,0,.25);
+        }
+
+
+        .voting-hero::before,
+        .voting-hero::after {
+            content: "";
+
+            position: absolute;
+
+            border:
+                1px solid
+                rgba(168,85,247,.10);
+
+            border-radius: 50%;
+
+            pointer-events: none;
+        }
+
+
+        .voting-hero::before {
+            width: 330px;
+            height: 330px;
+
+            right: -100px;
+            top: -125px;
+        }
+
+
+        .voting-hero::after {
+            width: 190px;
+            height: 190px;
+
+            right: 30px;
+            top: 35px;
+        }
+
+
+        .voting-hero-content {
+            position: relative;
+            z-index: 2;
+
+            max-width:
+                830px;
+        }
+
+
+        .voting-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            margin-bottom: 10px;
+
+            color:
+                #fcd34d;
+
+            font-size:
+                9px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                .15em;
+
+            text-transform:
+                uppercase;
+        }
+
+
+        .voting-eyebrow i {
+            color:
+                #f59e0b;
+        }
+
+
+        .voting-hero h1 {
+            margin:
+                0 0 10px;
+
+            color: white;
+
+            font-family:
+                "Space Grotesk",
+                sans-serif;
+
+            font-size:
+                clamp(
+                    32px,
+                    5vw,
+                    56px
+                );
+
+            line-height:
+                .98;
+
+            letter-spacing:
+                -.07em;
+        }
+
+
+        .voting-hero h1 span {
+            background:
+                var(--gradient-main);
+
+            -webkit-background-clip:
+                text;
+
+            background-clip:
+                text;
+
+            -webkit-text-fill-color:
+                transparent;
+
+            color:
+                transparent;
+        }
+
+
+        .voting-hero p {
+            max-width:
+                700px;
+
+            margin:
+                0;
+
+            color:
+                var(--text-secondary);
+
+            font-size:
+                11px;
+
+            line-height:
+                1.75;
+        }
+
+
+        /* =================================================
+           CHALLENGE META
+           ================================================= */
+
+        .voting-challenge-meta {
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            flex-wrap:
+                wrap;
+
+            gap:
+                8px;
+
+            margin-top:
+                18px;
+        }
+
+
+        .voting-pill {
+            display:
+                inline-flex;
+
+            align-items:
+                center;
+
+            gap:
+                6px;
+
+            padding:
+                8px 10px;
+
+            border:
+                1px solid
+                rgba(255,255,255,.10);
+
+            border-radius:
+                999px;
+
+            background:
+                rgba(5,5,8,.40);
+
+            color:
+                rgba(255,255,255,.80);
+
+            font-size:
+                8px;
+
+            font-weight:
+                700;
+        }
+
+
+        .voting-pill.status {
+            color:
+                #fcd34d;
+
+            border-color:
+                rgba(245,158,11,.20);
+
+            background:
+                rgba(245,158,11,.06);
+        }
+
+
+        .voting-pill.status.active {
+            color:
+                #86efac;
+
+            border-color:
+                rgba(34,197,94,.20);
+
+            background:
+                rgba(34,197,94,.06);
+        }
+
+
+        .voting-pill.status.completed {
+            color:
+                #c4b5fd;
+
+            border-color:
+                rgba(124,58,237,.20);
+
+            background:
+                rgba(124,58,237,.06);
+        }
+
+
+        /* =================================================
+           STATS
+           ================================================= */
+
+        .voting-stats {
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(4,minmax(0,1fr));
+
+            gap:
+                10px;
+
+            margin-bottom:
+                20px;
+        }
+
+
+        .voting-stat {
+            padding:
+                15px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:
+                15px;
+
+            background:
+                rgba(255,255,255,.03);
+        }
+
+
+        .voting-stat-value {
+            margin-bottom:
+                4px;
+
+            color:
+                white;
+
+            font-family:
+                "Space Grotesk",
+                sans-serif;
+
+            font-size:
+                23px;
+
+            font-weight:
+                700;
+
+            letter-spacing:
+                -.05em;
+        }
+
+
+        .voting-stat-label {
+            color:
+                var(--text-muted);
+
+            font-size:
+                7px;
+
+            font-weight:
+                700;
+
+            letter-spacing:
+                .08em;
+
+            text-transform:
+                uppercase;
+        }
+
+
+        /* =================================================
+           CONTROLS
+           ================================================= */
+
+        .voting-toolbar {
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            gap:
+                10px;
+
+            margin-bottom:
+                18px;
+
+            padding:
+                9px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:
+                15px;
+
+            background:
+                rgba(255,255,255,.025);
+        }
+
+
+        .voting-toolbar-left {
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            gap:
+                8px;
+
+            width:
+                100%;
+        }
+
+
+        .voting-search {
+            position:
+                relative;
+
+            width:
+                min(
+                    100%,
+                    360px
+                );
+        }
+
+
+        .voting-search i {
+            position:
+                absolute;
+
+            left:
+                13px;
+
+            top:
+                50%;
+
+            transform:
+                translateY(-50%);
+
+            color:
+                var(--text-muted);
+
+            pointer-events:
+                none;
+        }
+
+
+        .voting-search input,
+        .voting-sort {
+            height:
+                41px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:
+                10px;
+
+            outline:
+                none;
+
+            background:
+                rgba(255,255,255,.035);
+
+            color:
+                white;
+
+            font-family:
+                "Inter",
+                sans-serif;
+
+            font-size:
+                9px;
+        }
+
+
+        .voting-search input {
+            width:
+                100%;
+
+            padding:
+                0 12px 0 38px;
+        }
+
+
+        .voting-search input::placeholder {
+            color:
+                var(--text-muted);
+        }
+
+
+        .voting-search input:focus,
+        .voting-sort:focus {
+            border-color:
+                rgba(168,85,247,.50);
+
+            box-shadow:
+                0 0 0 3px
+                rgba(124,58,237,.07);
+        }
+
+
+        .voting-sort {
+            min-width:
+                145px;
+
+            padding:
+                0 10px;
+        }
+
+
+        .voting-sort option {
+            background:
+                #0b0b11;
+
+            color:
+                white;
+        }
+
+
+        /* =================================================
+           SECTION HEADER
+           ================================================= */
+
+        .voting-section-header {
+            display:
+                flex;
+
+            align-items:
+                flex-end;
+
+            justify-content:
+                space-between;
+
+            gap:
+                14px;
+
+            margin-bottom:
+                14px;
+        }
+
+
+        .voting-section-header h2 {
+            margin:
+                0 0 4px;
+
+            color:
+                white;
+
+            font-size:
+                21px;
+
+            letter-spacing:
+                -.04em;
+        }
+
+
+        .voting-section-header p {
+            margin:
+                0;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                8px;
+        }
+
+
+        .voting-result-count {
+            color:
+                var(--text-muted);
+
+            font-size:
+                8px;
+
+            white-space:
+                nowrap;
+        }
+
+
+        /* =================================================
+           SUBMISSION GRID
+           ================================================= */
+
+        .voting-submission-grid {
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(
+                    3,
+                    minmax(0,1fr)
+                );
+
+            gap:
+                16px;
+        }
+
+
+        /* =================================================
+           SUBMISSION CARD
+           ================================================= */
+
+        .voting-submission-card {
+            overflow:
+                hidden;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:
+                19px;
+
+            background:
+                rgba(255,255,255,.035);
+
+            transition:
+                transform 220ms ease,
+                border-color 220ms ease,
+                box-shadow 220ms ease;
+        }
+
+
+        .voting-submission-card:hover {
+            transform:
+                translateY(-4px);
+
+            border-color:
+                rgba(168,85,247,.28);
+
+            box-shadow:
+                0 25px 60px
+                rgba(0,0,0,.25);
+        }
+
+
+        .voting-submission-image {
+            position:
+                relative;
+
+            overflow:
+                hidden;
+
+            aspect-ratio:
+                4 / 3;
+
+            background:
+                #08080d;
+        }
+
+
+        .voting-submission-image img {
+            width:
+                100%;
+
+            height:
+                100%;
+
+            display:
+                block;
+
+            object-fit:
+                cover;
+
+            transition:
+                transform 350ms ease;
+        }
+
+
+        .voting-submission-card:hover
+        .voting-submission-image img {
+            transform:
+                scale(1.035);
+        }
+
+
+        .voting-image-placeholder {
+            width:
+                100%;
+
+            height:
+                100%;
+
+            display:
+                grid;
+
+            place-items:
+                center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #120825,
+                    #153b75
+                );
+
+            color:
+                #c4b5fd;
+
+            font-size:
+                30px;
+        }
+
+
+        .voting-submission-body {
+            padding:
+                15px;
+        }
+
+
+        .voting-submission-card
+        .btn[disabled] {
+            opacity:
+                .50;
+
+            cursor:
+                not-allowed;
+        }
+
+
+        .voting-submission-card
+        [data-vote-button] {
+            min-width:
+                84px;
+        }
+
+
+        /* =================================================
+           EMPTY STATE
+           ================================================= */
+
+        .voting-empty {
+            min-height:
+                330px;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            flex-direction:
+                column;
+
+            padding:
+                40px;
+
+            border:
+                1px dashed
+                var(--border-light);
+
+            border-radius:
+                18px;
+
+            text-align:
+                center;
+        }
+
+
+        .voting-empty h3 {
+            margin:
+                0 0 6px;
+
+            color:
+                white;
+
+            font-size:
+                17px;
+        }
+
+
+        .voting-empty p {
+            max-width:
+                420px;
+
+            margin:
+                0;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                9px;
+
+            line-height:
+                1.6;
+        }
+
+
+        /* =================================================
+           INFO BOX
+           ================================================= */
+
+        .voting-info-box {
+            display:
+                flex;
+
+            align-items:
+                flex-start;
+
+            gap:
+                10px;
+
+            margin-top:
+                20px;
+
+            padding:
+                14px;
+
+            border:
+                1px solid
+                rgba(56,189,248,.12);
+
+            border-radius:
+                13px;
+
+            background:
+                rgba(56,189,248,.035);
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                8px;
+
+            line-height:
+                1.6;
+        }
+
+
+        .voting-info-box i {
+            margin-top:
+                2px;
+
+            color:
+                #7dd3fc;
+        }
+
+
+        /* =================================================
+           LOADING
+           ================================================= */
+
+        .voting-loading {
+            min-height:
+                380px;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            flex-direction:
+                column;
+
+            gap:
+                9px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:
+                18px;
+
+            background:
+                rgba(255,255,255,.025);
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                9px;
+        }
+
+
+        .voting-loading i {
+            color:
+                #c4b5fd;
+
+            font-size:
+                23px;
+        }
+
+
+        /* =================================================
+           PAGE ERROR
+           ================================================= */
+
+        .voting-error {
+            display:
+                none;
+
+            min-height:
+                420px;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            flex-direction:
+                column;
+
+            padding:
+                40px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:
+                20px;
+
+            text-align:
+                center;
+        }
+
+
+        .voting-error.visible {
+            display:
+                flex;
+        }
+
+
+        .voting-error-icon {
+            width:
+                64px;
+
+            height:
+                64px;
+
+            display:
+                grid;
+
+            place-items:
+                center;
+
+            margin-bottom:
+                14px;
+
+            border-radius:
+                18px;
+
+            background:
+                rgba(239,68,68,.08);
+
+            color:
+                #fca5a5;
+
+            font-size:
+                22px;
+        }
+
+
+        .voting-error h2 {
+            margin:
+                0 0 7px;
+
+            color:
+                white;
+
+            font-size:
+                21px;
+        }
+
+
+        .voting-error p {
+            max-width:
+                440px;
+
+            margin:
+                0 0 17px;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                9px;
+
+            line-height:
+                1.6;
+        }
+
+
+        /* =================================================
+           RESPONSIVE
+           ================================================= */
+
+        @media (max-width: 1100px) {
+
+            .voting-submission-grid {
+                grid-template-columns:
+                    repeat(
+                        2,
+                        minmax(0,1fr)
+                    );
+            }
+        }
+
+
+        @media (max-width: 800px) {
+
+            .voting-main {
+                padding:
+                    24px 16px 65px;
+            }
+
+
+            .voting-hero {
+                padding:
+                    27px;
+            }
+
+
+            .voting-stats {
+                grid-template-columns:
+                    repeat(
+                        2,
+                        minmax(0,1fr)
+                    );
+            }
+        }
+
+
+        @media (max-width: 650px) {
+
+            .voting-toolbar {
+                flex-direction:
+                    column;
+
+                align-items:
+                    stretch;
+            }
+
+
+            .voting-toolbar-left {
+                flex-direction:
+                    column;
+
+                align-items:
+                    stretch;
+            }
+
+
+            .voting-search {
+                width:
+                    100%;
+            }
+
+
+            .voting-sort {
+                width:
+                    100%;
+            }
+
+
+            .voting-section-header {
+                align-items:
+                    flex-start;
+
+                flex-direction:
+                    column;
+            }
+        }
+
+
+        @media (max-width: 540px) {
+
+            .voting-main {
+                padding:
+                    20px 12px 50px;
+            }
+
+
+            .voting-hero {
+                padding:
+                    23px 19px;
+
+                border-radius:
+                    20px;
+            }
+
+
+            .voting-submission-grid {
+                grid-template-columns:
+                    1fr;
+            }
+
+
+            .voting-stats {
+                grid-template-columns:
+                    1fr 1fr;
+            }
+
+
+            .voting-stat {
+                padding:
+                    13px;
+            }
+
+
+            .voting-stat-value {
+                font-size:
+                    20px;
+            }
+        }
+
+
+        @media (hover: none) and (pointer: coarse) {
+
+            .voting-submission-card:hover {
+                transform:
+                    none;
+
+                box-shadow:
+                    none;
+            }
+
+
+            .voting-submission-card:hover
+            .voting-submission-image img {
+                transform:
+                    none;
+            }
+        }
+
+
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration:
+                    .01ms !important;
+
+                animation-iteration-count:
+                    1 !important;
+
+                transition-duration:
+                    .01ms !important;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body data-voting-page="true">
+
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <header
+        class="site-header"
+        id="site-header"
+    >
+
+        <nav class="navbar container">
+
+            <a
+                href="../index.html"
+                class="brand"
+                aria-label="DESIGNVERSE Home"
+            >
+
+                <div class="brand-icon">
+                    <span>DV</span>
+                </div>
+
+                <div class="brand-text">
+
+                    <span class="brand-name">
+                        DESIGNVERSE
+                    </span>
+
+                    <span class="brand-subtitle">
+                        BY BESTB DESIGNS
+                    </span>
+
+                </div>
+
+            </a>
+
+
+            <div class="desktop-nav">
+
+                <a href="explore.html">
+                    Explore
+                </a>
+
+                <a
+                    href="challenges.html"
+                    class="active"
+                >
+                    Challenges
+                </a>
+
+                <a href="leaderboard.html">
+                    Leaderboard
+                </a>
+
+                <a href="designers.html">
+                    Designers
+                </a>
+
+            </div>
+
+
+            <div class="nav-actions">
+
+                <a
+                    href="dashboard/dashboard.html"
+                    class="btn btn-secondary btn-small"
+                >
+
+                    <i
+                        class="fa-solid fa-chart-pie"
+                    ></i>
+
+                    Dashboard
+
+                </a>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+
+    <!-- =====================================================
+         PAGE
+         ===================================================== -->
+
+    <main class="voting-page">
+
+        <div class="voting-main">
+
+            <div class="voting-container">
+
+
+                <!-- =========================================
+                     BREADCRUMB
+                     ========================================= -->
+
+                <nav
+                    class="voting-breadcrumb"
+                    aria-label="Breadcrumb"
+                >
+
+                    <a href="challenges.html">
+                        Challenges
+                    </a>
+
+                    <i
+                        class="fa-solid fa-chevron-right"
+                    ></i>
+
+                    <span id="votingBreadcrumb">
+                        Voting
+                    </span>
+
+                </nav>
+
+
+                <!-- =========================================
+                     HERO
+                     ========================================= -->
+
+                <section
+                    class="voting-hero"
+                >
+
+                    <div
+                        class="voting-hero-content"
+                    >
+
+                        <div
+                            class="voting-eyebrow"
+                        >
+
+                            <i
+                                class="fa-solid fa-check-to-slot"
+                            ></i>
+
+                            DESIGNVERSE COMMUNITY VOTE
+
+                        </div>
+
+
+                        <h1>
+
+                            Choose the design
+                            <span>that stands out.</span>
+
+                        </h1>
+
+
+                        <p
+                            id="votingHeroDescription"
+                        >
+
+                            Explore the challenge entries,
+                            support the work you believe deserves
+                            recognition, and help decide the winners.
+
+                        </p>
+
+
+                        <div
+                            class="voting-challenge-meta"
+                        >
+
+                            <span
+                                class="voting-pill"
+                            >
+
+                                <i
+                                    class="fa-solid fa-trophy"
+                                ></i>
+
+                                <span
+                                    id="votingChallengeTitle"
+                                >
+                                    Loading challenge...
+                                </span>
+
+                            </span>
+
+
+                            <span
+                                class="voting-pill status"
+                                id="votingStatusPill"
+                            >
+
+                                <i
+                                    class="fa-solid fa-spinner fa-spin"
+                                ></i>
+
+                                <span
+                                    id="votingStatusText"
+                                >
+                                    Loading
+                                </span>
+
+                            </span>
+
+
+                            <span
+                                class="voting-pill"
+                            >
+
+                                <i
+                                    class="fa-regular fa-clock"
+                                ></i>
+
+                                <span
+                                    id="votingDeadline"
+                                >
+                                    Voting deadline —
+                                </span>
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =========================================
+                     STATS
+                     ========================================= -->
+
+                <section
+                    class="voting-stats"
+                >
+
+                    <article
+                        class="voting-stat"
+                    >
+
+                        <div
+                            class="voting-stat-value"
+                            id="submissionCountStat"
+                        >
+                            0
+                        </div>
+
+                        <div
+                            class="voting-stat-label"
+                        >
+                            Entries
+                        </div>
+
+                    </article>
+
+
+                    <article
+                        class="voting-stat"
+                    >
+
+                        <div
+                            class="voting-stat-value"
+                            id="totalVotesStat"
+                        >
+                            0
+                        </div>
+
+                        <div
+                            class="voting-stat-label"
+                        >
+                            Votes
+                        </div>
+
+                    </article>
+
+
+                    <article
+                        class="voting-stat"
+                    >
+
+                        <div
+                            class="voting-stat-value"
+                            id="yourVotesStat"
+                        >
+                            0
+                        </div>
+
+                        <div
+                            class="voting-stat-label"
+                        >
+                            Your Votes
+                        </div>
+
+                    </article>
+
+
+                    <article
+                        class="voting-stat"
+                    >
+
+                        <div
+                            class="voting-stat-value"
+                            id="timeRemainingStat"
+                        >
+                            —
+                        </div>
+
+                        <div
+                            class="voting-stat-label"
+                        >
+                            Time Left
+                        </div>
+
+                    </article>
+
+                </section>
+
+
+                <!-- =========================================
+                     ERROR
+                     ========================================= -->
+
+                <section
+                    class="voting-error"
+                    id="votingError"
+                >
+
+                    <div
+                        class="voting-error-icon"
+                    >
+
+                        <i
+                            class="fa-solid fa-triangle-exclamation"
+                        ></i>
+
+                    </div>
+
+
+                    <h2>
+                        Voting unavailable
+                    </h2>
+
+
+                    <p
+                        id="votingErrorMessage"
+                    >
+                        We couldn't load this challenge's
+                        submissions.
+                    </p>
+
+
+                    <a
+                        href="challenges.html"
+                        class="btn btn-primary"
+                    >
+
+                        <i
+                            class="fa-solid fa-arrow-left"
+                        ></i>
+
+                        Back to Challenges
+
+                    </a>
+
+                </section>
+
+
+                <!-- =========================================
+                     CONTENT
+                     ========================================= -->
+
+                <div
+                    id="votingContent"
+                >
+
+
+                    <!-- =====================================
+                         TOOLBAR
+                         ===================================== -->
+
+                    <section
+                        class="voting-toolbar"
+                    >
+
+                        <div
+                            class="voting-toolbar-left"
+                        >
+
+                            <div
+                                class="voting-search"
+                            >
+
+                                <i
+                                    class="fa-solid fa-magnifying-glass"
+                                ></i>
+
+
+                                <input
+                                    type="search"
+                                    id="votingSearch"
+                                    placeholder="Search submissions..."
+                                    autocomplete="off"
+                                    aria-label="Search submissions"
+                                >
+
+                            </div>
+
+
+                            <select
+                                class="voting-sort"
+                                id="votingSort"
+                                aria-label="Sort submissions"
+                            >
+
+                                <option value="votes">
+                                    Most Votes
+                                </option>
+
+                                <option value="newest">
+                                    Newest
+                                </option>
+
+                                <option value="oldest">
+                                    Oldest
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- =====================================
+                         SECTION HEADER
+                         ===================================== -->
+
+                    <div
+                        class="voting-section-header"
+                    >
+
+                        <div>
+
+                            <h2>
+                                Challenge Entries
+                            </h2>
+
+                            <p>
+                                Every vote helps shape the final results.
+                            </p>
+
+                        </div>
+
+
+                        <span
+                            class="voting-result-count"
+                            id="votingResultCount"
+                        >
+                            Loading...
+                        </span>
+
+                    </div>
+
+
+                    <!-- =====================================
+                         LOADING
+                         ===================================== -->
+
+                    <section
+                        class="voting-loading"
+                        id="votingLoading"
+                    >
+
+                        <i
+                            class="fa-solid fa-spinner fa-spin"
+                        ></i>
+
+                        Loading submissions...
+
+                    </section>
+
+
+                    <!-- =====================================
+                         GRID
+                         ===================================== -->
+
+                    <section
+                        class="voting-submission-grid"
+                        id="votingSubmissionGrid"
+                    ></section>
+
+
+                    <!-- =====================================
+                         INFO
+                         ===================================== -->
+
+                    <div
+                        class="voting-info-box"
+                    >
+
+                        <i
+                            class="fa-solid fa-shield-halved"
+                        ></i>
+
+
+                        <span>
+
+                            You can vote once for each submission.
+                            You cannot vote for your own entry.
+                            Your vote can be changed during the
+                            active voting period.
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         SCRIPTS
+         ===================================================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+    <script
+        src="../js/utils.js"
+    ></script>
+
+    <script
+        src="../js/supabase.js"
+    ></script>
+
+    <script
+        src="../js/auth.js"
+    ></script>
+
+    <script
+        src="../js/voting.js"
+    ></script>
+
+    <script
+        src="../js/navigation.js"
+    ></script>
+
+
+    <!-- =====================================================
+         PAGE UI
+         ===================================================== -->
+
+    <script>
+
+        "use strict";
+
+
+        /* =================================================
+           HELPERS
+           ================================================= */
+
+        const $vote =
+            selector =>
+                document.querySelector(
+                    selector
+                );
+
+
+        function setVoteText(
+            selector,
+            value
+        ) {
+
+            const element =
+                $vote(
+                    selector
+                );
+
+
+            if (element) {
+
+                element.textContent =
+                    value ?? "—";
+            }
+        }
+
+
+        function parseVoteDate(
+            value
+        ) {
+
+            if (!value) {
+
+                return null;
+            }
+
+
+            const time =
+                new Date(
+                    value
+                ).getTime();
+
+
+            return Number.isNaN(
+                time
+            )
+                ? null
+                : time;
+        }
+
+
+        function formatDate(
+            value
+        ) {
+
+            const time =
+                parseVoteDate(
+                    value
+                );
+
+
+            if (
+                time === null
+            ) {
+
+                return "Not set";
+            }
+
+
+            return new Date(
+                time
+            ).toLocaleString(
+                undefined,
+                {
+                    month:
+                        "short",
+
+                    day:
+                        "numeric",
+
+                    hour:
+                        "numeric",
+
+                    minute:
+                        "2-digit"
+                }
+            );
+        }
+
+
+        function formatNumber(
+            value
+        ) {
+
+            return new Intl.NumberFormat(
+                "en-US"
+            ).format(
+                Number(value) || 0
+            );
+        }
+
+
+        function formatRemaining(
+            difference
+        ) {
+
+            if (
+                difference <= 0
+            ) {
+
+                return "Ended";
+            }
+
+
+            const minute =
+                60 * 1000;
+
+
+            const hour =
+                60 * minute;
+
+
+            const day =
+                24 * hour;
+
+
+            if (
+                difference >=
+                day
+            ) {
+
+                const days =
+                    Math.floor(
+                        difference /
+                        day
+                    );
+
+
+                const hours =
+                    Math.floor(
+                        (
+                            difference %
+                            day
+                        ) /
+                        hour
+                    );
+
+
+                return `${days}d ${hours}h`;
+            }
+
+
+            if (
+                difference >=
+                hour
+            ) {
+
+                const hours =
+                    Math.floor(
+                        difference /
+                        hour
+                    );
+
+
+                const minutes =
+                    Math.floor(
+                        (
+                            difference %
+                            hour
+                        ) /
+                        minute
+                    );
+
+
+                return `${hours}h ${minutes}m`;
+            }
+
+
+            return `${Math.max(
+                1,
+                Math.floor(
+                    difference /
+                    minute
+                )
+            )}m`;
+        }
+
+
+        /* =================================================
+           UPDATE HEADER/STATS
+           ================================================= */
+
+        function updateVotingUI() {
+
+            const voting =
+                window.DVVoting;
+
+
+            if (
+                !voting
+            ) {
+
+                return;
+            }
+
+
+            const challenge =
+                voting.state.challenge;
+
+
+            const submissions =
+                voting.state.submissions ||
+                [];
+
+
+            if (!challenge) {
+
+                return;
+            }
+
+
+            const status =
+                voting.getChallengeStatus();
+
+
+            setVoteText(
+                "#votingChallengeTitle",
+                challenge.title
+            );
+
+
+            setVoteText(
+                "#votingBreadcrumb",
+                challenge.title
+            );
+
+
+            setVoteText(
+                "#votingDeadline",
+                `Voting ends ${formatDate(
+                    challenge.voting_ends_at
+                )}`
+            );
+
+
+            setVoteText(
+                "#submissionCountStat",
+                formatNumber(
+                    submissions.length
+                )
+            );
+
+
+            const totalVotes =
+                submissions.reduce(
+                    (
+                        total,
+                        submission
+                    ) =>
+                        total +
+                        Number(
+                            submission.voteCount ||
+                            0
+                        ),
+                    0
+                );
+
+
+            const yourVotes =
+                submissions.filter(
+                    submission =>
+                        submission.hasVoted
+                ).length;
+
+
+            setVoteText(
+                "#totalVotesStat",
+                formatNumber(
+                    totalVotes
+                )
+            );
+
+
+            setVoteText(
+                "#yourVotesStat",
+                formatNumber(
+                    yourVotes
+                )
+            );
+
+
+            const statusPill =
+                $vote(
+                    "#votingStatusPill"
+                );
+
+
+            if (
+                statusPill
+            ) {
+
+                statusPill.className =
+                    `voting-pill status ${status}`;
+            }
+
+
+            const statusIcon =
+                status === "voting"
+                    ? "fa-check-to-slot"
+                    : status === "active"
+                        ? "fa-clock"
+                        : status === "completed"
+                            ? "fa-flag-checkered"
+                            : "fa-calendar";
+
+
+            const statusIconElement =
+                statusPill?.querySelector(
+                    "i"
+                );
+
+
+            if (
+                statusIconElement
+            ) {
+
+                statusIconElement.className =
+                    `fa-solid ${statusIcon}`;
+            }
+
+
+            const labels = {
+
+                upcoming:
+                    "Upcoming",
+
+                active:
+                    "Voting Soon",
+
+                voting:
+                    "Voting Open",
+
+                completed:
+                    "Voting Closed",
+
+                cancelled:
+                    "Cancelled"
+
+            };
+
+
+            setVoteText(
+                "#votingStatusText",
+                labels[status] ||
+                "Unavailable"
+            );
+
+
+            const votingEnd =
+                parseVoteDate(
+                    challenge.voting_ends_at
+                );
+
+
+            if (
+                votingEnd !== null
+            ) {
+
+                setVoteText(
+                    "#timeRemainingStat",
+                    formatRemaining(
+                        votingEnd -
+                        Date.now()
+                    )
+                );
+
+            } else {
+
+                setVoteText(
+                    "#timeRemainingStat",
+                    "—"
+                );
+            }
+
+
+            const resultCount =
+                submissions.length;
+
+
+            setVoteText(
+                "#votingResultCount",
+                `${formatNumber(
+                    resultCount
+                )} ${
+                    resultCount === 1
+                        ? "submission"
+                        : "submissions"
+                }`
+            );
+        }
+
+
+        /* =================================================
+           SEARCH
+           ================================================= */
+
+        $vote(
+            "#votingSearch"
+        )?.addEventListener(
+            "input",
+            event => {
+
+                window.DVVoting
+                    ?.searchSubmissions(
+                        event.target.value
+                    );
+
+            }
+        );
+
+
+        /* =================================================
+           SORT
+           ================================================= */
+
+        $vote(
+            "#votingSort"
+        )?.addEventListener(
+            "change",
+            event => {
+
+                const value =
+                    event.target.value;
+
+
+                window.DVVoting
+                    ?.renderSubmissions({
+                        sort:
+                            value
+                    });
+
+
+                setTimeout(
+                    updateVotingUI,
+                    0
+                );
+            }
+        );
+
+
+        /* =================================================
+           WAIT FOR VOTING SYSTEM
+           ================================================= */
+
+        function waitForVotingSystem(
+            attempts = 0
+        ) {
+
+            if (
+                window.DVVoting &&
+                window.DVVoting.state.challenge
+            ) {
+
+                updateVotingUI();
+
+
+                $vote(
+                    "#votingLoading"
+                )?.remove();
+
+
+                return;
+            }
+
+
+            if (
+                attempts >= 60
+            ) {
+
+                $vote(
+                    "#votingLoading"
+                )?.remove();
+
+
+                const error =
+                    $vote(
+                        "#votingError"
+                    );
+
+
+                error?.classList.add(
+                    "visible"
+                );
+
+
+                setVoteText(
+                    "#votingErrorMessage",
+                    "We could not load this challenge. Please go back and try again."
+                );
+
+
+                $vote(
+                    "#votingContent"
+                )?.setAttribute(
+                    "hidden",
+                    ""
+                );
+
+
+                return;
+            }
+
+
+            setTimeout(
+                () => {
+
+                    waitForVotingSystem(
+                        attempts + 1
+                    );
+
+                },
+                150
+            );
+        }
+
+
+        /* =================================================
+           REFRESH STATS
+           ================================================= */
+
+        setInterval(
+            () => {
+
+                updateVotingUI();
+
+            },
+            60 * 1000
+        );
+
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            () => {
+
+                waitForVotingSystem();
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>
