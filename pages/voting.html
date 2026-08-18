@@ -4,8 +4,7 @@
 <head>
 
     <!-- =====================================================
-         DESIGNVERSE
-         Challenge Voting
+         DESIGNVERSE — VOTING PAGE
          ===================================================== -->
 
     <meta charset="UTF-8">
@@ -22,7 +21,7 @@
 
     <meta
         name="description"
-        content="Vote for your favorite DESIGNVERSE challenge submissions."
+        content="Vote for your favorite design in a DESIGNVERSE challenge."
     >
 
     <title>Vote — DESIGNVERSE</title>
@@ -39,7 +38,7 @@
 
     <link
         rel="preconnect"
-        href="https://fonts.googleapis.com"
+        href="https://fonts.gstatic.com"
         crossorigin
     >
 
@@ -85,7 +84,7 @@
 
 
     <!-- =====================================================
-         VOTING PAGE STYLES
+         PAGE STYLES
          ===================================================== -->
 
     <style>
@@ -100,10 +99,6 @@
         }
 
 
-        /* =================================================
-           PAGE
-           ================================================= */
-
         .voting-page {
             min-height: 100vh;
             padding-top: 82px;
@@ -111,15 +106,12 @@
 
 
         .voting-main {
-            padding:
-                30px 20px 80px;
+            padding: 30px 20px 80px;
         }
 
 
         .voting-container {
-            width:
-                min(100%, 1280px);
-
+            width: min(100%, 1280px);
             margin-inline: auto;
         }
 
@@ -132,20 +124,17 @@
             display: flex;
             align-items: center;
             flex-wrap: wrap;
-            gap: 7px;
 
+            gap: 7px;
             margin-bottom: 18px;
 
-            color:
-                var(--text-muted);
-
+            color: var(--text-muted);
             font-size: 9px;
         }
 
 
         .voting-breadcrumb a {
-            color:
-                var(--text-muted);
+            color: var(--text-muted);
 
             transition:
                 color 180ms ease;
@@ -169,36 +158,32 @@
 
         .voting-hero {
             position: relative;
-
             overflow: hidden;
 
-            margin-bottom: 20px;
-
-            padding:
-                34px;
+            margin-bottom: 18px;
+            padding: 36px 38px;
 
             border:
                 1px solid
-                rgba(168,85,247,.20);
+                rgba(168,85,247,.18);
 
-            border-radius:
-                24px;
+            border-radius: 24px;
 
             background:
                 radial-gradient(
-                    circle at 85% 20%,
-                    rgba(168,85,247,.27),
-                    transparent 28%
+                    circle at 86% 10%,
+                    rgba(168,85,247,.26),
+                    transparent 29%
                 ),
                 radial-gradient(
-                    circle at 12% 90%,
+                    circle at 15% 95%,
                     rgba(37,99,235,.18),
-                    transparent 35%
+                    transparent 34%
                 ),
                 linear-gradient(
                     135deg,
                     rgba(255,255,255,.055),
-                    rgba(255,255,255,.018)
+                    rgba(255,255,255,.015)
                 );
 
             box-shadow:
@@ -207,15 +192,12 @@
         }
 
 
-        .voting-hero::before,
-        .voting-hero::after {
-            content: "";
-
+        .voting-hero-orb {
             position: absolute;
 
             border:
                 1px solid
-                rgba(168,85,247,.10);
+                rgba(168,85,247,.09);
 
             border-radius: 50%;
 
@@ -223,21 +205,12 @@
         }
 
 
-        .voting-hero::before {
-            width: 330px;
-            height: 330px;
+        .voting-hero-orb.one {
+            width: 360px;
+            height: 360px;
 
-            right: -100px;
-            top: -125px;
-        }
-
-
-        .voting-hero::after {
-            width: 190px;
-            height: 190px;
-
-            right: 30px;
-            top: 35px;
+            right: -125px;
+            top: -185px;
         }
 
 
@@ -245,8 +218,7 @@
             position: relative;
             z-index: 2;
 
-            max-width:
-                830px;
+            max-width: 820px;
         }
 
 
@@ -257,32 +229,24 @@
 
             margin-bottom: 10px;
 
-            color:
-                #fcd34d;
+            color: #fda4af;
 
-            font-size:
-                9px;
+            font-size: 8px;
+            font-weight: 800;
 
-            font-weight:
-                800;
-
-            letter-spacing:
-                .15em;
-
-            text-transform:
-                uppercase;
+            letter-spacing: .15em;
+            text-transform: uppercase;
         }
 
 
         .voting-eyebrow i {
-            color:
-                #f59e0b;
+            color: #fb7185;
         }
 
 
         .voting-hero h1 {
             margin:
-                0 0 10px;
+                0 0 9px;
 
             color: white;
 
@@ -292,16 +256,13 @@
 
             font-size:
                 clamp(
-                    32px,
+                    34px,
                     5vw,
-                    56px
+                    58px
                 );
 
-            line-height:
-                .98;
-
-            letter-spacing:
-                -.07em;
+            line-height: .95;
+            letter-spacing: -.075em;
         }
 
 
@@ -315,37 +276,31 @@
             background-clip:
                 text;
 
-            -webkit-text-fill-color:
+            color:
                 transparent;
 
-            color:
+            -webkit-text-fill-color:
                 transparent;
         }
 
 
-        .voting-hero p {
-            max-width:
-                700px;
+        .voting-hero-description {
+            max-width: 700px;
 
-            margin:
-                0;
+            margin: 0;
 
             color:
                 var(--text-secondary);
 
             font-size:
-                11px;
+                10px;
 
             line-height:
                 1.75;
         }
 
 
-        /* =================================================
-           CHALLENGE META
-           ================================================= */
-
-        .voting-challenge-meta {
+        .voting-context {
             display:
                 flex;
 
@@ -359,7 +314,7 @@
                 8px;
 
             margin-top:
-                18px;
+                17px;
         }
 
 
@@ -378,141 +333,36 @@
 
             border:
                 1px solid
-                rgba(255,255,255,.10);
+                rgba(255,255,255,.09);
 
             border-radius:
                 999px;
 
             background:
-                rgba(5,5,8,.40);
+                rgba(5,5,8,.38);
 
             color:
-                rgba(255,255,255,.80);
-
-            font-size:
-                8px;
-
-            font-weight:
-                700;
-        }
-
-
-        .voting-pill.status {
-            color:
-                #fcd34d;
-
-            border-color:
-                rgba(245,158,11,.20);
-
-            background:
-                rgba(245,158,11,.06);
-        }
-
-
-        .voting-pill.status.active {
-            color:
-                #86efac;
-
-            border-color:
-                rgba(34,197,94,.20);
-
-            background:
-                rgba(34,197,94,.06);
-        }
-
-
-        .voting-pill.status.completed {
-            color:
-                #c4b5fd;
-
-            border-color:
-                rgba(124,58,237,.20);
-
-            background:
-                rgba(124,58,237,.06);
-        }
-
-
-        /* =================================================
-           STATS
-           ================================================= */
-
-        .voting-stats {
-            display:
-                grid;
-
-            grid-template-columns:
-                repeat(4,minmax(0,1fr));
-
-            gap:
-                10px;
-
-            margin-bottom:
-                20px;
-        }
-
-
-        .voting-stat {
-            padding:
-                15px;
-
-            border:
-                1px solid
-                var(--border);
-
-            border-radius:
-                15px;
-
-            background:
-                rgba(255,255,255,.03);
-        }
-
-
-        .voting-stat-value {
-            margin-bottom:
-                4px;
-
-            color:
-                white;
-
-            font-family:
-                "Space Grotesk",
-                sans-serif;
-
-            font-size:
-                23px;
-
-            font-weight:
-                700;
-
-            letter-spacing:
-                -.05em;
-        }
-
-
-        .voting-stat-label {
-            color:
-                var(--text-muted);
+                rgba(255,255,255,.78);
 
             font-size:
                 7px;
 
             font-weight:
                 700;
+        }
 
-            letter-spacing:
-                .08em;
 
-            text-transform:
-                uppercase;
+        .voting-pill i {
+            color:
+                #c4b5fd;
         }
 
 
         /* =================================================
-           CONTROLS
+           STATUS
            ================================================= */
 
-        .voting-toolbar {
+        .voting-status-row {
             display:
                 flex;
 
@@ -529,139 +379,201 @@
                 18px;
 
             padding:
-                9px;
+                11px 13px;
 
             border:
                 1px solid
                 var(--border);
 
             border-radius:
-                15px;
+                13px;
 
             background:
                 rgba(255,255,255,.025);
         }
 
 
-        .voting-toolbar-left {
+        .voting-status-copy {
+            min-width:
+                0;
+        }
+
+
+        .voting-status-message {
+            margin:
+                0;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                8px;
+        }
+
+
+        .voting-status {
             display:
-                flex;
+                inline-flex;
 
             align-items:
                 center;
 
             gap:
-                8px;
+                6px;
 
-            width:
-                100%;
-        }
+            flex-shrink:
+                0;
 
+            padding:
+                7px 9px;
 
-        .voting-search {
-            position:
-                relative;
+            border:
+                1px solid
+                rgba(255,255,255,.08);
 
-            width:
-                min(
-                    100%,
-                    360px
-                );
-        }
-
-
-        .voting-search i {
-            position:
-                absolute;
-
-            left:
-                13px;
-
-            top:
-                50%;
-
-            transform:
-                translateY(-50%);
+            border-radius:
+                999px;
 
             color:
-                var(--text-muted);
+                #a1a1aa;
 
-            pointer-events:
-                none;
+            font-size:
+                7px;
+
+            font-weight:
+                800;
+
+            text-transform:
+                uppercase;
         }
 
 
-        .voting-search input,
-        .voting-sort {
-            height:
-                41px;
+        .voting-status.voting {
+            color:
+                #86efac;
+
+            border-color:
+                rgba(34,197,94,.18);
+
+            background:
+                rgba(34,197,94,.05);
+        }
+
+
+        .voting-status.active {
+            color:
+                #c4b5fd;
+
+            border-color:
+                rgba(124,58,237,.18);
+
+            background:
+                rgba(124,58,237,.05);
+        }
+
+
+        .voting-status.completed {
+            color:
+                #fcd34d;
+
+            border-color:
+                rgba(245,158,11,.18);
+
+            background:
+                rgba(245,158,11,.05);
+        }
+
+
+        .voting-status.cancelled {
+            color:
+                #fca5a5;
+
+            border-color:
+                rgba(239,68,68,.18);
+
+            background:
+                rgba(239,68,68,.05);
+        }
+
+
+        /* =================================================
+           STATS
+           ================================================= */
+
+        .voting-stats {
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(
+                    3,
+                    minmax(0,1fr)
+                );
+
+            gap:
+                9px;
+
+            margin-bottom:
+                19px;
+        }
+
+
+        .voting-stat {
+            padding:
+                14px;
 
             border:
                 1px solid
                 var(--border);
 
             border-radius:
-                10px;
-
-            outline:
-                none;
+                14px;
 
             background:
-                rgba(255,255,255,.035);
+                rgba(255,255,255,.03);
+        }
+
+
+        .voting-stat strong {
+            display:
+                block;
+
+            margin-bottom:
+                4px;
 
             color:
                 white;
 
             font-family:
-                "Inter",
+                "Space Grotesk",
                 sans-serif;
 
             font-size:
-                9px;
+                22px;
+
+            line-height:
+                1;
+
+            letter-spacing:
+                -.05em;
         }
 
 
-        .voting-search input {
-            width:
-                100%;
-
-            padding:
-                0 12px 0 38px;
-        }
-
-
-        .voting-search input::placeholder {
+        .voting-stat span {
             color:
                 var(--text-muted);
-        }
 
+            font-size:
+                6px;
 
-        .voting-search input:focus,
-        .voting-sort:focus {
-            border-color:
-                rgba(168,85,247,.50);
+            font-weight:
+                700;
 
-            box-shadow:
-                0 0 0 3px
-                rgba(124,58,237,.07);
-        }
+            letter-spacing:
+                .08em;
 
-
-        .voting-sort {
-            min-width:
-                145px;
-
-            padding:
-                0 10px;
-        }
-
-
-        .voting-sort option {
-            background:
-                #0b0b11;
-
-            color:
-                white;
+            text-transform:
+                uppercase;
         }
 
 
@@ -680,10 +592,10 @@
                 space-between;
 
             gap:
-                14px;
+                12px;
 
             margin-bottom:
-                14px;
+                13px;
         }
 
 
@@ -714,23 +626,11 @@
         }
 
 
-        .voting-result-count {
-            color:
-                var(--text-muted);
-
-            font-size:
-                8px;
-
-            white-space:
-                nowrap;
-        }
-
-
         /* =================================================
-           SUBMISSION GRID
+           VOTING GRID
            ================================================= */
 
-        .voting-submission-grid {
+        .voting-grid {
             display:
                 grid;
 
@@ -741,15 +641,15 @@
                 );
 
             gap:
-                16px;
+                15px;
         }
 
 
         /* =================================================
-           SUBMISSION CARD
+           CARD
            ================================================= */
 
-        .voting-submission-card {
+        .voting-card {
             overflow:
                 hidden;
 
@@ -758,47 +658,55 @@
                 var(--border);
 
             border-radius:
-                19px;
+                18px;
 
             background:
-                rgba(255,255,255,.035);
+                rgba(255,255,255,.03);
+
+            box-shadow:
+                0 15px 40px
+                rgba(0,0,0,.14);
 
             transition:
-                transform 220ms ease,
-                border-color 220ms ease,
-                box-shadow 220ms ease;
+                transform 180ms ease,
+                border-color 180ms ease,
+                box-shadow 180ms ease;
         }
 
 
-        .voting-submission-card:hover {
+        .voting-card:hover {
             transform:
-                translateY(-4px);
+                translateY(-3px);
 
             border-color:
-                rgba(168,85,247,.28);
+                rgba(168,85,247,.26);
 
             box-shadow:
                 0 25px 60px
-                rgba(0,0,0,.25);
+                rgba(0,0,0,.23);
         }
 
 
-        .voting-submission-image {
+        /* =================================================
+           IMAGE
+           ================================================= */
+
+        .voting-card-image {
             position:
                 relative;
-
-            overflow:
-                hidden;
 
             aspect-ratio:
                 4 / 3;
 
+            overflow:
+                hidden;
+
             background:
-                #08080d;
+                #09090f;
         }
 
 
-        .voting-submission-image img {
+        .voting-card-image > img {
             width:
                 100%;
 
@@ -812,12 +720,12 @@
                 cover;
 
             transition:
-                transform 350ms ease;
+                transform 300ms ease;
         }
 
 
-        .voting-submission-card:hover
-        .voting-submission-image img {
+        .voting-card:hover
+        .voting-card-image > img {
             transform:
                 scale(1.035);
         }
@@ -836,6 +744,253 @@
             place-items:
                 center;
 
+            color:
+                #c4b5fd;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #120825,
+                    #153b75
+                );
+
+            font-size:
+                30px;
+        }
+
+
+        .voting-entry-number {
+            position:
+                absolute;
+
+            left:
+                10px;
+
+            top:
+                10px;
+
+            padding:
+                6px 8px;
+
+            border:
+                1px solid
+                rgba(255,255,255,.08);
+
+            border-radius:
+                7px;
+
+            background:
+                rgba(5,5,8,.68);
+
+            backdrop-filter:
+                blur(10px);
+
+            color:
+                rgba(255,255,255,.78);
+
+            font-size:
+                6px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                .08em;
+        }
+
+
+        .voting-own-badge {
+            position:
+                absolute;
+
+            right:
+                10px;
+
+            top:
+                10px;
+
+            display:
+                inline-flex;
+
+            align-items:
+                center;
+
+            gap:
+                5px;
+
+            padding:
+                6px 8px;
+
+            border:
+                1px solid
+                rgba(168,85,247,.20);
+
+            border-radius:
+                7px;
+
+            background:
+                rgba(20,10,40,.76);
+
+            backdrop-filter:
+                blur(10px);
+
+            color:
+                #c4b5fd;
+
+            font-size:
+                6px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                .06em;
+        }
+
+
+        /* =================================================
+           CARD BODY
+           ================================================= */
+
+        .voting-card-body {
+            padding:
+                14px;
+        }
+
+
+        .voting-category {
+            display:
+                inline-flex;
+
+            align-items:
+                center;
+
+            gap:
+                5px;
+
+            margin-bottom:
+                7px;
+
+            color:
+                #a1a1aa;
+
+            font-size:
+                7px;
+
+            font-weight:
+                700;
+
+            text-transform:
+                uppercase;
+        }
+
+
+        .voting-category i {
+            color:
+                #c4b5fd;
+        }
+
+
+        .voting-design-title {
+            margin:
+                0 0 6px;
+
+            color:
+                white;
+
+            font-family:
+                "Space Grotesk",
+                sans-serif;
+
+            font-size:
+                17px;
+
+            line-height:
+                1.05;
+
+            letter-spacing:
+                -.04em;
+        }
+
+
+        .voting-description {
+            height:
+                31px;
+
+            margin:
+                0 0 12px;
+
+            overflow:
+                hidden;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                8px;
+
+            line-height:
+                1.55;
+
+            display:
+                -webkit-box;
+
+            -webkit-line-clamp:
+                2;
+
+            -webkit-box-orient:
+                vertical;
+        }
+
+
+        /* =================================================
+           DESIGNER
+           ================================================= */
+
+        .voting-designer {
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            gap:
+                8px;
+
+            margin-bottom:
+                13px;
+
+            padding-bottom:
+                11px;
+
+            border-bottom:
+                1px solid
+                rgba(255,255,255,.06);
+        }
+
+
+        .voting-designer-avatar {
+            width:
+                30px;
+
+            height:
+                30px;
+
+            flex-shrink:
+                0;
+
+            overflow:
+                hidden;
+
+            display:
+                grid;
+
+            place-items:
+                center;
+
+            border-radius:
+                9px;
+
             background:
                 linear-gradient(
                     135deg,
@@ -847,41 +1002,81 @@
                 #c4b5fd;
 
             font-size:
-                30px;
+                10px;
         }
 
 
-        .voting-submission-body {
-            padding:
-                15px;
+        .voting-designer-avatar img {
+            width:
+                100%;
+
+            height:
+                100%;
+
+            display:
+                block;
+
+            object-fit:
+                cover;
         }
 
 
-        .voting-submission-card
-        .btn[disabled] {
-            opacity:
-                .50;
-
-            cursor:
-                not-allowed;
-        }
-
-
-        .voting-submission-card
-        [data-vote-button] {
+        .voting-designer-info {
             min-width:
-                84px;
+                0;
+        }
+
+
+        .voting-designer-info strong {
+            display:
+                block;
+
+            margin-bottom:
+                2px;
+
+            overflow:
+                hidden;
+
+            color:
+                white;
+
+            font-size:
+                8px;
+
+            text-overflow:
+                ellipsis;
+
+            white-space:
+                nowrap;
+        }
+
+
+        .voting-designer-info span {
+            display:
+                block;
+
+            overflow:
+                hidden;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                7px;
+
+            text-overflow:
+                ellipsis;
+
+            white-space:
+                nowrap;
         }
 
 
         /* =================================================
-           EMPTY STATE
+           FOOTER
            ================================================= */
 
-        .voting-empty {
-            min-height:
-                330px;
-
+        .voting-card-footer {
             display:
                 flex;
 
@@ -889,103 +1084,163 @@
                 center;
 
             justify-content:
-                center;
+                space-between;
 
-            flex-direction:
-                column;
-
-            padding:
-                40px;
-
-            border:
-                1px dashed
-                var(--border-light);
-
-            border-radius:
-                18px;
-
-            text-align:
-                center;
+            gap:
+                8px;
         }
 
 
-        .voting-empty h3 {
-            margin:
-                0 0 6px;
-
-            color:
-                white;
-
-            font-size:
-                17px;
-        }
-
-
-        .voting-empty p {
-            max-width:
-                420px;
-
-            margin:
-                0;
-
-            color:
-                var(--text-muted);
-
-            font-size:
-                9px;
-
-            line-height:
-                1.6;
-        }
-
-
-        /* =================================================
-           INFO BOX
-           ================================================= */
-
-        .voting-info-box {
+        .voting-count {
             display:
                 flex;
 
             align-items:
-                flex-start;
+                baseline;
 
             gap:
-                10px;
+                4px;
+        }
 
-            margin-top:
-                20px;
 
-            padding:
-                14px;
+        .voting-count strong {
+            color:
+                white;
 
-            border:
-                1px solid
-                rgba(56,189,248,.12);
+            font-family:
+                "Space Grotesk",
+                sans-serif;
 
-            border-radius:
-                13px;
+            font-size:
+                18px;
 
-            background:
-                rgba(56,189,248,.035);
+            line-height:
+                1;
+        }
 
+
+        .voting-count span {
             color:
                 var(--text-muted);
 
             font-size:
-                8px;
+                7px;
 
-            line-height:
-                1.6;
+            font-weight:
+                700;
+
+            text-transform:
+                uppercase;
         }
 
 
-        .voting-info-box i {
-            margin-top:
-                2px;
+        /* =================================================
+           ACTIONS
+           ================================================= */
+
+        .voting-action {
+            min-height:
+                36px;
+
+            display:
+                inline-flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            gap:
+                6px;
+
+            padding:
+                0 11px;
+
+            border:
+                1px solid
+                rgba(255,255,255,.08);
+
+            border-radius:
+                9px;
+
+            font-family:
+                "Inter",
+                sans-serif;
+
+            font-size:
+                7px;
+
+            font-weight:
+                800;
+
+            cursor:
+                pointer;
+
+            transition:
+                transform 180ms ease,
+                border-color 180ms ease,
+                background 180ms ease;
+        }
+
+
+        .voting-action.vote {
+            border-color:
+                rgba(244,63,94,.22);
+
+            background:
+                rgba(244,63,94,.07);
 
             color:
-                #7dd3fc;
+                #fda4af;
+        }
+
+
+        .voting-action.vote:hover {
+            transform:
+                translateY(-1px);
+
+            border-color:
+                rgba(244,63,94,.36);
+
+            background:
+                rgba(244,63,94,.12);
+        }
+
+
+        .voting-action.voted {
+            border-color:
+                rgba(34,197,94,.20);
+
+            background:
+                rgba(34,197,94,.07);
+
+            color:
+                #86efac;
+        }
+
+
+        .voting-action.own {
+            cursor:
+                default;
+
+            border-color:
+                rgba(168,85,247,.14);
+
+            background:
+                rgba(124,58,237,.05);
+
+            color:
+                #a1a1aa;
+        }
+
+
+        .voting-action:disabled {
+            opacity:
+                .76;
+
+            cursor:
+                not-allowed;
         }
 
 
@@ -993,9 +1248,9 @@
            LOADING
            ================================================= */
 
-        .voting-loading {
+        #votingLoading {
             min-height:
-                380px;
+                390px;
 
             display:
                 flex;
@@ -1010,14 +1265,14 @@
                 column;
 
             gap:
-                9px;
+                10px;
 
             border:
                 1px solid
                 var(--border);
 
             border-radius:
-                18px;
+                20px;
 
             background:
                 rgba(255,255,255,.025);
@@ -1030,7 +1285,7 @@
         }
 
 
-        .voting-loading i {
+        #votingLoading i {
             color:
                 #c4b5fd;
 
@@ -1040,15 +1295,15 @@
 
 
         /* =================================================
-           PAGE ERROR
+           ERROR
            ================================================= */
 
-        .voting-error {
+        #votingError {
             display:
                 none;
 
             min-height:
-                420px;
+                390px;
 
             align-items:
                 center;
@@ -1074,7 +1329,7 @@
         }
 
 
-        .voting-error.visible {
+        #votingError.visible {
             display:
                 flex;
         }
@@ -1110,7 +1365,7 @@
         }
 
 
-        .voting-error h2 {
+        #votingError h2 {
             margin:
                 0 0 7px;
 
@@ -1118,16 +1373,16 @@
                 white;
 
             font-size:
-                21px;
+                20px;
         }
 
 
-        .voting-error p {
+        #votingError p {
             max-width:
                 440px;
 
             margin:
-                0 0 17px;
+                0 0 16px;
 
             color:
                 var(--text-muted);
@@ -1144,9 +1399,9 @@
            RESPONSIVE
            ================================================= */
 
-        @media (max-width: 1100px) {
+        @media (max-width: 1050px) {
 
-            .voting-submission-grid {
+            .voting-grid {
                 grid-template-columns:
                     repeat(
                         2,
@@ -1156,127 +1411,116 @@
         }
 
 
-        @media (max-width: 800px) {
+        @media (max-width: 750px) {
 
             .voting-main {
                 padding:
-                    24px 16px 65px;
+                    23px 15px 60px;
             }
 
 
             .voting-hero {
                 padding:
-                    27px;
+                    28px 22px;
             }
 
 
-            .voting-stats {
+            .voting-grid {
                 grid-template-columns:
-                    repeat(
-                        2,
-                        minmax(0,1fr)
-                    );
+                    1fr;
             }
         }
 
 
-        @media (max-width: 650px) {
+        @media (max-width: 560px) {
 
-            .voting-toolbar {
-                flex-direction:
-                    column;
+            .voting-stats {
+                grid-template-columns:
+                    1fr 1fr 1fr;
 
-                align-items:
-                    stretch;
+                gap:
+                    7px;
             }
 
 
-            .voting-toolbar-left {
-                flex-direction:
-                    column;
-
-                align-items:
-                    stretch;
+            .voting-stat {
+                padding:
+                    12px;
             }
 
 
-            .voting-search {
-                width:
-                    100%;
+            .voting-stat strong {
+                font-size:
+                    19px;
             }
 
 
-            .voting-sort {
-                width:
-                    100%;
-            }
-
-
-            .voting-section-header {
+            .voting-status-row {
                 align-items:
                     flex-start;
 
                 flex-direction:
                     column;
             }
+
+
+            .voting-status {
+                align-self:
+                    flex-start;
+            }
         }
 
 
-        @media (max-width: 540px) {
+        @media (max-width: 420px) {
 
             .voting-main {
                 padding:
-                    20px 12px 50px;
+                    18px 11px 50px;
             }
 
 
-            .voting-hero {
+            .voting-card-body {
                 padding:
-                    23px 19px;
-
-                border-radius:
-                    20px;
+                    12px;
             }
 
 
-            .voting-submission-grid {
-                grid-template-columns:
-                    1fr;
+            .voting-card-footer {
+                align-items:
+                    stretch;
+
+                flex-direction:
+                    column;
             }
 
 
-            .voting-stats {
-                grid-template-columns:
-                    1fr 1fr;
-            }
-
-
-            .voting-stat {
-                padding:
-                    13px;
-            }
-
-
-            .voting-stat-value {
-                font-size:
-                    20px;
+            .voting-action {
+                width:
+                    100%;
             }
         }
 
 
         @media (hover: none) and (pointer: coarse) {
 
-            .voting-submission-card:hover {
+            .voting-card:hover {
                 transform:
                     none;
 
                 box-shadow:
+                    0 15px 40px
+                    rgba(0,0,0,.14);
+            }
+
+
+            .voting-card:hover
+            .voting-card-image > img {
+                transform:
                     none;
             }
 
 
-            .voting-submission-card:hover
-            .voting-submission-image img {
+            .voting-action.vote:hover {
                 transform:
                     none;
             }
@@ -1288,6 +1532,7 @@
             *,
             *::before,
             *::after {
+
                 animation-duration:
                     .01ms !important;
 
@@ -1328,6 +1573,7 @@
                     <span>DV</span>
                 </div>
 
+
                 <div class="brand-text">
 
                     <span class="brand-name">
@@ -1349,16 +1595,19 @@
                     Explore
                 </a>
 
-                <a
-                    href="challenges.html"
-                    class="active"
-                >
+
+                <a href="challenges.html">
                     Challenges
                 </a>
 
-                <a href="leaderboard.html">
+
+                <a
+                    href="leaderboard.html"
+                    class="active"
+                >
                     Leaderboard
                 </a>
+
 
                 <a href="designers.html">
                     Designers
@@ -1413,12 +1662,16 @@
                         Challenges
                     </a>
 
+
                     <i
                         class="fa-solid fa-chevron-right"
                     ></i>
 
-                    <span id="votingBreadcrumb">
-                        Voting
+
+                    <span
+                        id="votingBreadcrumbTitle"
+                    >
+                        Vote
                     </span>
 
                 </nav>
@@ -1433,6 +1686,11 @@
                 >
 
                     <div
+                        class="voting-hero-orb one"
+                    ></div>
+
+
+                    <div
                         class="voting-hero-content"
                     >
 
@@ -1441,35 +1699,34 @@
                         >
 
                             <i
-                                class="fa-solid fa-check-to-slot"
+                                class="fa-solid fa-heart"
                             ></i>
 
-                            DESIGNVERSE COMMUNITY VOTE
+                            COMMUNITY VOTING
 
                         </div>
 
 
                         <h1>
 
-                            Choose the design
-                            <span>that stands out.</span>
+                            Pick the
+                            <span>best.</span>
 
                         </h1>
 
 
                         <p
-                            id="votingHeroDescription"
+                            class="voting-hero-description"
+                            id="votingChallengeDescription"
                         >
 
-                            Explore the challenge entries,
-                            support the work you believe deserves
-                            recognition, and help decide the winners.
+                            Loading challenge...
 
                         </p>
 
 
                         <div
-                            class="voting-challenge-meta"
+                            class="voting-context"
                         >
 
                             <span
@@ -1483,25 +1740,7 @@
                                 <span
                                     id="votingChallengeTitle"
                                 >
-                                    Loading challenge...
-                                </span>
-
-                            </span>
-
-
-                            <span
-                                class="voting-pill status"
-                                id="votingStatusPill"
-                            >
-
-                                <i
-                                    class="fa-solid fa-spinner fa-spin"
-                                ></i>
-
-                                <span
-                                    id="votingStatusText"
-                                >
-                                    Loading
+                                    Loading...
                                 </span>
 
                             </span>
@@ -1512,13 +1751,47 @@
                             >
 
                                 <i
-                                    class="fa-regular fa-clock"
+                                    class="fa-solid fa-palette"
                                 ></i>
 
                                 <span
-                                    id="votingDeadline"
+                                    id="votingCategory"
                                 >
-                                    Voting deadline —
+                                    —
+                                </span>
+
+                            </span>
+
+
+                            <span
+                                class="voting-pill"
+                            >
+
+                                <i
+                                    class="fa-solid fa-gift"
+                                ></i>
+
+                                <span
+                                    id="votingPrize"
+                                >
+                                    —
+                                </span>
+
+                            </span>
+
+
+                            <span
+                                class="voting-pill"
+                            >
+
+                                <i
+                                    class="fa-solid fa-star"
+                                ></i>
+
+                                <span
+                                    id="votingPoints"
+                                >
+                                    0 XP
                                 </span>
 
                             </span>
@@ -1526,6 +1799,42 @@
                         </div>
 
                     </div>
+
+                </section>
+
+
+                <!-- =========================================
+                     STATUS
+                     ========================================= -->
+
+                <section
+                    class="voting-status-row"
+                >
+
+                    <div
+                        class="voting-status-copy"
+                    >
+
+                        <p
+                            class="voting-status-message"
+                            id="votingStatusMessage"
+                        >
+
+                            Loading voting status...
+
+                        </p>
+
+                    </div>
+
+
+                    <span
+                        class="voting-status"
+                        id="votingStatus"
+                    >
+
+                        Loading
+
+                    </span>
 
                 </section>
 
@@ -1542,18 +1851,15 @@
                         class="voting-stat"
                     >
 
-                        <div
-                            class="voting-stat-value"
-                            id="submissionCountStat"
+                        <strong
+                            id="votingSubmissionCount"
                         >
                             0
-                        </div>
+                        </strong>
 
-                        <div
-                            class="voting-stat-label"
-                        >
+                        <span>
                             Entries
-                        </div>
+                        </span>
 
                     </article>
 
@@ -1562,18 +1868,15 @@
                         class="voting-stat"
                     >
 
-                        <div
-                            class="voting-stat-value"
-                            id="totalVotesStat"
+                        <strong
+                            id="votingTotalVotes"
                         >
                             0
-                        </div>
+                        </strong>
 
-                        <div
-                            class="voting-stat-label"
-                        >
-                            Votes
-                        </div>
+                        <span>
+                            Votes Cast
+                        </span>
 
                     </article>
 
@@ -1582,38 +1885,15 @@
                         class="voting-stat"
                     >
 
-                        <div
-                            class="voting-stat-value"
-                            id="yourVotesStat"
+                        <strong
+                            id="votingMyVotes"
                         >
                             0
-                        </div>
+                        </strong>
 
-                        <div
-                            class="voting-stat-label"
-                        >
+                        <span>
                             Your Votes
-                        </div>
-
-                    </article>
-
-
-                    <article
-                        class="voting-stat"
-                    >
-
-                        <div
-                            class="voting-stat-value"
-                            id="timeRemainingStat"
-                        >
-                            —
-                        </div>
-
-                        <div
-                            class="voting-stat-label"
-                        >
-                            Time Left
-                        </div>
+                        </span>
 
                     </article>
 
@@ -1625,7 +1905,6 @@
                      ========================================= -->
 
                 <section
-                    class="voting-error"
                     id="votingError"
                 >
 
@@ -1648,8 +1927,9 @@
                     <p
                         id="votingErrorMessage"
                     >
-                        We couldn't load this challenge's
-                        submissions.
+
+                        We couldn't load this challenge.
+
                     </p>
 
 
@@ -1670,74 +1950,29 @@
 
 
                 <!-- =========================================
-                     CONTENT
+                     LOADING
                      ========================================= -->
 
-                <div
-                    id="votingContent"
+                <section
+                    id="votingLoading"
                 >
 
+                    <i
+                        class="fa-solid fa-spinner fa-spin"
+                    ></i>
 
-                    <!-- =====================================
-                         TOOLBAR
-                         ===================================== -->
+                    Loading submissions...
 
-                    <section
-                        class="voting-toolbar"
-                    >
-
-                        <div
-                            class="voting-toolbar-left"
-                        >
-
-                            <div
-                                class="voting-search"
-                            >
-
-                                <i
-                                    class="fa-solid fa-magnifying-glass"
-                                ></i>
+                </section>
 
 
-                                <input
-                                    type="search"
-                                    id="votingSearch"
-                                    placeholder="Search submissions..."
-                                    autocomplete="off"
-                                    aria-label="Search submissions"
-                                >
+                <!-- =========================================
+                     SUBMISSIONS
+                     ========================================= -->
 
-                            </div>
-
-
-                            <select
-                                class="voting-sort"
-                                id="votingSort"
-                                aria-label="Sort submissions"
-                            >
-
-                                <option value="votes">
-                                    Most Votes
-                                </option>
-
-                                <option value="newest">
-                                    Newest
-                                </option>
-
-                                <option value="oldest">
-                                    Oldest
-                                </option>
-
-                            </select>
-
-                        </div>
-
-                    </section>
-
-
-                    <!-- =====================================
-                         SECTION HEADER
-                         ===================================== -->
+                <section
+                    class="voting-section"
+                >
 
                     <div
                         class="voting-section-header"
@@ -1746,79 +1981,25 @@
                         <div>
 
                             <h2>
-                                Challenge Entries
+                                Choose your favorite
                             </h2>
 
                             <p>
-                                Every vote helps shape the final results.
+                                One vote per submission.
+                                Your own submission cannot be voted for.
                             </p>
 
                         </div>
 
-
-                        <span
-                            class="voting-result-count"
-                            id="votingResultCount"
-                        >
-                            Loading...
-                        </span>
-
                     </div>
 
-
-                    <!-- =====================================
-                         LOADING
-                         ===================================== -->
-
-                    <section
-                        class="voting-loading"
-                        id="votingLoading"
-                    >
-
-                        <i
-                            class="fa-solid fa-spinner fa-spin"
-                        ></i>
-
-                        Loading submissions...
-
-                    </section>
-
-
-                    <!-- =====================================
-                         GRID
-                         ===================================== -->
-
-                    <section
-                        class="voting-submission-grid"
-                        id="votingSubmissionGrid"
-                    ></section>
-
-
-                    <!-- =====================================
-                         INFO
-                         ===================================== -->
 
                     <div
-                        class="voting-info-box"
-                    >
+                        class="voting-grid"
+                        id="votingGrid"
+                    ></div>
 
-                        <i
-                            class="fa-solid fa-shield-halved"
-                        ></i>
-
-
-                        <span>
-
-                            You can vote once for each submission.
-                            You cannot vote for your own entry.
-                            Your vote can be changed during the
-                            active voting period.
-
-                        </span>
-
-                    </div>
-
-                </div>
+                </section>
 
             </div>
 
@@ -1831,33 +2012,16 @@
          SCRIPTS
          ===================================================== -->
 
-    <script
-        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-    ></script>
-
-    <script
-        src="../js/utils.js"
-    ></script>
-
-    <script
-        src="../js/supabase.js"
-    ></script>
-
-    <script
-        src="../js/auth.js"
-    ></script>
-
-    <script
-        src="../js/voting.js"
-    ></script>
-
-    <script
-        src="../js/navigation.js"
-    ></script>
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/utils.js"></script>
+<script src="../js/supabase.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/voting.js"></script>
+<script src="../js/navigation.js"></script>
 
 
     <!-- =====================================================
-         PAGE UI
+         PAGE CONTROLLER
          ===================================================== -->
 
     <script>
@@ -1865,462 +2029,41 @@
         "use strict";
 
 
-        /* =================================================
-           HELPERS
-           ================================================= */
+        /*
+         * Update the breadcrumb once voting.js
+         * has loaded the challenge.
+         */
 
-        const $vote =
-            selector =>
-                document.querySelector(
-                    selector
-                );
+        function updateVotingBreadcrumb() {
 
+            const title =
+                window.DVVoting
+                    ?.state
+                    ?.challenge
+                    ?.title;
 
-        function setVoteText(
-            selector,
-            value
-        ) {
 
             const element =
-                $vote(
-                    selector
+                document.getElementById(
+                    "votingBreadcrumbTitle"
                 );
 
 
-            if (element) {
+            if (
+                element &&
+                title
+            ) {
 
                 element.textContent =
-                    value ?? "—";
+                    title;
             }
         }
 
 
-        function parseVoteDate(
-            value
-        ) {
-
-            if (!value) {
-
-                return null;
-            }
-
-
-            const time =
-                new Date(
-                    value
-                ).getTime();
-
-
-            return Number.isNaN(
-                time
-            )
-                ? null
-                : time;
-        }
-
-
-        function formatDate(
-            value
-        ) {
-
-            const time =
-                parseVoteDate(
-                    value
-                );
-
-
-            if (
-                time === null
-            ) {
-
-                return "Not set";
-            }
-
-
-            return new Date(
-                time
-            ).toLocaleString(
-                undefined,
-                {
-                    month:
-                        "short",
-
-                    day:
-                        "numeric",
-
-                    hour:
-                        "numeric",
-
-                    minute:
-                        "2-digit"
-                }
-            );
-        }
-
-
-        function formatNumber(
-            value
-        ) {
-
-            return new Intl.NumberFormat(
-                "en-US"
-            ).format(
-                Number(value) || 0
-            );
-        }
-
-
-        function formatRemaining(
-            difference
-        ) {
-
-            if (
-                difference <= 0
-            ) {
-
-                return "Ended";
-            }
-
-
-            const minute =
-                60 * 1000;
-
-
-            const hour =
-                60 * minute;
-
-
-            const day =
-                24 * hour;
-
-
-            if (
-                difference >=
-                day
-            ) {
-
-                const days =
-                    Math.floor(
-                        difference /
-                        day
-                    );
-
-
-                const hours =
-                    Math.floor(
-                        (
-                            difference %
-                            day
-                        ) /
-                        hour
-                    );
-
-
-                return `${days}d ${hours}h`;
-            }
-
-
-            if (
-                difference >=
-                hour
-            ) {
-
-                const hours =
-                    Math.floor(
-                        difference /
-                        hour
-                    );
-
-
-                const minutes =
-                    Math.floor(
-                        (
-                            difference %
-                            hour
-                        ) /
-                        minute
-                    );
-
-
-                return `${hours}h ${minutes}m`;
-            }
-
-
-            return `${Math.max(
-                1,
-                Math.floor(
-                    difference /
-                    minute
-                )
-            )}m`;
-        }
-
-
-        /* =================================================
-           UPDATE HEADER/STATS
-           ================================================= */
-
-        function updateVotingUI() {
-
-            const voting =
-                window.DVVoting;
-
-
-            if (
-                !voting
-            ) {
-
-                return;
-            }
-
-
-            const challenge =
-                voting.state.challenge;
-
-
-            const submissions =
-                voting.state.submissions ||
-                [];
-
-
-            if (!challenge) {
-
-                return;
-            }
-
-
-            const status =
-                voting.getChallengeStatus();
-
-
-            setVoteText(
-                "#votingChallengeTitle",
-                challenge.title
-            );
-
-
-            setVoteText(
-                "#votingBreadcrumb",
-                challenge.title
-            );
-
-
-            setVoteText(
-                "#votingDeadline",
-                `Voting ends ${formatDate(
-                    challenge.voting_ends_at
-                )}`
-            );
-
-
-            setVoteText(
-                "#submissionCountStat",
-                formatNumber(
-                    submissions.length
-                )
-            );
-
-
-            const totalVotes =
-                submissions.reduce(
-                    (
-                        total,
-                        submission
-                    ) =>
-                        total +
-                        Number(
-                            submission.voteCount ||
-                            0
-                        ),
-                    0
-                );
-
-
-            const yourVotes =
-                submissions.filter(
-                    submission =>
-                        submission.hasVoted
-                ).length;
-
-
-            setVoteText(
-                "#totalVotesStat",
-                formatNumber(
-                    totalVotes
-                )
-            );
-
-
-            setVoteText(
-                "#yourVotesStat",
-                formatNumber(
-                    yourVotes
-                )
-            );
-
-
-            const statusPill =
-                $vote(
-                    "#votingStatusPill"
-                );
-
-
-            if (
-                statusPill
-            ) {
-
-                statusPill.className =
-                    `voting-pill status ${status}`;
-            }
-
-
-            const statusIcon =
-                status === "voting"
-                    ? "fa-check-to-slot"
-                    : status === "active"
-                        ? "fa-clock"
-                        : status === "completed"
-                            ? "fa-flag-checkered"
-                            : "fa-calendar";
-
-
-            const statusIconElement =
-                statusPill?.querySelector(
-                    "i"
-                );
-
-
-            if (
-                statusIconElement
-            ) {
-
-                statusIconElement.className =
-                    `fa-solid ${statusIcon}`;
-            }
-
-
-            const labels = {
-
-                upcoming:
-                    "Upcoming",
-
-                active:
-                    "Voting Soon",
-
-                voting:
-                    "Voting Open",
-
-                completed:
-                    "Voting Closed",
-
-                cancelled:
-                    "Cancelled"
-
-            };
-
-
-            setVoteText(
-                "#votingStatusText",
-                labels[status] ||
-                "Unavailable"
-            );
-
-
-            const votingEnd =
-                parseVoteDate(
-                    challenge.voting_ends_at
-                );
-
-
-            if (
-                votingEnd !== null
-            ) {
-
-                setVoteText(
-                    "#timeRemainingStat",
-                    formatRemaining(
-                        votingEnd -
-                        Date.now()
-                    )
-                );
-
-            } else {
-
-                setVoteText(
-                    "#timeRemainingStat",
-                    "—"
-                );
-            }
-
-
-            const resultCount =
-                submissions.length;
-
-
-            setVoteText(
-                "#votingResultCount",
-                `${formatNumber(
-                    resultCount
-                )} ${
-                    resultCount === 1
-                        ? "submission"
-                        : "submissions"
-                }`
-            );
-        }
-
-
-        /* =================================================
-           SEARCH
-           ================================================= */
-
-        $vote(
-            "#votingSearch"
-        )?.addEventListener(
-            "input",
-            event => {
-
-                window.DVVoting
-                    ?.searchSubmissions(
-                        event.target.value
-                    );
-
-            }
-        );
-
-
-        /* =================================================
-           SORT
-           ================================================= */
-
-        $vote(
-            "#votingSort"
-        )?.addEventListener(
-            "change",
-            event => {
-
-                const value =
-                    event.target.value;
-
-
-                window.DVVoting
-                    ?.renderSubmissions({
-                        sort:
-                            value
-                    });
-
-
-                setTimeout(
-                    updateVotingUI,
-                    0
-                );
-            }
-        );
-
-
-        /* =================================================
-           WAIT FOR VOTING SYSTEM
-           ================================================= */
+        /*
+         * Poll briefly while voting.js initializes.
+         * This avoids duplicating its database logic.
+         */
 
         function waitForVotingSystem(
             attempts = 0
@@ -2328,15 +2071,31 @@
 
             if (
                 window.DVVoting &&
-                window.DVVoting.state.challenge
+                window.DVVoting.state
             ) {
 
-                updateVotingUI();
+                const loading =
+                    document.getElementById(
+                        "votingLoading"
+                    );
 
 
-                $vote(
-                    "#votingLoading"
-                )?.remove();
+                loading?.remove();
+
+
+                updateVotingBreadcrumb();
+
+
+                setTimeout(
+                    updateVotingBreadcrumb,
+                    200
+                );
+
+
+                setTimeout(
+                    updateVotingBreadcrumb,
+                    700
+                );
 
 
                 return;
@@ -2347,34 +2106,13 @@
                 attempts >= 60
             ) {
 
-                $vote(
-                    "#votingLoading"
-                )?.remove();
-
-
-                const error =
-                    $vote(
-                        "#votingError"
+                const loading =
+                    document.getElementById(
+                        "votingLoading"
                     );
 
 
-                error?.classList.add(
-                    "visible"
-                );
-
-
-                setVoteText(
-                    "#votingErrorMessage",
-                    "We could not load this challenge. Please go back and try again."
-                );
-
-
-                $vote(
-                    "#votingContent"
-                )?.setAttribute(
-                    "hidden",
-                    ""
-                );
+                loading?.remove();
 
 
                 return;
@@ -2389,23 +2127,9 @@
                     );
 
                 },
-                150
+                100
             );
         }
-
-
-        /* =================================================
-           REFRESH STATS
-           ================================================= */
-
-        setInterval(
-            () => {
-
-                updateVotingUI();
-
-            },
-            60 * 1000
-        );
 
 
         document.addEventListener(

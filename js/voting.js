@@ -2,37 +2,30 @@
    DESIGNVERSE — VOTING SYSTEM
    js/voting.js
 
-   Handles:
-   - Loading challenge submissions
-   - Voting phase validation
-   - Current-user authentication
-   - Preventing self-voting
-   - Checking existing votes
-   - Casting votes
-   - Removing votes
-   - Vote counts
-   - Submission display
-   - Challenge-aware voting
+   Uses actual DESIGNVERSE database schema.
 
-   Voting lifecycle:
+   TABLE:
+       votes
 
-   ACTIVE
-      ↓
-   submission deadline
-      ↓
-   VOTING
-      ↓
-   votes allowed
-      ↓
-   voting_ends_at
-      ↓
-   COMPLETED
+   COLUMNS:
+       id
+       submission_id
+       voter_id
+       created_at
+
+   RULES:
+       - User must be authenticated
+       - User cannot vote for own submission
+       - User can vote once per submission
+       - User can remove their own vote
+       - Database RLS remains authoritative
    ========================================================= */
 
 "use strict";
 
 
 const DVVoting = (() => {
+
 
     /* =====================================================
        STATE
@@ -42,19 +35,23 @@ const DVVoting = (() => {
 
         initialized: false,
 
-        user: null,
+        loading: false,
+
+        currentUser: null,
 
         challenge: null,
 
         submissions: [],
 
-        userVotes: new Set(),
+        votedSubmissionIds: new Set(),
 
-        selectedSubmission: null,
+        votesBySubmission: new Map(),
 
-        loading: false,
+        challengeStatus: "unknown",
 
-        voting: false
+        voteActionInProgress: false,
+
+        realtimeChannel: null
 
     };
 
@@ -80,12 +77,11 @@ const DVVoting = (() => {
         if (!window.supabaseClient) {
 
             console.error(
-                "DESIGNVERSE: Supabase client unavailable."
+                "DESIGNVERSE: Supabase client is unavailable."
             );
 
             return null;
         }
-
 
         return window.supabaseClient;
     }
@@ -116,26 +112,29 @@ const DVVoting = (() => {
 
         if (error) {
 
-            console.error(
-                "DESIGNVERSE user error:",
+            console.warn(
+                "DESIGNVERSE voting auth error:",
                 error
             );
+
+            state.currentUser =
+                null;
 
             return null;
         }
 
 
-        state.user =
+        state.currentUser =
             data?.user ||
             null;
 
 
-        return state.user;
+        return state.currentUser;
     }
 
 
     /* =====================================================
-       URL CHALLENGE ID
+       CHALLENGE IDENTIFIER
        ===================================================== */
 
     function getChallengeIdentifier() {
@@ -162,9 +161,6 @@ const DVVoting = (() => {
             slug:
                 params.get(
                     "slug"
-                ) ||
-                params.get(
-                    "challengeSlug"
                 )
 
         };
@@ -175,9 +171,7 @@ const DVVoting = (() => {
        LOAD CHALLENGE
        ===================================================== */
 
-    async function loadChallenge(
-        identifier = null
-    ) {
+    async function loadChallenge() {
 
         const supabase =
             getSupabase();
@@ -191,14 +185,13 @@ const DVVoting = (() => {
         }
 
 
-        const challengeIdentifier =
-            identifier ||
+        const identifier =
             getChallengeIdentifier();
 
 
         if (
-            !challengeIdentifier.id &&
-            !challengeIdentifier.slug
+            !identifier.id &&
+            !identifier.slug
         ) {
 
             throw new Error(
@@ -206,6 +199,12 @@ const DVVoting = (() => {
             );
         }
 
+
+        /*
+         * Don't request columns we haven't verified.
+         * These are the core challenge fields already
+         * used throughout DESIGNVERSE.
+         */
 
         let query =
             supabase
@@ -215,28 +214,26 @@ const DVVoting = (() => {
                     title,
                     slug,
                     description,
-                    brief,
                     category,
                     difficulty,
-                    cover_image_url,
                     prize,
                     points,
-                    max_submissions,
                     starts_at,
                     ends_at,
                     voting_ends_at,
-                    status
+                    status,
+                    cover_image_url
                 `);
 
 
         if (
-            challengeIdentifier.id
+            identifier.id
         ) {
 
             query =
                 query.eq(
                     "id",
-                    challengeIdentifier.id
+                    identifier.id
                 );
 
         } else {
@@ -244,7 +241,7 @@ const DVVoting = (() => {
             query =
                 query.eq(
                     "slug",
-                    challengeIdentifier.slug
+                    identifier.slug
                 );
         }
 
@@ -258,17 +255,26 @@ const DVVoting = (() => {
 
         if (error) {
 
-            console.error(
-                "DESIGNVERSE challenge load error:",
-                error
-            );
-
             throw error;
+        }
+
+
+        if (!data) {
+
+            throw new Error(
+                "Challenge not found."
+            );
         }
 
 
         state.challenge =
             data;
+
+
+        state.challengeStatus =
+            calculateChallengeStatus(
+                data
+            );
 
 
         return data;
@@ -279,8 +285,8 @@ const DVVoting = (() => {
        CHALLENGE STATUS
        ===================================================== */
 
-    function getChallengeStatus(
-        challenge = state.challenge
+    function calculateChallengeStatus(
+        challenge
     ) {
 
         if (!challenge) {
@@ -302,36 +308,70 @@ const DVVoting = (() => {
             Date.now();
 
 
-        const starts =
+        const startsAt =
             parseDate(
                 challenge.starts_at
             );
 
 
-        const ends =
+        const endsAt =
             parseDate(
                 challenge.ends_at
             );
 
 
-        const votingEnds =
+        const votingEndsAt =
             parseDate(
                 challenge.voting_ends_at
             );
 
 
         if (
-            starts !== null &&
-            now < starts
+            startsAt !== null &&
+            now < startsAt
         ) {
 
             return "upcoming";
         }
 
 
+        /*
+         * Once the submission period ends,
+         * voting can be open.
+         */
+
         if (
-            ends !== null &&
-            now < ends
+            votingEndsAt !== null &&
+            now < votingEndsAt
+        ) {
+
+            /*
+             * If the challenge has an explicit
+             * active/voting status, respect it.
+             */
+
+            if (
+                challenge.status ===
+                "voting"
+            ) {
+
+                return "voting";
+            }
+
+
+            if (
+                endsAt !== null &&
+                now >= endsAt
+            ) {
+
+                return "voting";
+            }
+        }
+
+
+        if (
+            endsAt !== null &&
+            now < endsAt
         ) {
 
             return "active";
@@ -339,42 +379,29 @@ const DVVoting = (() => {
 
 
         if (
-            votingEnds !== null &&
-            now < votingEnds
-        ) {
-
-            return "voting";
-        }
-
-
-        if (
-            votingEnds !== null &&
-            now >= votingEnds
+            votingEndsAt !== null &&
+            now >= votingEndsAt
         ) {
 
             return "completed";
         }
 
 
-        /*
-         * Legacy fallback.
-         */
-
         return (
             challenge.status ||
-            "completed"
+            "unknown"
         );
     }
 
 
     /* =====================================================
-       VOTING WINDOW CHECK
+       CAN VOTE
        ===================================================== */
 
-    function canVoteNow() {
+    function canVote() {
 
         return (
-            getChallengeStatus() ===
+            state.challengeStatus ===
             "voting"
         );
     }
@@ -390,120 +417,196 @@ const DVVoting = (() => {
             getSupabase();
 
 
+        if (!supabase) {
+
+            throw new Error(
+                "Supabase is unavailable."
+            );
+        }
+
+
+        const challengeId =
+            state.challenge?.id;
+
+
+        if (!challengeId) {
+
+            throw new Error(
+                "No challenge has been loaded."
+            );
+        }
+
+
+        const {
+            data,
+            error
+        } =
+            await supabase
+                .from("submissions")
+                .select(`
+                    id,
+                    challenge_id,
+                    design_id,
+                    designer_id,
+                    status,
+                    score,
+                    rank,
+                    submitted_at,
+                    updated_at,
+                    design:designs (
+                        id,
+                        title,
+                        description,
+                        category,
+                        image_url,
+                        thumbnail_url,
+                        tags,
+                        views,
+                        likes_count,
+                        votes_count,
+                        is_public
+                    )
+                `)
+                .eq(
+                    "challenge_id",
+                    challengeId
+                )
+                .order(
+                    "submitted_at",
+                    {
+                        ascending:
+                            true
+                    }
+                );
+
+
+        if (error) {
+
+            throw error;
+        }
+
+
+        state.submissions =
+            (
+                data || []
+            )
+            .filter(
+                submission =>
+                    Boolean(
+                        submission.design
+                    )
+            );
+
+
+        await Promise.all([
+
+            loadDesignerProfiles(),
+
+            loadVoteCounts(),
+
+            loadCurrentUserVotes()
+
+        ]);
+
+
+        return state.submissions;
+    }
+
+
+    /* =====================================================
+       LOAD DESIGNER PROFILES
+       ===================================================== */
+
+    async function loadDesignerProfiles() {
+
+        const supabase =
+            getSupabase();
+
+
         if (
             !supabase ||
-            !state.challenge
+            !state.submissions.length
         ) {
 
-            return [];
+            return;
         }
 
 
-        state.loading =
-            true;
-
-
-        try {
-
-            /*
-             * We use submission rows as the source
-             * of challenge entries.
-             *
-             * The nested design relationship assumes
-             * submissions.design_id references designs.id.
-             *
-             * If your RLS policies expose public
-             * submissions/designs, visitors can read
-             * these rows during voting.
-             */
-
-            const {
-                data,
-                error
-            } =
-                await supabase
-                    .from("submissions")
-                    .select(`
-                        id,
-                        challenge_id,
-                        design_id,
-                        designer_id,
-                        status,
-                        score,
-                        rank,
-                        submitted_at,
-                        updated_at,
-                        design:designs (
-                            id,
-                            title,
-                            description,
-                            category,
-                            image_url,
-                            thumbnail_url,
-                            tags,
-                            is_public,
-                            created_at
-                        )
-                    `)
-                    .eq(
-                        "challenge_id",
-                        state.challenge.id
+        const designerIds =
+            [
+                ...new Set(
+                    state.submissions.map(
+                        submission =>
+                            submission.designer_id
                     )
-                    .order(
-                        "submitted_at",
-                        {
-                            ascending:
-                                true
-                        }
-                    );
+                )
+            ]
+            .filter(
+                Boolean
+            );
 
 
-            if (error) {
+        if (
+            !designerIds.length
+        ) {
 
-                console.error(
-                    "DESIGNVERSE submissions load error:",
-                    error
-                );
-
-                throw error;
-            }
-
-
-            state.submissions =
-                (data || []).map(
-                    submission => ({
-
-                        ...submission,
-
-                        voteCount:
-                            0,
-
-                        hasVoted:
-                            false
-
-                    })
-                );
-
-
-            await loadVoteCounts();
-
-
-            if (
-                state.user
-            ) {
-
-                await loadUserVotes();
-            }
-
-
-            return state.submissions;
-
-
-        } finally {
-
-            state.loading =
-                false;
+            return;
         }
+
+
+        const {
+            data,
+            error
+        } =
+            await supabase
+                .from("profiles")
+                .select(`
+                    id,
+                    username,
+                    display_name,
+                    avatar_url
+                `)
+                .in(
+                    "id",
+                    designerIds
+                );
+
+
+        if (error) {
+
+            console.warn(
+                "DESIGNVERSE voting designer profile error:",
+                error
+            );
+
+            return;
+        }
+
+
+        const profiles =
+            new Map(
+                (
+                    data || []
+                )
+                .map(
+                    profile => [
+                        profile.id,
+                        profile
+                    ]
+                )
+            );
+
+
+        state.submissions.forEach(
+            submission => {
+
+                submission.designerProfile =
+                    profiles.get(
+                        submission.designer_id
+                    ) ||
+                    null;
+            }
+        );
     }
 
 
@@ -526,11 +629,6 @@ const DVVoting = (() => {
         }
 
 
-        /*
-         * Fetch all votes for the visible
-         * submissions in this challenge.
-         */
-
         const submissionIds =
             state.submissions.map(
                 submission =>
@@ -544,9 +642,10 @@ const DVVoting = (() => {
         } =
             await supabase
                 .from("votes")
-                .select(
-                    "id, submission_id, voter_id"
-                )
+                .select(`
+                    id,
+                    submission_id
+                `)
                 .in(
                     "submission_id",
                     submissionIds
@@ -555,67 +654,52 @@ const DVVoting = (() => {
 
         if (error) {
 
-            console.warn(
-                "DESIGNVERSE vote count load error:",
-                error
-            );
-
-            /*
-             * Keep the UI usable even when RLS
-             * doesn't expose vote rows.
-             */
-
-            return;
+            throw error;
         }
 
 
-        const counts =
+        const map =
             new Map();
 
 
-        (data || []).forEach(
+        (
+            data || []
+        )
+        .forEach(
             vote => {
 
-                counts.set(
-                    vote.submission_id,
-                    (
-                        counts.get(
-                            vote.submission_id
-                        ) ||
-                        0
-                    ) + 1
-                );
-
-            }
-        );
-
-
-        state.submissions.forEach(
-            submission => {
-
-                submission.voteCount =
-                    counts.get(
-                        submission.id
+                const count =
+                    map.get(
+                        vote.submission_id
                     ) ||
                     0;
 
+
+                map.set(
+                    vote.submission_id,
+                    count + 1
+                );
             }
         );
+
+
+        state.votesBySubmission =
+            map;
     }
 
 
     /* =====================================================
-       LOAD USER VOTES
+       LOAD CURRENT USER VOTES
        ===================================================== */
 
-    async function loadUserVotes() {
+    async function loadCurrentUserVotes() {
 
         const supabase =
             getSupabase();
 
 
         const user =
-            state.user ||
+            state.currentUser ||
             await getCurrentUser();
 
 
@@ -625,6 +709,9 @@ const DVVoting = (() => {
             !state.submissions.length
         ) {
 
+            state.votedSubmissionIds =
+                new Set();
+
             return;
         }
 
@@ -642,9 +729,10 @@ const DVVoting = (() => {
         } =
             await supabase
                 .from("votes")
-                .select(
-                    "submission_id"
-                )
+                .select(`
+                    id,
+                    submission_id
+                `)
                 .eq(
                     "voter_id",
                     user.id
@@ -657,65 +745,105 @@ const DVVoting = (() => {
 
         if (error) {
 
-            console.warn(
-                "DESIGNVERSE user vote load error:",
-                error
-            );
-
-            return;
+            throw error;
         }
 
 
-        state.userVotes =
+        state.votedSubmissionIds =
             new Set(
                 (
                     data || []
-                ).map(
+                )
+                .map(
                     vote =>
                         vote.submission_id
                 )
             );
+    }
 
 
-        state.submissions.forEach(
-            submission => {
+    /* =====================================================
+       HELPERS
+       ===================================================== */
 
-                submission.hasVoted =
-                    state.userVotes.has(
-                        submission.id
-                    );
+    function getSubmission(
+        submissionId
+    ) {
 
-            }
+        return state.submissions.find(
+            submission =>
+                submission.id ===
+                submissionId
+        ) || null;
+    }
+
+
+    function isOwnSubmission(
+        submission
+    ) {
+
+        return Boolean(
+            state.currentUser &&
+            submission &&
+            state.currentUser.id ===
+                submission.designer_id
+        );
+    }
+
+
+    function hasVoted(
+        submissionId
+    ) {
+
+        return state.votedSubmissionIds.has(
+            submissionId
+        );
+    }
+
+
+    function getVoteCount(
+        submissionId
+    ) {
+
+        return Number(
+            state.votesBySubmission.get(
+                submissionId
+            ) ||
+            0
+        );
+    }
+
+
+    function setVoteCount(
+        submissionId,
+        count
+    ) {
+
+        state.votesBySubmission.set(
+            submissionId,
+            Math.max(
+                0,
+                Number(
+                    count
+                ) || 0
+            )
         );
     }
 
 
     /* =====================================================
-       CHECK EXISTING VOTE
+       CAST VOTE
        ===================================================== */
 
-    async function hasVoted(
+    async function voteForSubmission(
         submissionId
     ) {
 
-        const user =
-            state.user ||
-            await getCurrentUser();
-
-
-        if (!user) {
-
-            return false;
-        }
-
-
         if (
-            state.userVotes.has(
-                submissionId
-            )
+            state.voteActionInProgress
         ) {
 
-            return true;
+            return;
         }
 
 
@@ -725,92 +853,50 @@ const DVVoting = (() => {
 
         if (!supabase) {
 
-            return false;
+            throw new Error(
+                "Supabase is unavailable."
+            );
         }
 
 
-        const {
-            data,
-            error
-        } =
-            await supabase
-                .from("votes")
-                .select(
-                    "id"
-                )
-                .eq(
-                    "submission_id",
-                    submissionId
-                )
-                .eq(
-                    "voter_id",
-                    user.id
-                )
-                .maybeSingle();
+        const user =
+            state.currentUser ||
+            await getCurrentUser();
 
 
-        if (error) {
+        if (!user) {
 
-            console.warn(
-                "DESIGNVERSE vote lookup error:",
-                error
-            );
+            redirectToLogin();
 
-            return false;
+            return;
         }
 
 
-        const voted =
-            Boolean(
-                data
+        /*
+         * Recalculate immediately before writing.
+         */
+
+        state.challengeStatus =
+            calculateChallengeStatus(
+                state.challenge
             );
 
 
-        if (
-            voted
-        ) {
+        if (!canVote()) {
 
-            state.userVotes.add(
+            throw new Error(
+                getVotingClosedMessage(
+                    state.challengeStatus
+                )
+            );
+        }
+
+
+        const submission =
+            getSubmission(
                 submissionId
             );
-        }
 
-
-        return voted;
-    }
-
-
-    /* =====================================================
-       SELF-VOTE PROTECTION
-       ===================================================== */
-
-    function isOwnSubmission(
-        submission
-    ) {
-
-        if (
-            !submission ||
-            !state.user
-        ) {
-
-            return false;
-        }
-
-
-        return (
-            submission.designer_id ===
-            state.user.id
-        );
-    }
-
-
-    /* =====================================================
-       VALIDATE VOTE
-       ===================================================== */
-
-    async function validateVote(
-        submission
-    ) {
 
         if (!submission) {
 
@@ -819,80 +905,6 @@ const DVVoting = (() => {
             );
         }
 
-
-        if (!state.challenge) {
-
-            throw new Error(
-                "No challenge selected."
-            );
-        }
-
-
-        const status =
-            getChallengeStatus();
-
-
-        if (
-            status !==
-            "voting"
-        ) {
-
-            if (
-                status ===
-                "active"
-            ) {
-
-                throw new Error(
-                    "Voting has not started yet."
-                );
-            }
-
-
-            if (
-                status ===
-                "completed"
-            ) {
-
-                throw new Error(
-                    "Voting has ended for this challenge."
-                );
-            }
-
-
-            if (
-                status ===
-                "upcoming"
-            ) {
-
-                throw new Error(
-                    "This challenge has not started yet."
-                );
-            }
-
-
-            throw new Error(
-                "Voting is not currently available."
-            );
-        }
-
-
-        const user =
-            state.user ||
-            await getCurrentUser();
-
-
-        if (!user) {
-
-            throw new Error(
-                "Please sign in to vote."
-            );
-        }
-
-
-        /*
-         * Designers cannot vote for their own
-         * challenge submission.
-         */
 
         if (
             isOwnSubmission(
@@ -906,171 +918,168 @@ const DVVoting = (() => {
         }
 
 
-        const alreadyVoted =
-            await hasVoted(
-                submission.id
-            );
-
-
         if (
-            alreadyVoted
+            hasVoted(
+                submissionId
+            )
         ) {
 
             throw new Error(
-                "You have already voted for this submission."
+                "You have already voted for this design."
             );
         }
 
 
-        /*
-         * Verify this submission actually
-         * belongs to the current challenge.
-         */
-
-        if (
-            submission.challenge_id !==
-            state.challenge.id
-        ) {
-
-            throw new Error(
-                "This submission does not belong to the selected challenge."
-            );
-        }
-
-
-        return true;
-    }
-
-
-    /* =====================================================
-       CAST VOTE
-       ===================================================== */
-
-    async function castVote(
-        submission
-    ) {
-
-        const supabase =
-            getSupabase();
-
-
-        if (!supabase) {
-
-            throw new Error(
-                "Supabase is unavailable."
-            );
-        }
-
-
-        const user =
-            state.user ||
-            await getCurrentUser();
-
-
-        if (!user) {
-
-            throw new Error(
-                "Please sign in to vote."
-            );
-        }
-
-
-        await validateVote(
-            submission
-        );
-
-
-        const {
-            data,
-            error
-        } =
-            await supabase
-                .from("votes")
-                .insert({
-
-                    submission_id:
-                        submission.id,
-
-                    voter_id:
-                        user.id
-
-                })
-                .select(`
-                    id,
-                    submission_id,
-                    voter_id,
-                    created_at
-                `)
-                .single();
-
-
-        if (error) {
-
-            console.error(
-                "DESIGNVERSE vote insert error:",
-                error
-            );
-
-
-            const message =
-                String(
-                    error.message ||
-                    ""
-                ).toLowerCase();
-
-
-            if (
-                message.includes(
-                    "duplicate"
-                ) ||
-                message.includes(
-                    "unique"
-                )
-            ) {
-
-                throw new Error(
-                    "You have already voted for this submission."
-                );
-            }
-
-
-            if (
-                message.includes(
-                    "row-level security"
-                )
-            ) {
-
-                throw new Error(
-                    "DESIGNVERSE blocked this vote because your account doesn't have permission."
-                );
-            }
-
-
-            throw error;
-        }
-
-
-        /*
-         * Update local state.
-         */
-
-        state.userVotes.add(
-            submission.id
-        );
-
-
-        submission.hasVoted =
+        state.voteActionInProgress =
             true;
 
 
-        submission.voteCount =
-            Number(
-                submission.voteCount ||
-                0
-            ) + 1;
+        const previousCount =
+            getVoteCount(
+                submissionId
+            );
 
 
-        return data;
+        try {
+
+            /*
+             * Optimistic state.
+             */
+
+            state.votedSubmissionIds.add(
+                submissionId
+            );
+
+
+            setVoteCount(
+                submissionId,
+                previousCount + 1
+            );
+
+
+            renderVotingGrid();
+
+            renderVotingStats();
+
+
+            const {
+                data,
+                error
+            } =
+                await supabase
+                    .from("votes")
+                    .insert({
+
+                        submission_id:
+                            submissionId,
+
+                        voter_id:
+                            user.id
+
+                    })
+                    .select(`
+                        id,
+                        submission_id,
+                        voter_id,
+                        created_at
+                    `)
+                    .single();
+
+
+            if (error) {
+
+                /*
+                 * Roll back optimistic state.
+                 */
+
+                state.votedSubmissionIds.delete(
+                    submissionId
+                );
+
+
+                setVoteCount(
+                    submissionId,
+                    previousCount
+                );
+
+
+                renderVotingGrid();
+
+                renderVotingStats();
+
+
+                const message =
+                    String(
+                        error.message ||
+                        ""
+                    ).toLowerCase();
+
+
+                if (
+                    message.includes(
+                        "duplicate"
+                    ) ||
+                    message.includes(
+                        "unique"
+                    )
+                ) {
+
+                    /*
+                     * Refresh current state because
+                     * another request may have won the
+                     * race.
+                     */
+
+                    await loadCurrentUserVotes();
+
+                    await loadVoteCounts();
+
+                    renderVotingGrid();
+
+                    renderVotingStats();
+
+
+                    throw new Error(
+                        "You have already voted for this design."
+                    );
+                }
+
+
+                if (
+                    message.includes(
+                        "row-level security"
+                    )
+                ) {
+
+                    throw new Error(
+                        "Supabase blocked this vote."
+                    );
+                }
+
+
+                throw error;
+            }
+
+
+            /*
+             * The INSERT succeeded.
+             *
+             * Keep optimistic state.
+             */
+
+            showVotingToast(
+                "Vote submitted successfully.",
+                "success"
+            );
+
+
+            return data;
+
+        } finally {
+
+            state.voteActionInProgress =
+                false;
+        }
     }
 
 
@@ -1079,8 +1088,16 @@ const DVVoting = (() => {
        ===================================================== */
 
     async function removeVote(
-        submission
+        submissionId
     ) {
+
+        if (
+            state.voteActionInProgress
+        ) {
+
+            return;
+        }
+
 
         const supabase =
             getSupabase();
@@ -1095,352 +1112,484 @@ const DVVoting = (() => {
 
 
         const user =
-            state.user ||
+            state.currentUser ||
             await getCurrentUser();
 
 
         if (!user) {
 
-            throw new Error(
-                "Please sign in."
-            );
-        }
-
-
-        if (!submission) {
-
-            throw new Error(
-                "Submission not found."
-            );
-        }
-
-
-        /*
-         * Only allow removal during the voting
-         * period. Once voting is over, votes
-         * become immutable.
-         */
-
-        if (
-            getChallengeStatus() !==
-            "voting"
-        ) {
-
-            throw new Error(
-                "Votes can only be changed during the voting period."
-            );
-        }
-
-
-        const {
-            error
-        } =
-            await supabase
-                .from("votes")
-                .delete()
-                .eq(
-                    "submission_id",
-                    submission.id
-                )
-                .eq(
-                    "voter_id",
-                    user.id
-                );
-
-
-        if (error) {
-
-            console.error(
-                "DESIGNVERSE vote removal error:",
-                error
-            );
-
-            throw error;
-        }
-
-
-        state.userVotes.delete(
-            submission.id
-        );
-
-
-        submission.hasVoted =
-            false;
-
-
-        submission.voteCount =
-            Math.max(
-                0,
-                Number(
-                    submission.voteCount ||
-                    0
-                ) - 1
-            );
-
-
-        return true;
-    }
-
-
-    /* =====================================================
-       TOGGLE VOTE
-       ===================================================== */
-
-    async function toggleVote(
-        submission
-    ) {
-
-        const voted =
-            await hasVoted(
-                submission.id
-            );
-
-
-        if (
-            voted
-        ) {
-
-            return removeVote(
-                submission
-            );
-        }
-
-
-        return castVote(
-            submission
-        );
-    }
-
-
-    /* =====================================================
-       SORT SUBMISSIONS
-       ===================================================== */
-
-    function sortSubmissions(
-        mode = "votes"
-    ) {
-
-        const list =
-            [
-                ...state.submissions
-            ];
-
-
-        switch (
-            mode
-        ) {
-
-            case "newest":
-
-                list.sort(
-                    (
-                        a,
-                        b
-                    ) =>
-                        new Date(
-                            b.submitted_at
-                        ) -
-                        new Date(
-                            a.submitted_at
-                        )
-                );
-
-                break;
-
-
-            case "oldest":
-
-                list.sort(
-                    (
-                        a,
-                        b
-                    ) =>
-                        new Date(
-                            a.submitted_at
-                        ) -
-                        new Date(
-                            b.submitted_at
-                        )
-                );
-
-                break;
-
-
-            case "votes":
-
-                list.sort(
-                    (
-                        a,
-                        b
-                    ) =>
-                        Number(
-                            b.voteCount ||
-                            0
-                        ) -
-                        Number(
-                            a.voteCount ||
-                            0
-                        )
-                );
-
-                break;
-
-
-            default:
-
-                break;
-        }
-
-
-        return list;
-    }
-
-
-    /* =====================================================
-       RENDER SUBMISSIONS
-       ===================================================== */
-
-    function renderSubmissions(
-        options = {}
-    ) {
-
-        const container =
-            options.container ||
-            $("#votingSubmissionGrid");
-
-
-        if (!container) {
+            redirectToLogin();
 
             return;
         }
 
 
-        const sort =
-            options.sort ||
-            "votes";
+        if (
+            !hasVoted(
+                submissionId
+            )
+        ) {
+
+            return;
+        }
 
 
-        const list =
-            sortSubmissions(
-                sort
+        state.voteActionInProgress =
+            true;
+
+
+        const previousCount =
+            getVoteCount(
+                submissionId
             );
 
 
-        container.innerHTML =
+        try {
+
+            state.votedSubmissionIds.delete(
+                submissionId
+            );
+
+
+            setVoteCount(
+                submissionId,
+                previousCount - 1
+            );
+
+
+            renderVotingGrid();
+
+            renderVotingStats();
+
+
+            const {
+                error
+            } =
+                await supabase
+                    .from("votes")
+                    .delete()
+                    .eq(
+                        "submission_id",
+                        submissionId
+                    )
+                    .eq(
+                        "voter_id",
+                        user.id
+                    );
+
+
+            if (error) {
+
+                /*
+                 * Roll back.
+                 */
+
+                state.votedSubmissionIds.add(
+                    submissionId
+                );
+
+
+                setVoteCount(
+                    submissionId,
+                    previousCount
+                );
+
+
+                renderVotingGrid();
+
+                renderVotingStats();
+
+
+                const message =
+                    String(
+                        error.message ||
+                        ""
+                    ).toLowerCase();
+
+
+                if (
+                    message.includes(
+                        "row-level security"
+                    )
+                ) {
+
+                    throw new Error(
+                        "Supabase blocked removing your vote."
+                    );
+                }
+
+
+                throw error;
+            }
+
+
+            showVotingToast(
+                "Your vote was removed.",
+                "success"
+            );
+
+
+            return true;
+
+        } finally {
+
+            state.voteActionInProgress =
+                false;
+        }
+    }
+
+
+    /* =====================================================
+       RENDER
+       ===================================================== */
+
+    function renderPage() {
+
+        renderChallengeHeader();
+
+        renderVotingStatus();
+
+        renderVotingStats();
+
+        renderVotingGrid();
+    }
+
+
+    /* =====================================================
+       CHALLENGE HEADER
+       ===================================================== */
+
+    function renderChallengeHeader() {
+
+        const challenge =
+            state.challenge;
+
+
+        if (!challenge) {
+
+            return;
+        }
+
+
+        document.title =
+            `Vote — ${challenge.title} — DESIGNVERSE`;
+
+
+        setText(
+            "#votingChallengeTitle",
+            challenge.title
+        );
+
+
+        setText(
+            "#votingChallengeDescription",
+            challenge.description ||
+            "Review the submissions and vote for your favorite design."
+        );
+
+
+        setText(
+            "#votingCategory",
+            formatCategory(
+                challenge.category
+            )
+        );
+
+
+        setText(
+            "#votingPrize",
+            challenge.prize ||
+            "No prize listed"
+        );
+
+
+        setText(
+            "#votingPoints",
+            `${formatNumber(
+                challenge.points
+            )} XP`
+        );
+
+
+        setText(
+            "#votingBreadcrumbTitle",
+            challenge.title
+        );
+    }
+
+
+    /* =====================================================
+       STATUS
+       ===================================================== */
+
+    function renderVotingStatus() {
+
+        const status =
+            state.challengeStatus;
+
+
+        const statusElement =
+            $("#votingStatus");
+
+
+        if (
+            statusElement
+        ) {
+
+            statusElement.className =
+                `voting-status ${status}`;
+
+
+            statusElement.textContent =
+                formatStatus(
+                    status
+                );
+        }
+
+
+        const message =
+            $("#votingStatusMessage");
+
+
+        if (!message) {
+
+            return;
+        }
+
+
+        if (
+            status ===
+            "voting"
+        ) {
+
+            if (
+                state.currentUser
+            ) {
+
+                message.textContent =
+                    "Choose the design you think deserves your vote.";
+
+            } else {
+
+                message.textContent =
+                    "Sign in to vote for your favorite design.";
+            }
+
+
+            return;
+        }
+
+
+        if (
+            status ===
+            "completed"
+        ) {
+
+            message.textContent =
+                "Voting has ended. Final results are available.";
+
+            return;
+        }
+
+
+        if (
+            status ===
+            "active"
+        ) {
+
+            message.textContent =
+                "Submissions are open. Voting will begin when the submission period ends.";
+
+            return;
+        }
+
+
+        if (
+            status ===
+            "upcoming"
+        ) {
+
+            message.textContent =
+                "This challenge has not started yet.";
+
+            return;
+        }
+
+
+        if (
+            status ===
+            "cancelled"
+        ) {
+
+            message.textContent =
+                "This challenge has been cancelled.";
+
+            return;
+        }
+
+
+        message.textContent =
+            "Voting is currently unavailable.";
+    }
+
+
+    /* =====================================================
+       STATS
+       ===================================================== */
+
+    function renderVotingStats() {
+
+        const totalEntries =
+            state.submissions.length;
+
+
+        const totalVotes =
+            [
+                ...state.votesBySubmission.values()
+            ]
+            .reduce(
+                (
+                    total,
+                    count
+                ) =>
+                    total +
+                    Number(
+                        count
+                    ),
+                0
+            );
+
+
+        const myVotes =
+            state.votedSubmissionIds.size;
+
+
+        setText(
+            "#votingSubmissionCount",
+            formatNumber(
+                totalEntries
+            )
+        );
+
+
+        setText(
+            "#votingTotalVotes",
+            formatNumber(
+                totalVotes
+            )
+        );
+
+
+        setText(
+            "#votingMyVotes",
+            formatNumber(
+                myVotes
+            )
+        );
+    }
+
+
+    /* =====================================================
+       GRID
+       ===================================================== */
+
+    function renderVotingGrid() {
+
+        const grid =
+            $("#votingGrid");
+
+
+        if (!grid) {
+
+            return;
+        }
+
+
+        grid.innerHTML =
             "";
 
 
         if (
-            !list.length
+            !state.submissions.length
         ) {
 
-            container.innerHTML = `
-
-                <div
-                    class="voting-empty"
-                    style="
-                        grid-column:1/-1;
-                        padding:50px 20px;
-                        text-align:center;
-                    "
-                >
-
-                    <i
-                        class="fa-solid fa-images"
-                        style="
-                            font-size:28px;
-                            color:#c4b5fd;
-                            margin-bottom:12px;
-                        "
-                    ></i>
-
-
-                    <h3>
-                        No submissions yet
-                    </h3>
-
-
-                    <p>
-                        Challenge entries will appear here
-                        once designers submit their work.
-                    </p>
-
-                </div>
-
-            `;
+            renderEmptyState(
+                grid
+            );
 
 
             return;
         }
 
 
-        list.forEach(
-            submission => {
+        state.submissions
+            .forEach(
+                (
+                    submission,
+                    index
+                ) => {
 
-                container.appendChild(
-                    createSubmissionCard(
-                        submission,
-                        options
-                    )
-                );
+                    grid.appendChild(
+                        createVotingCard(
+                            submission,
+                            index
+                        )
+                    );
 
-            }
-        );
+                }
+            );
     }
 
 
     /* =====================================================
-       SUBMISSION CARD
+       CARD
        ===================================================== */
 
-    function createSubmissionCard(
+    function createVotingCard(
         submission,
-        options = {}
+        index
     ) {
 
-        const article =
+        const card =
             document.createElement(
                 "article"
             );
 
 
-        article.className =
-            "voting-submission-card";
+        card.className =
+            "voting-card";
 
 
-        article.dataset.submissionId =
+        card.dataset.submissionId =
             submission.id;
 
 
         const design =
-            submission.design;
+            submission.design ||
+            {};
+
+
+        const profile =
+            submission.designerProfile ||
+            {};
 
 
         const image =
-            design?.image_url
-                ? `
-                    <img
-                        src="${escapeAttribute(
-                            design.image_url
-                        )}"
-                        alt="${escapeAttribute(
-                            design.title ||
-                            "Design submission"
-                        )}"
-                        loading="lazy"
-                    >
-                `
-                : `
-                    <div
-                        class="voting-image-placeholder"
-                    >
+            design.image_url ||
+            design.thumbnail_url ||
+            "";
 
-                        <i
-                            class="fa-solid fa-palette"
-                        ></i>
 
-                    </div>
-                `;
+        const voteCount =
+            getVoteCount(
+                submission.id
+            );
+
+
+        const voted =
+            hasVoted(
+                submission.id
+            );
 
 
         const ownSubmission =
@@ -1449,54 +1598,34 @@ const DVVoting = (() => {
             );
 
 
-        const voted =
-            submission.hasVoted;
+        const designerName =
+            profile.display_name ||
+            profile.username ||
+            "Designer";
 
 
-        const status =
-            getChallengeStatus();
+        const designerUsername =
+            profile.username
+                ? `@${profile.username}`
+                : "";
 
 
-        const canVote =
-            status === "voting" &&
-            Boolean(state.user) &&
-            !ownSubmission;
+        let actionHTML;
 
 
-        let voteButton;
-
+        /*
+         * Completed / inactive state.
+         */
 
         if (
-            ownSubmission
+            !canVote()
         ) {
 
-            voteButton = `
+            actionHTML = `
 
                 <button
                     type="button"
-                    class="btn btn-secondary btn-small"
-                    disabled
-                >
-
-                    <i
-                        class="fa-solid fa-user"
-                    ></i>
-
-                    Your Submission
-
-                </button>
-
-            `;
-
-        } else if (
-            status !== "voting"
-        ) {
-
-            voteButton = `
-
-                <button
-                    type="button"
-                    class="btn btn-secondary btn-small"
+                    class="voting-action own"
                     disabled
                 >
 
@@ -1505,10 +1634,55 @@ const DVVoting = (() => {
                     ></i>
 
                     ${
-                        status === "active"
-                            ? "Voting Soon"
-                            : "Voting Closed"
+                        state.challengeStatus ===
+                        "completed"
+                            ? "Voting Closed"
+                            : "Voting Unavailable"
                     }
+
+                </button>
+
+            `;
+
+        } else if (
+            ownSubmission
+        ) {
+
+            actionHTML = `
+
+                <button
+                    type="button"
+                    class="voting-action own"
+                    disabled
+                >
+
+                    <i
+                        class="fa-solid fa-user"
+                    ></i>
+
+                    Your Design
+
+                </button>
+
+            `;
+
+        } else if (
+            !state.currentUser
+        ) {
+
+            actionHTML = `
+
+                <button
+                    type="button"
+                    class="voting-action vote"
+                    data-vote-login
+                >
+
+                    <i
+                        class="fa-solid fa-right-to-bracket"
+                    ></i>
+
+                    Sign in to Vote
 
                 </button>
 
@@ -1518,41 +1692,19 @@ const DVVoting = (() => {
             voted
         ) {
 
-            voteButton = `
+            actionHTML = `
 
                 <button
                     type="button"
-                    class="btn btn-primary btn-small"
-                    data-vote-button
+                    class="voting-action voted"
+                    data-vote-action="remove"
                 >
 
                     <i
-                        class="fa-solid fa-heart"
+                        class="fa-solid fa-check"
                     ></i>
 
-                    Voted
-
-                </button>
-
-            `;
-
-        } else if (
-            canVote
-        ) {
-
-            voteButton = `
-
-                <button
-                    type="button"
-                    class="btn btn-secondary btn-small"
-                    data-vote-button
-                >
-
-                    <i
-                        class="fa-regular fa-heart"
-                    ></i>
-
-                    Vote
+                    Voted · Remove
 
                 </button>
 
@@ -1560,15 +1712,19 @@ const DVVoting = (() => {
 
         } else {
 
-            voteButton = `
+            actionHTML = `
 
                 <button
                     type="button"
-                    class="btn btn-secondary btn-small"
-                    disabled
+                    class="voting-action vote"
+                    data-vote-action="add"
                 >
 
-                    Sign in to vote
+                    <i
+                        class="fa-solid fa-heart"
+                    ></i>
+
+                    Vote for this design
 
                 </button>
 
@@ -1576,139 +1732,208 @@ const DVVoting = (() => {
         }
 
 
-        article.innerHTML = `
+        card.innerHTML = `
 
             <div
-                class="voting-submission-image"
+                class="voting-card-image"
             >
 
-                ${image}
+                ${
+                    image
+                        ? `
+                            <img
+                                src="${escapeAttribute(
+                                    image
+                                )}"
+                                alt="${escapeAttribute(
+                                    design.title ||
+                                    "Submitted design"
+                                )}"
+                                loading="lazy"
+                            >
+                          `
+                        : `
+                            <div
+                                class="voting-image-placeholder"
+                            >
+
+                                <i
+                                    class="fa-solid fa-palette"
+                                ></i>
+
+                            </div>
+                          `
+                }
+
+
+                <div
+                    class="voting-entry-number"
+                >
+
+                    ENTRY #${formatNumber(
+                        index + 1
+                    )}
+
+                </div>
+
+
+                ${
+                    ownSubmission
+                        ? `
+                            <div
+                                class="voting-own-badge"
+                            >
+
+                                <i
+                                    class="fa-solid fa-user"
+                                ></i>
+
+                                YOUR ENTRY
+
+                            </div>
+                          `
+                        : ""
+                }
 
             </div>
 
 
             <div
-                class="voting-submission-body"
+                class="voting-card-body"
             >
 
                 <div
-                    class="voting-submission-top"
-                    style="
-                        display:flex;
-                        justify-content:space-between;
-                        gap:10px;
-                        align-items:flex-start;
-                    "
+                    class="voting-category"
                 >
 
-                    <div>
+                    <i
+                        class="fa-solid fa-palette"
+                    ></i>
 
-                        <h3
-                            style="
-                                margin:0 0 4px;
-                                color:white;
-                                font-size:13px;
-                            "
+                    ${escapeHTML(
+                        formatCategory(
+                            design.category
+                        )
+                    )}
+
+                </div>
+
+
+                <h2
+                    class="voting-design-title"
+                >
+
+                    ${escapeHTML(
+                        design.title ||
+                        "Untitled Design"
+                    )}
+
+                </h2>
+
+
+                ${
+                    design.description
+                        ? `
+                            <p
+                                class="voting-description"
+                            >
+
+                                ${escapeHTML(
+                                    design.description
+                                )}
+
+                            </p>
+                          `
+                        : ""
+                }
+
+
+                <div
+                    class="voting-designer"
+                >
+
+                    <div
+                        class="voting-designer-avatar"
+                    >
+
+                        ${
+                            profile.avatar_url
+                                ? `
+                                    <img
+                                        src="${escapeAttribute(
+                                            profile.avatar_url
+                                        )}"
+                                        alt="${escapeAttribute(
+                                            designerName
+                                        )}"
+                                        loading="lazy"
+                                    >
+                                  `
+                                : `
+                                    <i
+                                        class="fa-solid fa-user"
+                                    ></i>
+                                  `
+                        }
+
+                    </div>
+
+
+                    <div
+                        class="voting-designer-info"
+                    >
+
+                        <strong>
+                            ${escapeHTML(
+                                designerName
+                            )}
+                        </strong>
+
+
+                        <span>
+                            ${escapeHTML(
+                                designerUsername
+                            )}
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="voting-card-footer"
+                >
+
+                    <div
+                        class="voting-count"
+                    >
+
+                        <strong
+                            data-vote-count
                         >
 
-                            ${escapeHTML(
-                                design?.title ||
-                                "Untitled Design"
+                            ${formatNumber(
+                                voteCount
                             )}
 
-                        </h3>
+                        </strong>
 
 
-                        <span
-                            style="
-                                color:#a1a1aa;
-                                font-size:8px;
-                            "
-                        >
+                        <span>
 
-                            ${escapeHTML(
-                                formatCategory(
-                                    design?.category
-                                )
-                            )}
+                            ${
+                                voteCount === 1
+                                    ? "vote"
+                                    : "votes"
+                            }
 
                         </span>
 
                     </div>
 
 
-                    <span
-                        class="voting-count"
-                        style="
-                            display:inline-flex;
-                            align-items:center;
-                            gap:5px;
-                            color:#c4b5fd;
-                            font-size:9px;
-                            font-weight:700;
-                            white-space:nowrap;
-                        "
-                    >
-
-                        <i
-                            class="fa-solid fa-heart"
-                        ></i>
-
-                        <span data-vote-count>
-                            ${formatNumber(
-                                submission.voteCount
-                            )}
-                        </span>
-
-                    </span>
-
-                </div>
-
-
-                <p
-                    style="
-                        margin:10px 0 12px;
-                        color:#a1a1aa;
-                        font-size:8px;
-                        line-height:1.55;
-                    "
-                >
-
-                    ${escapeHTML(
-                        design?.description ||
-                        "No description provided."
-                    )}
-
-                </p>
-
-
-                <div
-                    style="
-                        display:flex;
-                        justify-content:space-between;
-                        align-items:center;
-                        gap:8px;
-                    "
-                >
-
-                    <span
-                        style="
-                            color:#71717a;
-                            font-size:7px;
-                        "
-                    >
-
-                        Entry #${escapeHTML(
-                            submission.id
-                        ).slice(
-                            0,
-                            8
-                        )}
-
-                    </span>
-
-
-                    ${voteButton}
+                    ${actionHTML}
 
                 </div>
 
@@ -1717,340 +1942,377 @@ const DVVoting = (() => {
         `;
 
 
-        const voteButtonElement =
-            article.querySelector(
-                "[data-vote-button]"
-            );
+        /*
+         * Add vote.
+         */
 
-
-        voteButtonElement?.addEventListener(
+        card.querySelector(
+            '[data-vote-action="add"]'
+        )
+        ?.addEventListener(
             "click",
-            async () => {
+            async event => {
 
-                await handleVoteButton(
-                    submission,
-                    voteButtonElement,
-                    article
-                );
+                event.stopPropagation();
+
+
+                try {
+
+                    await voteForSubmission(
+                        submission.id
+                    );
+
+                } catch (error) {
+
+                    showVotingToast(
+                        getVotingErrorMessage(
+                            error
+                        ),
+                        "error"
+                    );
+                }
 
             }
         );
 
 
-        return article;
+        /*
+         * Remove vote.
+         */
+
+        card.querySelector(
+            '[data-vote-action="remove"]'
+        )
+        ?.addEventListener(
+            "click",
+            async event => {
+
+                event.stopPropagation();
+
+
+                try {
+
+                    await removeVote(
+                        submission.id
+                    );
+
+                } catch (error) {
+
+                    showVotingToast(
+                        getVotingErrorMessage(
+                            error
+                        ),
+                        "error"
+                    );
+                }
+
+            }
+        );
+
+
+        /*
+         * Logged-out user.
+         */
+
+        card.querySelector(
+            "[data-vote-login]"
+        )
+        ?.addEventListener(
+            "click",
+            () => {
+
+                redirectToLogin();
+
+            }
+        );
+
+
+        return card;
     }
 
 
     /* =====================================================
-       HANDLE VOTE BUTTON
+       EMPTY STATE
        ===================================================== */
 
-    async function handleVoteButton(
-        submission,
-        button,
-        article
+    function renderEmptyState(
+        container
     ) {
 
-        if (
-            state.voting
-        ) {
+        container.innerHTML = `
 
-            return;
-        }
+            <div
+                style="
+                    grid-column:1/-1;
+                    min-height:300px;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    flex-direction:column;
+                    padding:40px;
+                    border:1px dashed rgba(255,255,255,.10);
+                    border-radius:18px;
+                    text-align:center;
+                "
+            >
 
+                <i
+                    class="fa-solid fa-images"
+                    style="
+                        margin-bottom:13px;
+                        color:#c4b5fd;
+                        font-size:27px;
+                    "
+                ></i>
+
+
+                <h2
+                    style="
+                        margin:0 0 6px;
+                        color:white;
+                        font-size:20px;
+                    "
+                >
+
+                    No submissions yet
+
+                </h2>
+
+
+                <p
+                    style="
+                        max-width:420px;
+                        margin:0;
+                        color:#71717a;
+                        font-size:9px;
+                        line-height:1.6;
+                    "
+                >
+
+                    There are no submissions available
+                    for this challenge yet.
+
+                </p>
+
+            </div>
+
+        `;
+    }
+
+
+    /* =====================================================
+       LOGIN
+       ===================================================== */
+
+    function redirectToLogin() {
 
         try {
 
-            state.voting =
-                true;
-
-
-            button.disabled =
-                true;
-
-
-            button.innerHTML = `
-
-                <i
-                    class="fa-solid fa-spinner fa-spin"
-                ></i>
-
-                Voting...
-
-            `;
-
-
-            const hadVoted =
-                await hasVoted(
-                    submission.id
-                );
-
-
-            if (
-                hadVoted
-            ) {
-
-                await removeVote(
-                    submission
-                );
-
-                showToast(
-                    "Your vote was removed.",
-                    "info"
-                );
-
-            } else {
-
-                await castVote(
-                    submission
-                );
-
-                showToast(
-                    "Vote recorded! 🗳️",
-                    "success"
-                );
-            }
-
-
-            /*
-             * Update the card without a full
-             * page reload.
-             */
-
-            refreshSubmissionCard(
-                submission,
-                article
+            sessionStorage.setItem(
+                "designverse_redirect",
+                window.location.href
             );
 
-
-        } catch (error) {
-
-            console.error(
-                "DESIGNVERSE voting error:",
-                error
-            );
-
-
-            showToast(
-                getVotingErrorMessage(
-                    error
-                ),
-                "error"
-            );
-
-
-            refreshSubmissionCard(
-                submission,
-                article
-            );
-
-
-        } finally {
-
-            state.voting =
-                false;
+        } catch {
+            /* Ignore storage errors. */
         }
+
+
+        window.location.href =
+            "auth/login.html";
     }
 
 
     /* =====================================================
-       REFRESH CARD
+       REALTIME
        ===================================================== */
 
-    function refreshSubmissionCard(
-        submission,
-        article
-    ) {
+    function subscribeToVotes() {
 
-        const count =
-            article.querySelector(
-                "[data-vote-count]"
-            );
+        const supabase =
+            getSupabase();
 
 
-        if (count) {
+        if (
+            !supabase ||
+            !state.challenge
+        ) {
 
-            count.textContent =
-                formatNumber(
-                    submission.voteCount
-                );
+            return null;
         }
 
 
-        const button =
-            article.querySelector(
-                "[data-vote-button]"
-            );
+        if (
+            state.realtimeChannel
+        ) {
+
+            return state.realtimeChannel;
+        }
 
 
-        if (!button) {
+        /*
+         * Subscribe to all votes.
+         * We filter in the browser because the realtime
+         * filter cannot conveniently contain a dynamic
+         * list of submission IDs.
+         */
+
+        const channel =
+            supabase
+                .channel(
+                    `voting:${state.challenge.id}`
+                )
+                .on(
+                    "postgres_changes",
+                    {
+                        event:
+                            "INSERT",
+
+                        schema:
+                            "public",
+
+                        table:
+                            "votes"
+                    },
+                    payload => {
+
+                        handleRealtimeVoteInsert(
+                            payload
+                        );
+                    }
+                )
+                .on(
+                    "postgres_changes",
+                    {
+                        event:
+                            "DELETE",
+
+                        schema:
+                            "public",
+
+                        table:
+                            "votes"
+                    },
+                    payload => {
+
+                        handleRealtimeVoteDelete(
+                            payload
+                        );
+                    }
+                )
+                .subscribe();
+
+
+        state.realtimeChannel =
+            channel;
+
+
+        return channel;
+    }
+
+
+    function handleRealtimeVoteInsert(
+        payload
+    ) {
+
+        const vote =
+            payload?.new;
+
+
+        if (!vote) {
+
             return;
         }
 
 
-        button.disabled =
-            false;
-
-
-        if (
-            submission.hasVoted
-        ) {
-
-            button.className =
-                "btn btn-primary btn-small";
-
-
-            button.innerHTML = `
-
-                <i
-                    class="fa-solid fa-heart"
-                ></i>
-
-                Voted
-
-            `;
-
-        } else {
-
-            button.className =
-                "btn btn-secondary btn-small";
-
-
-            button.innerHTML = `
-
-                <i
-                    class="fa-regular fa-heart"
-                ></i>
-
-                Vote
-
-            `;
-        }
-    }
-
-
-    /* =====================================================
-       SEARCH
-       ===================================================== */
-
-    function searchSubmissions(
-        query
-    ) {
-
-        const text =
-            String(
-                query || ""
-            )
-            .trim()
-            .toLowerCase();
-
-
-        const cards =
-            document.querySelectorAll(
-                ".voting-submission-card"
+        const submission =
+            getSubmission(
+                vote.submission_id
             );
 
 
-        cards.forEach(
-            card => {
+        if (!submission) {
 
-                const title =
-                    card.textContent
-                        .toLowerCase();
+            return;
+        }
 
 
-                card.style.display =
-                    !text ||
-                    title.includes(
-                        text
-                    )
-                        ? ""
-                        : "none";
+        /*
+         * If this is our own vote, we've already
+         * updated the count optimistically.
+         */
 
-            }
+        if (
+            state.currentUser &&
+            vote.voter_id ===
+                state.currentUser.id
+        ) {
+
+            return;
+        }
+
+
+        setVoteCount(
+            vote.submission_id,
+            getVoteCount(
+                vote.submission_id
+            ) + 1
         );
+
+
+        renderVotingGrid();
+
+        renderVotingStats();
     }
 
 
-    /* =====================================================
-       ERROR HANDLING
-       ===================================================== */
-
-    function getVotingErrorMessage(
-        error
+    function handleRealtimeVoteDelete(
+        payload
     ) {
 
-        if (!error) {
+        const vote =
+            payload?.old;
 
-            return (
-                "Unable to complete the vote."
-            );
+
+        if (!vote) {
+
+            return;
         }
 
 
-        const message =
-            String(
-                error.message ||
-                error
+        const submission =
+            getSubmission(
+                vote.submission_id
             );
 
 
-        const lower =
-            message.toLowerCase();
+        if (!submission) {
 
-
-        if (
-            lower.includes(
-                "duplicate"
-            ) ||
-            lower.includes(
-                "unique"
-            )
-        ) {
-
-            return (
-                "You have already voted for this submission."
-            );
+            return;
         }
 
 
         if (
-            lower.includes(
-                "row-level security"
-            )
+            state.currentUser &&
+            vote.voter_id ===
+                state.currentUser.id
         ) {
 
-            return (
-                "DESIGNVERSE blocked the vote because your account doesn't have permission."
-            );
+            return;
         }
 
 
-        if (
-            lower.includes(
-                "foreign key"
-            )
-        ) {
-
-            return (
-                "The submission or voter account could not be found."
-            );
-        }
+        setVoteCount(
+            vote.submission_id,
+            getVoteCount(
+                vote.submission_id
+            ) - 1
+        );
 
 
-        if (
-            lower.includes(
-                "not authenticated"
-            )
-        ) {
+        renderVotingGrid();
 
-            return (
-                "Please sign in to vote."
-            );
-        }
-
-
-        return message;
+        renderVotingStats();
     }
 
 
@@ -2058,7 +2320,7 @@ const DVVoting = (() => {
        TOAST
        ===================================================== */
 
-    function showToast(
+    function showVotingToast(
         message,
         type = "info"
     ) {
@@ -2085,7 +2347,7 @@ const DVVoting = (() => {
                 position:fixed;
                 right:18px;
                 bottom:18px;
-                z-index:5000;
+                z-index:10000;
                 display:flex;
                 flex-direction:column;
                 gap:8px;
@@ -2116,7 +2378,7 @@ const DVVoting = (() => {
                     : "fa-info-circle";
 
 
-        const color =
+        const iconColor =
             type === "success"
                 ? "#86efac"
                 : type === "error"
@@ -2127,10 +2389,10 @@ const DVVoting = (() => {
         toast.style.cssText = `
             display:flex;
             align-items:center;
-            gap:10px;
-            padding:13px 14px;
+            gap:9px;
+            padding:12px 14px;
             border:1px solid rgba(255,255,255,.10);
-            border-radius:13px;
+            border-radius:12px;
             background:rgba(10,10,16,.96);
             color:white;
             box-shadow:0 20px 50px rgba(0,0,0,.35);
@@ -2143,9 +2405,7 @@ const DVVoting = (() => {
 
             <i
                 class="fa-solid ${icon}"
-                style="
-                    color:${color};
-                "
+                style="color:${iconColor};"
             ></i>
 
             <span>
@@ -2168,14 +2428,164 @@ const DVVoting = (() => {
                 toast.remove();
 
             },
-            4000
+            3500
         );
+    }
+
+
+    /* =====================================================
+       ERROR MESSAGES
+       ===================================================== */
+
+    function getVotingClosedMessage(
+        status
+    ) {
+
+        const messages = {
+
+            upcoming:
+                "This challenge hasn't started yet.",
+
+            active:
+                "Voting hasn't opened yet.",
+
+            completed:
+                "Voting has ended for this challenge.",
+
+            cancelled:
+                "This challenge has been cancelled.",
+
+            unknown:
+                "Voting is currently unavailable."
+
+        };
+
+
+        return (
+            messages[status] ||
+            messages.unknown
+        );
+    }
+
+
+    function getVotingErrorMessage(
+        error
+    ) {
+
+        if (!error) {
+
+            return (
+                "Unable to submit your vote."
+            );
+        }
+
+
+        const message =
+            String(
+                error.message ||
+                error
+            );
+
+
+        const lower =
+            message.toLowerCase();
+
+
+        if (
+            lower.includes(
+                "already voted"
+            ) ||
+            lower.includes(
+                "duplicate"
+            ) ||
+            lower.includes(
+                "unique"
+            )
+        ) {
+
+            return (
+                "You have already voted for this design."
+            );
+        }
+
+
+        if (
+            lower.includes(
+                "own submission"
+            ) ||
+            lower.includes(
+                "your own"
+            )
+        ) {
+
+            return (
+                "You cannot vote for your own submission."
+            );
+        }
+
+
+        if (
+            lower.includes(
+                "row-level security"
+            )
+        ) {
+
+            return (
+                "Supabase blocked this vote."
+            );
+        }
+
+
+        if (
+            lower.includes(
+                "foreign key"
+            )
+        ) {
+
+            return (
+                "This submission is no longer available."
+            );
+        }
+
+
+        return message;
     }
 
 
     /* =====================================================
        FORMATTERS
        ===================================================== */
+
+    function formatStatus(
+        status
+    ) {
+
+        const map = {
+
+            upcoming:
+                "Upcoming",
+
+            active:
+                "Submissions Open",
+
+            voting:
+                "Voting Open",
+
+            completed:
+                "Completed",
+
+            cancelled:
+                "Cancelled"
+
+        };
+
+
+        return (
+            map[status] ||
+            "Unavailable"
+        );
+    }
+
 
     function formatCategory(
         category
@@ -2221,7 +2631,9 @@ const DVVoting = (() => {
         return new Intl.NumberFormat(
             "en-US"
         ).format(
-            Number(value) || 0
+            Number(
+                value
+            ) || 0
         );
     }
 
@@ -2242,17 +2654,28 @@ const DVVoting = (() => {
             ).getTime();
 
 
-        if (
-            Number.isNaN(
-                timestamp
-            )
-        ) {
+        return Number.isNaN(
+            timestamp
+        )
+            ? null
+            : timestamp;
+    }
 
-            return null;
+
+    function setText(
+        selector,
+        value
+    ) {
+
+        const element =
+            $(selector);
+
+
+        if (element) {
+
+            element.textContent =
+                value ?? "";
         }
-
-
-        return timestamp;
     }
 
 
@@ -2296,6 +2719,49 @@ const DVVoting = (() => {
 
 
     /* =====================================================
+       ERROR SCREEN
+       ===================================================== */
+
+    function showVotingError(
+        error
+    ) {
+
+        $("#votingLoading")
+            ?.remove();
+
+
+        const grid =
+            $("#votingGrid");
+
+
+        if (grid) {
+
+            grid.innerHTML =
+                "";
+        }
+
+
+        const errorBox =
+            $("#votingError");
+
+
+        if (errorBox) {
+
+            errorBox.classList.add(
+                "visible"
+            );
+        }
+
+
+        setText(
+            "#votingErrorMessage",
+            error?.message ||
+            "Unable to load this challenge."
+        );
+    }
+
+
+    /* =====================================================
        INITIALIZE
        ===================================================== */
 
@@ -2309,32 +2775,17 @@ const DVVoting = (() => {
         }
 
 
-        /*
-         * Only initialize where voting UI exists
-         * or where a challenge context is present.
-         */
-
-        const votingGrid =
-            Boolean(
-                $("#votingSubmissionGrid")
-            );
-
-
-        const votingPage =
+        const isVotingPage =
             Boolean(
                 document.body.dataset.votingPage
+            ) ||
+            Boolean(
+                $("#votingGrid")
             );
-
-
-        const identifier =
-            getChallengeIdentifier();
 
 
         if (
-            !votingGrid &&
-            !votingPage &&
-            !identifier.id &&
-            !identifier.slug
+            !isVotingPage
         ) {
 
             return;
@@ -2345,29 +2796,55 @@ const DVVoting = (() => {
             true;
 
 
+        state.loading =
+            true;
+
+
         try {
 
-            await loadChallenge();
-
-
             await getCurrentUser();
+
+
+            await loadChallenge();
 
 
             await loadSubmissions();
 
 
+            renderPage();
+
+
+            subscribeToVotes();
+
+
             /*
-             * Render automatically when the page
-             * contains the voting grid.
+             * Re-check challenge status every minute.
              */
 
-            if (
-                votingGrid
-            ) {
+            window.setInterval(
+                () => {
 
-                renderSubmissions();
-            }
+                    if (
+                        !state.challenge
+                    ) {
 
+                        return;
+                    }
+
+
+                    state.challengeStatus =
+                        calculateChallengeStatus(
+                            state.challenge
+                        );
+
+
+                    renderVotingStatus();
+
+                    renderVotingGrid();
+
+                },
+                60 * 1000
+            );
 
         } catch (error) {
 
@@ -2377,12 +2854,14 @@ const DVVoting = (() => {
             );
 
 
-            showToast(
-                getVotingErrorMessage(
-                    error
-                ),
-                "error"
+            showVotingError(
+                error
             );
+
+        } finally {
+
+            state.loading =
+                false;
         }
     }
 
@@ -2401,33 +2880,31 @@ const DVVoting = (() => {
 
         loadChallenge,
 
-        getChallengeStatus,
-
-        canVoteNow,
-
         loadSubmissions,
 
         loadVoteCounts,
 
-        loadUserVotes,
+        loadCurrentUserVotes,
+
+        voteForSubmission,
+
+        removeVote,
 
         hasVoted,
 
         isOwnSubmission,
 
-        validateVote,
+        getVoteCount,
 
-        castVote,
+        canVote,
 
-        removeVote,
+        calculateChallengeStatus,
 
-        toggleVote,
+        renderPage,
 
-        sortSubmissions,
+        renderVotingGrid,
 
-        renderSubmissions,
-
-        searchSubmissions
+        subscribeToVotes
 
     };
 
