@@ -1,1619 +1,1589 @@
 /* =========================================================
    DESIGNVERSE — DESIGNS SYSTEM
    js/designs.js
-
-   Handles:
-   - Normal design creation
-   - Design image upload
-   - Design metadata
-   - Tags
-   - Public/private visibility
-   - My Designs loading
-   - Design deletion
-   - Edit/update support
-   - Challenge-aware separation
-
-   IMPORTANT:
-
-   NORMAL DESIGN FLOW
-      submit.html
-         ↓
-      designs.js
-         ↓
-      designs table
-
-   CHALLENGE ENTRY FLOW
-      challenge.html
-         ↓
-      submit.html?challenge=ID
-         ↓
-      submissions.js
-         ↓
-      submissions table
-
-   designs.js NEVER creates a submission record.
    ========================================================= */
 
 "use strict";
 
 
-const DVDesigns = (() => {
+/* =========================================================
+   SUPABASE
+   ========================================================= */
+
+const getDesignSupabase = () => {
+
+    if (!window.supabaseClient) {
+
+        console.error(
+            "DESIGNVERSE: Supabase client not found."
+        );
+
+        return null;
+    }
+
+    return window.supabaseClient;
+};
 
 
-    /* =====================================================
-       STATE
-       ===================================================== */
+/* =========================================================
+   HELPERS
+   ========================================================= */
 
-    const state = {
+const designQuery = (selector) => {
+    return document.querySelector(selector);
+};
 
-        initialized: false,
 
-        user: null,
+const getDesignUser = async () => {
 
-        designs: [],
+    const supabase =
+        getDesignSupabase();
 
-        currentDesign: null,
+    if (!supabase) {
+        return null;
+    }
 
-        editing: false,
+    const {
+        data,
+        error
+    } = await supabase.auth.getUser();
 
-        submitting: false,
+    if (error) {
 
-        imageObjectUrl: null
+        console.error(
+            "DESIGNVERSE user error:",
+            error
+        );
+
+        return null;
+    }
+
+    return data.user || null;
+};
+
+
+/* =========================================================
+   FILE VALIDATION
+   ========================================================= */
+
+const validateDesignFile = (file) => {
+
+    if (!file) {
+
+        throw new Error(
+            "Please select a design image."
+        );
+    }
+
+
+    const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/gif"
+    ];
+
+
+    if (
+        !allowedTypes.includes(
+            file.type
+        )
+    ) {
+
+        throw new Error(
+            "Please upload a JPG, PNG, WEBP or GIF image."
+        );
+    }
+
+
+    const maxSize =
+        10 * 1024 * 1024;
+
+
+    if (
+        file.size >
+        maxSize
+    ) {
+
+        throw new Error(
+            "Your design must be smaller than 10 MB."
+        );
+    }
+
+
+    return true;
+};
+
+
+/* =========================================================
+   CREATE SAFE FILE NAME
+   ========================================================= */
+
+const createDesignFileName = (
+    file
+) => {
+
+    const extension =
+        file.name
+            .split(".")
+            .pop()
+            .toLowerCase();
+
+
+    const randomPart =
+        crypto.randomUUID
+            ? crypto.randomUUID()
+            : `${Date.now()}-${Math.random()
+                .toString(36)
+                .slice(2)}`;
+
+
+    return `design-${randomPart}.${extension}`;
+};
+
+
+/* =========================================================
+   UPLOAD DESIGN IMAGE
+   ========================================================= */
+
+const uploadDesignImage = async (
+    file
+) => {
+
+    const supabase =
+        getDesignSupabase();
+
+
+    if (!supabase) {
+
+        throw new Error(
+            "Supabase is unavailable."
+        );
+    }
+
+
+    const user =
+        await getDesignUser();
+
+
+    if (!user) {
+
+        throw new Error(
+            "Please log in before uploading a design."
+        );
+    }
+
+
+    validateDesignFile(file);
+
+
+    const fileName =
+        createDesignFileName(
+            file
+        );
+
+
+    /*
+     * Storage structure:
+     *
+     * designs/
+     *   USER_UUID/
+     *       design-xxxxx.webp
+     */
+
+    const filePath =
+        `${user.id}/${fileName}`;
+
+
+    const {
+        error
+    } = await supabase
+        .storage
+        .from("designs")
+        .upload(
+            filePath,
+            file,
+            {
+                cacheControl:
+                    "3600",
+
+                upsert:
+                    false,
+
+                contentType:
+                    file.type
+            }
+        );
+
+
+    if (error) {
+
+        console.error(
+            "Design upload error:",
+            error
+        );
+
+        throw error;
+    }
+
+
+    const {
+        data
+    } = supabase
+        .storage
+        .from("designs")
+        .getPublicUrl(
+            filePath
+        );
+
+
+    return {
+
+        path:
+            filePath,
+
+        url:
+            data.publicUrl
+
+    };
+};
+
+
+/* =========================================================
+   CREATE DESIGN RECORD
+   ========================================================= */
+
+const createDesign = async ({
+    title,
+    description = "",
+    category = "",
+    imageUrl,
+    imagePath = "",
+    isPublic = true
+}) => {
+
+    const supabase =
+        getDesignSupabase();
+
+
+    if (!supabase) {
+
+        throw new Error(
+            "Supabase is unavailable."
+        );
+    }
+
+
+    const user =
+        await getDesignUser();
+
+
+    if (!user) {
+
+        throw new Error(
+            "Please log in first."
+        );
+    }
+
+
+    title =
+        String(title || "")
+            .trim();
+
+
+    description =
+        String(description || "")
+            .trim();
+
+
+    category =
+        String(category || "")
+            .trim();
+
+
+    if (!title) {
+
+        throw new Error(
+            "Please enter a design title."
+        );
+    }
+
+
+    if (!imageUrl) {
+
+        throw new Error(
+            "Design image is required."
+        );
+    }
+
+
+    /*
+     * IMPORTANT:
+     *
+     * We use the authenticated user's
+     * ID from Supabase Auth.
+     *
+     * Never accept designer_id
+     * directly from the frontend.
+     */
+
+    const designData = {
+
+        designer_id:
+            user.id,
+
+        title,
+
+        description,
+
+        category,
+
+        image_url:
+            imageUrl,
+
+        image_path:
+            imagePath,
+
+        is_public:
+            Boolean(isPublic)
 
     };
 
 
-    /* =====================================================
-       DOM
-       ===================================================== */
-
-    function $(selector) {
-
-        return document.querySelector(
-            selector
-        );
-    }
-
-
-    /* =====================================================
-       SUPABASE
-       ===================================================== */
-
-    function getSupabase() {
-
-        if (!window.supabaseClient) {
-
-            console.error(
-                "DESIGNVERSE: Supabase client unavailable."
-            );
-
-            return null;
-        }
+    const {
+        data,
+        error
+    } = await supabase
+        .from("designs")
+        .insert(
+            designData
+        )
+        .select()
+        .single();
 
 
-        return window.supabaseClient;
-    }
+    if (error) {
 
-
-    /* =====================================================
-       CURRENT USER
-       ===================================================== */
-
-    async function getCurrentUser() {
-
-        const supabase =
-            getSupabase();
-
-
-        if (!supabase) {
-
-            return null;
-        }
-
-
-        const {
-            data,
+        console.error(
+            "Create design error:",
             error
-        } =
-            await supabase.auth.getUser();
-
-
-        if (error) {
-
-            console.error(
-                "DESIGNVERSE user error:",
-                error
-            );
-
-            return null;
-        }
-
-
-        state.user =
-            data?.user ||
-            null;
-
-
-        return state.user;
-    }
-
-
-    /* =====================================================
-       CHALLENGE MODE DETECTION
-       ===================================================== */
-
-    function isChallengeMode() {
-
-        const params =
-            new URLSearchParams(
-                window.location.search
-            );
-
-
-        return Boolean(
-            params.get("challenge") ||
-            params.get("challenge_id")
         );
+
+        throw error;
     }
 
 
-    /* =====================================================
-       LOAD USER DESIGNS
-       ===================================================== */
-
-    async function loadMyDesigns() {
-
-        const supabase =
-            getSupabase();
+    return data;
+};
 
 
-        if (!supabase) {
+/* =========================================================
+   UPLOAD + CREATE DESIGN
+   ========================================================= */
 
-            throw new Error(
-                "Supabase is unavailable."
-            );
-        }
+const publishDesign = async ({
+    file,
+    title,
+    description = "",
+    category = "",
+    isPublic = true
+}) => {
+
+    /*
+     * Step 1:
+     * Upload image to Storage.
+     */
+
+    const upload =
+        await uploadDesignImage(
+            file
+        );
 
 
-        const user =
-            state.user ||
-            await getCurrentUser();
+    try {
+
+        /*
+         * Step 2:
+         * Create database record.
+         */
+
+        const design =
+            await createDesign({
+
+                title,
+
+                description,
+
+                category,
+
+                imageUrl:
+                    upload.url,
+
+                imagePath:
+                    upload.path,
+
+                isPublic
+
+            });
 
 
-        if (!user) {
+        return {
 
-            throw new Error(
-                "Please sign in to view your designs."
-            );
-        }
+            design,
+
+            upload
+
+        };
 
 
-        const {
-            data,
-            error
-        } =
+    } catch (error) {
+
+        /*
+         * If database creation fails
+         * after the image was uploaded,
+         * remove the orphaned image.
+         */
+
+        try {
+
+            const supabase =
+                getDesignSupabase();
+
+
             await supabase
+                .storage
                 .from("designs")
-                .select(`
+                .remove([
+                    upload.path
+                ]);
+
+        } catch (cleanupError) {
+
+            console.error(
+                "Storage cleanup error:",
+                cleanupError
+            );
+        }
+
+
+        throw error;
+    }
+};
+
+
+/* =========================================================
+   GET SINGLE DESIGN
+   ========================================================= */
+
+const getDesign = async (
+    designId
+) => {
+
+    const supabase =
+        getDesignSupabase();
+
+
+    if (!supabase) {
+        return null;
+    }
+
+
+    if (!designId) {
+        return null;
+    }
+
+
+    const {
+        data,
+        error
+    } = await supabase
+        .from("designs")
+        .select(`
+            *,
+            profiles:designer_id (
+                id,
+                username,
+                display_name,
+                avatar_url
+            )
+        `)
+        .eq(
+            "id",
+            designId
+        )
+        .single();
+
+
+    if (error) {
+
+        console.error(
+            "Get design error:",
+            error
+        );
+
+        return null;
+    }
+
+
+    return data;
+};
+
+
+/* =========================================================
+   GET PUBLIC DESIGNS
+   ========================================================= */
+
+const getPublicDesigns = async ({
+    limit = 24,
+    offset = 0,
+    category = "",
+    search = ""
+} = {}) => {
+
+    const supabase =
+        getDesignSupabase();
+
+
+    if (!supabase) {
+        return [];
+    }
+
+
+    let query =
+        supabase
+            .from("designs")
+            .select(`
+                *,
+                profiles:designer_id (
                     id,
-                    designer_id,
-                    title,
-                    description,
-                    category,
-                    image_url,
-                    thumbnail_url,
-                    tags,
-                    views,
-                    likes_count,
-                    votes_count,
-                    is_public,
-                    created_at,
-                    updated_at
-                `)
-                .eq(
-                    "designer_id",
-                    user.id
+                    username,
+                    display_name,
+                    avatar_url
                 )
-                .order(
-                    "created_at",
-                    {
-                        ascending: false
-                    }
+            `)
+            .eq(
+                "is_public",
+                true
+            )
+            .order(
+                "created_at",
+                {
+                    ascending:
+                        false
+                }
+            )
+            .range(
+                offset,
+                offset + limit - 1
+            );
+
+
+    if (category) {
+
+        query =
+            query.eq(
+                "category",
+                category
+            );
+    }
+
+
+    if (search) {
+
+        const safeSearch =
+            search
+                .trim()
+                .replace(
+                    /[%_]/g,
+                    ""
                 );
 
 
-        if (error) {
+        if (safeSearch) {
 
-            console.error(
-                "DESIGNVERSE designs load error:",
-                error
-            );
-
-            throw error;
+            query =
+                query.or(
+                    `title.ilike.%${safeSearch}%,description.ilike.%${safeSearch}%`
+                );
         }
-
-
-        state.designs =
-            data || [];
-
-
-        return state.designs;
     }
 
 
-    /* =====================================================
-       LOAD SINGLE DESIGN
-       ===================================================== */
+    const {
+        data,
+        error
+    } = await query;
 
-    async function loadDesign(
-        designId
+
+    if (error) {
+
+        console.error(
+            "Public designs error:",
+            error
+        );
+
+        return [];
+    }
+
+
+    return data || [];
+};
+
+
+/* =========================================================
+   GET CURRENT USER DESIGNS
+   ========================================================= */
+
+const getMyDesigns = async ({
+    limit = 50,
+    offset = 0
+} = {}) => {
+
+    const supabase =
+        getDesignSupabase();
+
+
+    if (!supabase) {
+        return [];
+    }
+
+
+    const user =
+        await getDesignUser();
+
+
+    if (!user) {
+        return [];
+    }
+
+
+    const {
+        data,
+        error
+    } = await supabase
+        .from("designs")
+        .select("*")
+        .eq(
+            "designer_id",
+            user.id
+        )
+        .order(
+            "created_at",
+            {
+                ascending:
+                    false
+            }
+        )
+        .range(
+            offset,
+            offset + limit - 1
+        );
+
+
+    if (error) {
+
+        console.error(
+            "My designs error:",
+            error
+        );
+
+        return [];
+    }
+
+
+    return data || [];
+};
+
+
+/* =========================================================
+   GET DESIGNS BY DESIGNER
+   ========================================================= */
+
+const getDesignsByDesigner = async (
+    designerId
+) => {
+
+    const supabase =
+        getDesignSupabase();
+
+
+    if (!supabase) {
+        return [];
+    }
+
+
+    if (!designerId) {
+        return [];
+    }
+
+
+    const {
+        data,
+        error
+    } = await supabase
+        .from("designs")
+        .select("*")
+        .eq(
+            "designer_id",
+            designerId
+        )
+        .eq(
+            "is_public",
+            true
+        )
+        .order(
+            "created_at",
+            {
+                ascending:
+                    false
+            }
+        );
+
+
+    if (error) {
+
+        console.error(
+            "Designer designs error:",
+            error
+        );
+
+        return [];
+    }
+
+
+    return data || [];
+};
+
+
+/* =========================================================
+   UPDATE DESIGN
+   ========================================================= */
+
+const updateDesign = async (
+    designId,
+    updates
+) => {
+
+    const supabase =
+        getDesignSupabase();
+
+
+    if (!supabase) {
+
+        throw new Error(
+            "Supabase is unavailable."
+        );
+    }
+
+
+    const user =
+        await getDesignUser();
+
+
+    if (!user) {
+
+        throw new Error(
+            "Please log in first."
+        );
+    }
+
+
+    if (!designId) {
+
+        throw new Error(
+            "Design ID is required."
+        );
+    }
+
+
+    const allowedFields = [
+        "title",
+        "description",
+        "category",
+        "is_public"
+    ];
+
+
+    const cleanUpdates = {};
+
+
+    allowedFields.forEach(
+        field => {
+
+            if (
+                Object.prototype
+                    .hasOwnProperty
+                    .call(
+                        updates,
+                        field
+                    )
+            ) {
+
+                cleanUpdates[field] =
+                    updates[field];
+            }
+
+        }
+    );
+
+
+    if (
+        typeof cleanUpdates.title ===
+        "string"
     ) {
 
-        const supabase =
-            getSupabase();
+        cleanUpdates.title =
+            cleanUpdates.title
+                .trim();
+    }
 
 
-        if (
-            !supabase ||
-            !designId
-        ) {
+    if (
+        typeof cleanUpdates.description ===
+        "string"
+    ) {
 
-            return null;
-        }
+        cleanUpdates.description =
+            cleanUpdates.description
+                .trim();
+    }
 
+
+    if (
+        typeof cleanUpdates.category ===
+        "string"
+    ) {
+
+        cleanUpdates.category =
+            cleanUpdates.category
+                .trim();
+    }
+
+
+    cleanUpdates.updated_at =
+        new Date().toISOString();
+
+
+    const {
+        data,
+        error
+    } = await supabase
+        .from("designs")
+        .update(
+            cleanUpdates
+        )
+        .eq(
+            "id",
+            designId
+        )
+        .eq(
+            "designer_id",
+            user.id
+        )
+        .select()
+        .single();
+
+
+    if (error) {
+
+        console.error(
+            "Update design error:",
+            error
+        );
+
+        throw error;
+    }
+
+
+    return data;
+};
+
+
+/* =========================================================
+   REPLACE DESIGN IMAGE
+   ========================================================= */
+
+const replaceDesignImage = async (
+    designId,
+    file
+) => {
+
+    const supabase =
+        getDesignSupabase();
+
+
+    if (!supabase) {
+
+        throw new Error(
+            "Supabase is unavailable."
+        );
+    }
+
+
+    const user =
+        await getDesignUser();
+
+
+    if (!user) {
+
+        throw new Error(
+            "Please log in first."
+        );
+    }
+
+
+    validateDesignFile(
+        file
+    );
+
+
+    /*
+     * Get existing design.
+     */
+
+    const design =
+        await getDesign(
+            designId
+        );
+
+
+    if (!design) {
+
+        throw new Error(
+            "Design not found."
+        );
+    }
+
+
+    if (
+        design.designer_id !==
+        user.id
+    ) {
+
+        throw new Error(
+            "You can only edit your own designs."
+        );
+    }
+
+
+    /*
+     * Upload new image.
+     */
+
+    const upload =
+        await uploadDesignImage(
+            file
+        );
+
+
+    try {
+
+        /*
+         * Update database.
+         */
 
         const {
             data,
             error
-        } =
-            await supabase
-                .from("designs")
-                .select(`
-                    id,
-                    designer_id,
-                    title,
-                    description,
-                    category,
-                    image_url,
-                    thumbnail_url,
-                    tags,
-                    views,
-                    likes_count,
-                    votes_count,
-                    is_public,
-                    created_at,
-                    updated_at
-                `)
-                .eq(
-                    "id",
-                    designId
-                )
-                .single();
+        } = await supabase
+            .from("designs")
+            .update({
+
+                image_url:
+                    upload.url,
+
+                image_path:
+                    upload.path,
+
+                updated_at:
+                    new Date()
+                        .toISOString()
+
+            })
+            .eq(
+                "id",
+                designId
+            )
+            .eq(
+                "designer_id",
+                user.id
+            )
+            .select()
+            .single();
 
 
         if (error) {
-
-            console.error(
-                "DESIGNVERSE design load error:",
-                error
-            );
-
             throw error;
         }
 
 
-        state.currentDesign =
-            data;
+        /*
+         * Delete old image.
+         */
+
+        if (
+            design.image_path
+        ) {
+
+            await supabase
+                .storage
+                .from("designs")
+                .remove([
+                    design.image_path
+                ]);
+        }
 
 
         return data;
+
+
+    } catch (error) {
+
+        /*
+         * Cleanup new image if
+         * database update failed.
+         */
+
+        await supabase
+            .storage
+            .from("designs")
+            .remove([
+                upload.path
+            ]);
+
+
+        throw error;
     }
+};
 
 
-    /* =====================================================
-       VALIDATE DESIGN DATA
-       ===================================================== */
+/* =========================================================
+   DELETE DESIGN
+   ========================================================= */
 
-    function validateDesignData({
+const deleteDesign = async (
+    designId
+) => {
 
-        title,
+    const supabase =
+        getDesignSupabase();
 
-        description,
 
-        category,
+    if (!supabase) {
 
-        tags,
-
-        isPublic
-
-    }) {
-
-        const cleanTitle =
-            String(
-                title || ""
-            )
-            .trim();
-
-
-        if (!cleanTitle) {
-
-            throw new Error(
-                "Please enter a design title."
-            );
-        }
-
-
-        if (
-            cleanTitle.length >
-            80
-        ) {
-
-            throw new Error(
-                "Design title must be 80 characters or fewer."
-            );
-        }
-
-
-        if (
-            String(
-                description || ""
-            ).length >
-            1000
-        ) {
-
-            throw new Error(
-                "Design description must be 1000 characters or fewer."
-            );
-        }
-
-
-        if (!category) {
-
-            throw new Error(
-                "Please select a design category."
-            );
-        }
-
-
-        if (
-            !Array.isArray(
-                tags
-            )
-        ) {
-
-            throw new Error(
-                "Invalid design tags."
-            );
-        }
-
-
-        if (
-            tags.length >
-            8
-        ) {
-
-            throw new Error(
-                "You can add up to 8 tags."
-            );
-        }
-
-
-        const normalizedTags =
-            normalizeTags(
-                tags
-            );
-
-
-        if (
-            normalizedTags.some(
-                tag =>
-                    tag.length >
-                    24
-            )
-        ) {
-
-            throw new Error(
-                "Each tag must be 24 characters or fewer."
-            );
-        }
-
-
-        return {
-
-            title:
-                cleanTitle,
-
-            description:
-                String(
-                    description || ""
-                )
-                .trim(),
-
-            category,
-
-            tags:
-                normalizedTags,
-
-            isPublic:
-                Boolean(
-                    isPublic
-                )
-
-        };
-    }
-
-
-    /* =====================================================
-       CREATE DESIGN
-       ===================================================== */
-
-    async function createDesign({
-
-        title,
-
-        description,
-
-        category,
-
-        tags,
-
-        isPublic,
-
-        imageFile
-
-    }) {
-
-        const supabase =
-            getSupabase();
-
-
-        if (!supabase) {
-
-            throw new Error(
-                "Supabase is unavailable."
-            );
-        }
-
-
-        const user =
-            state.user ||
-            await getCurrentUser();
-
-
-        if (!user) {
-
-            throw new Error(
-                "Please sign in before publishing a design."
-            );
-        }
-
-
-        const validated =
-            validateDesignData({
-
-                title,
-
-                description,
-
-                category,
-
-                tags,
-
-                isPublic
-
-            });
-
-
-        validateImageFile(
-            imageFile
+        throw new Error(
+            "Supabase is unavailable."
         );
-
-
-        /*
-         * Create database row FIRST so we obtain
-         * the design UUID for Storage.
-         */
-
-        const {
-            data: design,
-            error: insertError
-        } =
-            await supabase
-                .from("designs")
-                .insert({
-
-                    designer_id:
-                        user.id,
-
-                    title:
-                        validated.title,
-
-                    description:
-                        validated.description ||
-                        null,
-
-                    category:
-                        validated.category,
-
-                    tags:
-                        validated.tags,
-
-                    is_public:
-                        validated.isPublic
-
-                })
-                .select()
-                .single();
-
-
-        if (insertError) {
-
-            console.error(
-                "DESIGNVERSE design insert error:",
-                insertError
-            );
-
-            throw insertError;
-        }
-
-
-        let uploadedPath =
-            null;
-
-
-        try {
-
-            const uploaded =
-                await uploadDesignImage(
-                    design.id,
-                    imageFile
-                );
-
-
-            uploadedPath =
-                uploaded.path;
-
-
-            const {
-                data:
-                    updatedDesign,
-                error:
-                    updateError
-            } =
-                await supabase
-                    .from("designs")
-                    .update({
-
-                        image_url:
-                            uploaded.url,
-
-                        thumbnail_url:
-                            uploaded.url,
-
-                        updated_at:
-                            new Date()
-                                .toISOString()
-
-                    })
-                    .eq(
-                        "id",
-                        design.id
-                    )
-                    .eq(
-                        "designer_id",
-                        user.id
-                    )
-                    .select()
-                    .single();
-
-
-            if (updateError) {
-
-                throw updateError;
-            }
-
-
-            state.designs = [
-
-                updatedDesign,
-
-                ...state.designs
-
-            ];
-
-
-            state.currentDesign =
-                updatedDesign;
-
-
-            return updatedDesign;
-
-
-        } catch (error) {
-
-            /*
-             * Rollback database row and Storage file
-             * if image upload/update fails.
-             */
-
-            if (
-                uploadedPath
-            ) {
-
-                await removeDesignImage(
-                    uploadedPath
-                );
-            }
-
-
-            await supabase
-                .from("designs")
-                .delete()
-                .eq(
-                    "id",
-                    design.id
-                )
-                .eq(
-                    "designer_id",
-                    user.id
-                );
-
-
-            throw error;
-        }
     }
 
 
-    /* =====================================================
-       UPDATE DESIGN
-       ===================================================== */
+    const user =
+        await getDesignUser();
 
-    async function updateDesign(
 
-        designId,
+    if (!user) {
 
-        {
-
-            title,
-
-            description,
-
-            category,
-
-            tags,
-
-            isPublic,
-
-            imageFile
-
-        }
-
-    ) {
-
-        const supabase =
-            getSupabase();
-
-
-        if (!supabase) {
-
-            throw new Error(
-                "Supabase is unavailable."
-            );
-        }
-
-
-        const user =
-            state.user ||
-            await getCurrentUser();
-
-
-        if (!user) {
-
-            throw new Error(
-                "Please sign in before editing a design."
-            );
-        }
-
-
-        const validated =
-            validateDesignData({
-
-                title,
-
-                description,
-
-                category,
-
-                tags,
-
-                isPublic
-
-            });
-
-
-        const existing =
-            state.designs.find(
-                design =>
-                    design.id ===
-                    designId
-            ) ||
-            await loadDesign(
-                designId
-            );
-
-
-        if (!existing) {
-
-            throw new Error(
-                "Design not found."
-            );
-        }
-
-
-        if (
-            existing.designer_id !==
-            user.id
-        ) {
-
-            throw new Error(
-                "You can only edit your own designs."
-            );
-        }
-
-
-        let imageUrl =
-            existing.image_url ||
-            null;
-
-
-        let thumbnailUrl =
-            existing.thumbnail_url ||
-            null;
-
-
-        let newPath =
-            null;
-
-
-        try {
-
-            /*
-             * Optional image replacement.
-             */
-
-            if (
-                imageFile
-            ) {
-
-                validateImageFile(
-                    imageFile
-                );
-
-
-                const uploaded =
-                    await uploadDesignImage(
-                        designId,
-                        imageFile,
-                        {
-                            replace:
-                                true
-                        }
-                    );
-
-
-                newPath =
-                    uploaded.path;
-
-
-                imageUrl =
-                    uploaded.url;
-
-
-                thumbnailUrl =
-                    uploaded.url;
-            }
-
-
-            const {
-                data,
-                error
-            } =
-                await supabase
-                    .from("designs")
-                    .update({
-
-                        title:
-                            validated.title,
-
-                        description:
-                            validated.description ||
-                            null,
-
-                        category:
-                            validated.category,
-
-                        tags:
-                            validated.tags,
-
-                        is_public:
-                            validated.isPublic,
-
-                        image_url:
-                            imageUrl,
-
-                        thumbnail_url:
-                            thumbnailUrl,
-
-                        updated_at:
-                            new Date()
-                                .toISOString()
-
-                    })
-                    .eq(
-                        "id",
-                        designId
-                    )
-                    .eq(
-                        "designer_id",
-                        user.id
-                    )
-                    .select()
-                    .single();
-
-
-            if (error) {
-
-                throw error;
-            }
-
-
-            state.currentDesign =
-                data;
-
-
-            const index =
-                state.designs.findIndex(
-                    design =>
-                        design.id ===
-                        designId
-                );
-
-
-            if (
-                index !== -1
-            ) {
-
-                state.designs[index] =
-                    data;
-            }
-
-
-            return data;
-
-
-        } catch (error) {
-
-            /*
-             * If replacing an image succeeds but
-             * the database update fails, remove the
-             * newly uploaded file.
-             */
-
-            if (
-                newPath
-            ) {
-
-                await removeDesignImage(
-                    newPath
-                );
-            }
-
-
-            throw error;
-        }
-    }
-
-
-    /* =====================================================
-       UPLOAD DESIGN IMAGE
-       ===================================================== */
-
-    async function uploadDesignImage(
-        designId,
-        file,
-        options = {}
-    ) {
-
-        const supabase =
-            getSupabase();
-
-
-        if (!supabase) {
-
-            throw new Error(
-                "Supabase is unavailable."
-            );
-        }
-
-
-        validateImageFile(
-            file
+        throw new Error(
+            "Please log in first."
         );
-
-
-        const extension =
-            getFileExtension(
-                file
-            );
-
-
-        const safeName =
-            file.name
-                .split(".")
-                .slice(
-                    0,
-                    -1
-                )
-                .join(".")
-                .toLowerCase()
-                .replace(
-                    /[^a-z0-9]+/g,
-                    "-"
-                )
-                .replace(
-                    /^-+|-+$/g,
-                    ""
-                )
-                .substring(
-                    0,
-                    60
-                ) ||
-            "design";
-
-
-        const filePath =
-            `${designId}/` +
-            `${Date.now()}-` +
-            `${generateId()}-` +
-            `${safeName}.` +
-            `${extension}`;
-
-
-        const {
-            error
-        } =
-            await supabase
-                .storage
-                .from(
-                    "designs"
-                )
-                .upload(
-                    filePath,
-                    file,
-                    {
-
-                        cacheControl:
-                            "3600",
-
-                        upsert:
-                            false,
-
-                        contentType:
-                            file.type
-
-                    }
-                );
-
-
-        if (error) {
-
-            console.error(
-                "DESIGNVERSE design upload error:",
-                error
-            );
-
-            throw error;
-        }
-
-
-        const {
-            data
-        } =
-            supabase
-                .storage
-                .from(
-                    "designs"
-                )
-                .getPublicUrl(
-                    filePath
-                );
-
-
-        if (
-            !data?.publicUrl
-        ) {
-
-            throw new Error(
-                "Unable to generate the design image URL."
-            );
-        }
-
-
-        return {
-
-            path:
-                filePath,
-
-            url:
-                data.publicUrl
-
-        };
     }
 
 
-    /* =====================================================
-       DELETE DESIGN
-       ===================================================== */
+    /*
+     * Get design first so we know
+     * which Storage file to remove.
+     */
 
-    async function deleteDesign(
-        designId
-    ) {
-
-        const supabase =
-            getSupabase();
-
-
-        if (!supabase) {
-
-            throw new Error(
-                "Supabase is unavailable."
-            );
-        }
-
-
-        const user =
-            state.user ||
-            await getCurrentUser();
-
-
-        if (!user) {
-
-            throw new Error(
-                "Please sign in."
-            );
-        }
-
-
-        const design =
-            state.designs.find(
-                item =>
-                    item.id ===
-                    designId
-            ) ||
-            await loadDesign(
-                designId
-            );
-
-
-        if (!design) {
-
-            throw new Error(
-                "Design not found."
-            );
-        }
-
-
-        if (
-            design.designer_id !==
-            user.id
-        ) {
-
-            throw new Error(
-                "You can only delete your own designs."
-            );
-        }
-
-
-        /*
-         * Delete database row.
-         *
-         * Your database currently has ON DELETE
-         * CASCADE from submissions.design_id,
-         * so deleting a design that has been used
-         * in a challenge can also delete its
-         * submissions.
-         *
-         * We therefore block deletion when the
-         * design is already used in a submission.
-         */
-
-        const {
-            count,
-            error:
-                submissionCheckError
-        } =
-            await supabase
-                .from("submissions")
-                .select(
-                    "id",
-                    {
-                        count:
-                            "exact",
-                        head:
-                            true
-                    }
-                )
-                .eq(
-                    "design_id",
-                    designId
-                );
-
-
-        if (
-            submissionCheckError
-        ) {
-
-            console.warn(
-                "Unable to verify design submissions:",
-                submissionCheckError
-            );
-
-        } else if (
-            Number(count || 0) >
-            0
-        ) {
-
-            throw new Error(
-                "This design has already been submitted to a challenge and cannot be deleted."
-            );
-        }
-
-
-        const {
-            error
-        } =
-            await supabase
-                .from("designs")
-                .delete()
-                .eq(
-                    "id",
-                    designId
-                )
-                .eq(
-                    "designer_id",
-                    user.id
-                );
-
-
-        if (error) {
-
-            throw error;
-        }
-
-
-        /*
-         * Remove Storage objects after the row
-         * has been removed.
-         */
-
-        if (
-            design.image_url
-        ) {
-
-            const path =
-                extractStoragePath(
-                    design.image_url,
-                    "designs"
-                );
-
-
-            if (path) {
-
-                await removeDesignImage(
-                    path
-                );
-            }
-        }
-
-
-        state.designs =
-            state.designs.filter(
-                item =>
-                    item.id !==
-                    designId
-            );
-
-
-        if (
-            state.currentDesign?.id ===
+    const design =
+        await getDesign(
             designId
-        ) {
-
-            state.currentDesign =
-                null;
-        }
+        );
 
 
-        return true;
+    if (!design) {
+
+        throw new Error(
+            "Design not found."
+        );
     }
 
 
-    /* =====================================================
-       REMOVE DESIGN IMAGE
-       ===================================================== */
-
-    async function removeDesignImage(
-        path
+    if (
+        design.designer_id !==
+        user.id
     ) {
 
-        const supabase =
-            getSupabase();
+        throw new Error(
+            "You can only delete your own designs."
+        );
+    }
 
 
-        if (
-            !supabase ||
-            !path
-        ) {
+    /*
+     * Delete database record.
+     */
 
-            return;
-        }
+    const {
+        error
+    } = await supabase
+        .from("designs")
+        .delete()
+        .eq(
+            "id",
+            designId
+        )
+        .eq(
+            "designer_id",
+            user.id
+        );
 
+
+    if (error) {
+
+        console.error(
+            "Delete design error:",
+            error
+        );
+
+        throw error;
+    }
+
+
+    /*
+     * Delete Storage file.
+     */
+
+    if (
+        design.image_path
+    ) {
 
         const {
-            error
-        } =
-            await supabase
-                .storage
-                .from(
-                    "designs"
-                )
-                .remove([
-                    path
-                ]);
+            error:
+                storageError
+        } = await supabase
+            .storage
+            .from("designs")
+            .remove([
+                design.image_path
+            ]);
 
 
-        if (error) {
+        if (storageError) {
 
             console.warn(
-                "DESIGNVERSE design Storage cleanup failed:",
-                error
+                "Design database record deleted, but Storage cleanup failed:",
+                storageError
             );
         }
     }
 
 
-    /* =====================================================
-       IMAGE VALIDATION
-       ===================================================== */
+    return true;
+};
 
-    function validateImageFile(
-        file
+
+/* =========================================================
+   RENDER DESIGN CARD
+   ========================================================= */
+
+const renderDesignCard = (
+    design,
+    container
+) => {
+
+    if (!container) {
+        return;
+    }
+
+
+    const designer =
+        design.profiles || {};
+
+
+    const card =
+        document.createElement(
+            "article"
+        );
+
+
+    card.className =
+        "design-card";
+
+
+    card.dataset.designId =
+        design.id;
+
+
+    const title =
+        escapeDesignHtml(
+            design.title ||
+            "Untitled Design"
+        );
+
+
+    const description =
+        escapeDesignHtml(
+            design.description ||
+            ""
+        );
+
+
+    const displayName =
+        escapeDesignHtml(
+            designer.display_name ||
+            "Designer"
+        );
+
+
+    const username =
+        designer.username
+            ? `@${escapeDesignHtml(
+                designer.username
+            )}`
+            : "";
+
+
+    card.innerHTML = `
+
+        <a
+            class="design-card-image"
+            href="design.html?id=${encodeURIComponent(
+                design.id
+            )}"
+        >
+
+            <img
+                src="${escapeDesignAttribute(
+                    design.image_url
+                )}"
+                alt="${escapeDesignAttribute(
+                    design.title ||
+                    "Design"
+                )}"
+                loading="lazy"
+            >
+
+        </a>
+
+
+        <div class="design-card-content">
+
+            <h3 class="design-card-title">
+                ${title}
+            </h3>
+
+
+            ${
+                description
+                    ? `
+                    <p class="design-card-description">
+                        ${description}
+                    </p>
+                    `
+                    : ""
+            }
+
+
+            <div class="design-card-designer">
+
+                ${
+                    designer.avatar_url
+                        ? `
+                        <img
+                            src="${escapeDesignAttribute(
+                                designer.avatar_url
+                            )}"
+                            alt="${displayName}"
+                            class="design-card-avatar"
+                        >
+                        `
+                        : `
+                        <div class="design-card-avatar-placeholder">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        `
+                }
+
+
+                <div>
+
+                    <span>
+                        ${displayName}
+                    </span>
+
+                    ${
+                        username
+                            ? `
+                            <small>
+                                ${username}
+                            </small>
+                            `
+                            : ""
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+
+
+    container.appendChild(
+        card
+    );
+
+
+    return card;
+};
+
+
+/* =========================================================
+   ESCAPE HTML
+   ========================================================= */
+
+const escapeDesignHtml = (
+    value
+) => {
+
+    return String(
+        value ?? ""
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+};
+
+
+/* =========================================================
+   ESCAPE ATTRIBUTE
+   ========================================================= */
+
+const escapeDesignAttribute = (
+    value
+) => {
+
+    return escapeDesignHtml(
+        value
+    );
+};
+
+
+/* =========================================================
+   LOAD DESIGN GRID
+   ========================================================= */
+
+const loadDesignGrid = async ({
+    selector = "[data-design-grid]",
+    limit = 24,
+    category = "",
+    search = "",
+    append = false
+} = {}) => {
+
+    const container =
+        document.querySelector(
+            selector
+        );
+
+
+    if (!container) {
+        return [];
+    }
+
+
+    if (!append) {
+
+        container.innerHTML = `
+            <div class="design-loading">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <span>Loading designs...</span>
+            </div>
+        `;
+    }
+
+
+    const designs =
+        await getPublicDesigns({
+
+            limit,
+
+            category,
+
+            search
+
+        });
+
+
+    if (!append) {
+
+        container.innerHTML = "";
+    }
+
+
+    if (
+        designs.length ===
+        0
     ) {
 
-        if (!file) {
+        if (!append) {
 
-            throw new Error(
-                "Please select a design image."
-            );
+            container.innerHTML = `
+                <div class="design-empty">
+                    <i class="fa-regular fa-image"></i>
+
+                    <h3>
+                        No designs found
+                    </h3>
+
+                    <p>
+                        Be the first designer to showcase your work.
+                    </p>
+                </div>
+            `;
+
         }
 
-
-        const allowedTypes = [
-
-            "image/jpeg",
-
-            "image/png",
-
-            "image/webp",
-
-            "image/gif"
-
-        ];
-
-
-        const maxSize =
-            10 *
-            1024 *
-            1024;
-
-
-        if (
-            !allowedTypes.includes(
-                file.type
-            )
-        ) {
-
-            throw new Error(
-                "Design image must be JPG, PNG, WEBP or GIF."
-            );
-        }
-
-
-        if (
-            file.size >
-            maxSize
-        ) {
-
-            throw new Error(
-                "Design image must be 10 MB or smaller."
-            );
-        }
+        return [];
     }
 
 
-    /* =====================================================
-       IMAGE PREVIEW
-       ===================================================== */
-
-    function setupImagePreview() {
-
-        const input =
-            $("#designImageInput");
-
-
-        const uploadZone =
-            $("#uploadZone");
-
-
-        const uploadPreview =
-            $("#uploadPreview");
-
-
-        const previewImage =
-            $("#designPreviewImage");
-
-
-        const previewName =
-            $("#previewFileName");
-
-
-        const previewSize =
-            $("#previewFileSize");
-
-
-        const changeButton =
-            $("#changeImageButton");
-
-
-        if (!input) {
-
-            return;
-        }
-
-
-        input.addEventListener(
-            "change",
-            () => {
-
-                handleImageSelection(
-                    input.files?.[0]
-                );
-
-            }
-        );
-
-
-        changeButton?.addEventListener(
-            "click",
-            event => {
-
-                event.preventDefault();
-
-
-                input.click();
-
-            }
-        );
-
-
-        [
-            "dragenter",
-            "dragover"
-        ]
-        .forEach(
-            eventName => {
-
-                uploadZone?.addEventListener(
-                    eventName,
-                    event => {
-
-                        event.preventDefault();
-
-
-                        uploadZone.classList.add(
-                            "dragover"
-                        );
-
-                    }
-                );
-
-            }
-        );
-
-
-        [
-            "dragleave",
-            "drop"
-        ]
-        .forEach(
-            eventName => {
-
-                uploadZone?.addEventListener(
-                    eventName,
-                    event => {
-
-                        event.preventDefault();
-
-
-                        uploadZone.classList.remove(
-                            "dragover"
-                        );
-
-                    }
-                );
-
-            }
-        );
-
-
-        uploadZone?.addEventListener(
-            "drop",
-            event => {
-
-                const file =
-                    event.dataTransfer
-                        ?.files?.[0];
-
-
-                if (!file) {
-
-                    return;
-                }
-
-
-                /*
-                 * Attempt to sync the dropped file
-                 * with the native file input.
-                 */
-
-                try {
-
-                    const transfer =
-                        new DataTransfer();
-
-
-                    transfer.items.add(
-                        file
-                    );
-
-
-                    input.files =
-                        transfer.files;
-
-                } catch {
-                    /* Browser may block FileList assignment. */
-                }
-
-
-                handleImageSelection(
-                    file
-                );
-            }
-        );
-
-
-        function handleImageSelection(
-            file
-        ) {
-
-            clearImageError();
-
-
-            try {
-
-                validateImageFile(
-                    file
-                );
-
-            } catch (error) {
-
-                showImageError(
-                    error.message
-                );
-
-
-                input.value =
-                    "";
-
-
-                return;
-            }
-
-
-            if (
-                state.imageObjectUrl
-            ) {
-
-                URL.revokeObjectURL(
-                    state.imageObjectUrl
-                );
-            }
-
-
-            state.imageObjectUrl =
-                URL.createObjectURL(
-                    file
-                );
-
-
-            if (previewImage) {
-
-                previewImage.src =
-                    state.imageObjectUrl;
-            }
-
-
-            if (previewName) {
-
-                previewName.textContent =
-                    file.name;
-            }
-
-
-            if (previewSize) {
-
-                previewSize.textContent =
-                    formatBytes(
-                        file.size
-                    );
-            }
-
-
-            if (uploadZone) {
-
-                uploadZone.style.display =
-                    "none";
-            }
-
-
-            uploadPreview?.classList.add(
-                "visible"
+    designs.forEach(
+        design => {
+
+            renderDesignCard(
+                design,
+                container
             );
 
-
-            /*
-             * Optional live validation marker.
-             */
-
-            input.dataset.valid =
-                "true";
         }
-    }
+    );
 
 
-    /* =====================================================
-       FORM SETUP
-       ===================================================== */
+    return designs;
+};
 
-    function setupForm() {
+
+/* =========================================================
+   DESIGN UPLOAD FORM
+   ========================================================= */
+
+const setupDesignUploadForm =
+    () => {
 
         const form =
-            $("#designSubmitForm");
+            document.querySelector(
+                "#designUploadForm"
+            );
 
 
         if (!form) {
-
             return;
         }
 
 
+        const fileInput =
+            form.querySelector(
+                "#designFile"
+            );
+
+
+        const preview =
+            form.querySelector(
+                "[data-design-preview]"
+            );
+
+
+        const previewImage =
+            form.querySelector(
+                "[data-design-preview-image]"
+            );
+
+
         /*
-         * DO NOT attach the form when we are in
-         * challenge-selection-only mode.
-         *
-         * The normal design form remains available
-         * on the page, but the challenge entry flow
-         * is handled by submissions.js.
+         * File preview
+         */
+
+        if (fileInput) {
+
+            fileInput.addEventListener(
+                "change",
+                () => {
+
+                    const file =
+                        fileInput.files?.[0];
+
+
+                    if (!file) {
+                        return;
+                    }
+
+
+                    try {
+
+                        validateDesignFile(
+                            file
+                        );
+
+
+                        if (
+                            preview &&
+                            previewImage
+                        ) {
+
+                            const url =
+                                URL.createObjectURL(
+                                    file
+                                );
+
+
+                            previewImage.src =
+                                url;
+
+
+                            preview.classList.remove(
+                                "hidden"
+                            );
+                        }
+
+
+                    } catch (error) {
+
+                        fileInput.value =
+                            "";
+
+
+                        showDesignMessage(
+                            error.message,
+                            "error"
+                        );
+
+                    }
+
+                }
+            );
+        }
+
+
+        /*
+         * Submit
          */
 
         form.addEventListener(
@@ -1623,76 +1593,68 @@ const DVDesigns = (() => {
                 event.preventDefault();
 
 
-                /*
-                 * A challenge URL does not disable
-                 * normal design creation completely.
-                 * But the user must intentionally be
-                 * in "Upload Design" mode.
-                 */
-
-                if (
-                    isChallengeMode() &&
-                    getActiveSubmitMode() ===
-                    "challenge"
-                ) {
-
-                    return;
-                }
+                const button =
+                    form.querySelector(
+                        "button[type='submit']"
+                    );
 
 
-                if (
-                    state.submitting
-                ) {
+                const file =
+                    fileInput?.files?.[0];
 
-                    return;
-                }
+
+                const title =
+                    form.querySelector(
+                        "#designTitle"
+                    )?.value || "";
+
+
+                const description =
+                    form.querySelector(
+                        "#designDescription"
+                    )?.value || "";
+
+
+                const category =
+                    form.querySelector(
+                        "#designCategory"
+                    )?.value || "";
+
+
+                const isPublic =
+                    form.querySelector(
+                        "#designPublic"
+                    )?.checked ??
+                    true;
 
 
                 try {
 
-                    state.submitting =
-                        true;
-
-
-                    setPublishButtonLoading(
-                        true
+                    validateDesignFile(
+                        file
                     );
 
 
-                    const imageFile =
-                        $("#designImageInput")
-                            ?.files?.[0] ||
-                        null;
+                    if (button) {
+
+                        button.disabled =
+                            true;
+
+                        button.dataset
+                            .originalText =
+                            button.innerHTML;
+
+                        button.innerHTML = `
+                            <i class="fa-solid fa-spinner fa-spin"></i>
+                            Publishing...
+                        `;
+                    }
 
 
-                    const title =
-                        $("#designTitle")
-                            ?.value ||
-                        "";
+                    const result =
+                        await publishDesign({
 
-
-                    const description =
-                        $("#designDescription")
-                            ?.value ||
-                        "";
-
-
-                    const category =
-                        $("#designCategory")
-                            ?.value ||
-                        "";
-
-
-                    const isPublic =
-                        getVisibilityValue();
-
-
-                    const tags =
-                        readTagsFromForm();
-
-
-                    const design =
-                        await createDesign({
+                            file,
 
                             title,
 
@@ -1700,1407 +1662,258 @@ const DVDesigns = (() => {
 
                             category,
 
-                            tags,
-
-                            isPublic,
-
-                            imageFile
+                            isPublic
 
                         });
 
 
-                    showFormSuccess(
-                        design
+                    showDesignMessage(
+                        "Your design has been published successfully! 🎨",
+                        "success"
                     );
 
 
-                    resetDesignForm();
+                    form.reset();
+
+
+                    if (
+                        preview
+                    ) {
+
+                        preview.classList.add(
+                            "hidden"
+                        );
+                    }
 
 
                     /*
-                     * Give the user a moment to see
-                     * the success message.
+                     * Allow dashboard/grid
+                     * to refresh itself.
                      */
 
-                    setTimeout(
-                        () => {
-
-                            window.location.href =
-                                "dashboard/my-designs.html";
-
-                        },
-                        1200
+                    document.dispatchEvent(
+                        new CustomEvent(
+                            "designverse:design-created",
+                            {
+                                detail:
+                                    result.design
+                            }
+                        )
                     );
 
 
                 } catch (error) {
 
                     console.error(
-                        "DESIGNVERSE design publication error:",
+                        "Publish design error:",
                         error
                     );
 
 
-                    showFormError(
+                    showDesignMessage(
                         getDesignErrorMessage(
                             error
-                        )
+                        ),
+                        "error"
                     );
 
 
                 } finally {
 
-                    state.submitting =
-                        false;
+                    if (button) {
 
+                        button.disabled =
+                            false;
 
-                    setPublishButtonLoading(
-                        false
-                    );
+                        button.innerHTML =
+                            button.dataset
+                                .originalText ||
+                            "Publish Design";
+                    }
+
                 }
 
             }
         );
+    };
 
 
-        /*
-         * Character counter.
-         */
+/* =========================================================
+   DESIGN MESSAGE
+   ========================================================= */
 
-        const description =
-            $("#designDescription");
+const showDesignMessage = (
+    message,
+    type = "success"
+) => {
 
-
-        const counter =
-            $("#descriptionCount");
-
-
-        description?.addEventListener(
-            "input",
-            () => {
-
-                if (counter) {
-
-                    counter.textContent =
-                        `${description.value.length} / 1000`;
-                }
-
-            }
-        );
-    }
-
-
-    /* =====================================================
-       ACTIVE SUBMIT MODE
-       ===================================================== */
-
-    function getActiveSubmitMode() {
-
-        const active =
-            document.querySelector(
-                "[data-submit-mode].active"
-            );
-
-
-        return (
-            active?.dataset.submitMode ||
-            "upload"
-        );
-    }
-
-
-    /* =====================================================
-       READ VISIBILITY
-       ===================================================== */
-
-    function getVisibilityValue() {
-
-        const selected =
-            document.querySelector(
-                'input[name="visibility"]:checked'
-            );
-
-
-        return (
-            selected?.value !==
-            "private"
-        );
-    }
-
-
-    /* =====================================================
-       TAGS
-       ===================================================== */
-
-    function readTagsFromForm() {
-
-        const hidden =
-            $("#designTags");
-
-
-        if (!hidden) {
-
-            return [];
-        }
-
-
-        try {
-
-            const parsed =
-                JSON.parse(
-                    hidden.value ||
-                    "[]"
-                );
-
-
-            return normalizeTags(
-                parsed
-            );
-
-        } catch {
-
-            return [];
-        }
-    }
-
-
-    function normalizeTags(
-        tags
-    ) {
-
-        if (
-            !Array.isArray(
-                tags
-            )
-        ) {
-
-            return [];
-        }
-
-
-        return [
-            ...new Set(
-                tags
-                    .map(
-                        tag =>
-                            String(
-                                tag ||
-                                ""
-                            )
-                            .trim()
-                            .toLowerCase()
-                            .replace(
-                                /^#/,
-                                ""
-                            )
-                            .replace(
-                                /\s+/g,
-                                "-"
-                            )
-                    )
-                    .filter(
-                        Boolean
-                    )
-            )
-        ]
-        .slice(
-            0,
-            8
-        );
-    }
-
-
-    /* =====================================================
-       BUTTON LOADING
-       ===================================================== */
-
-    function setPublishButtonLoading(
-        loading
-    ) {
-
-        const button =
-            $("#publishDesignButton");
-
-
-        if (!button) {
-
-            return;
-        }
-
-
-        if (loading) {
-
-            button.disabled =
-                true;
-
-
-            button.dataset.originalText =
-                button.innerHTML;
-
-
-            button.innerHTML = `
-
-                <i
-                    class="fa-solid fa-spinner fa-spin"
-                ></i>
-
-                &nbsp;
-
-                Publishing...
-
-            `;
-
-        } else {
-
-            button.disabled =
-                false;
-
-
-            button.innerHTML =
-                button.dataset.originalText ||
-                `
-
-                    <i
-                        class="fa-solid fa-rocket"
-                    ></i>
-
-                    Publish Design
-
-                `;
-        }
-    }
-
-
-    /* =====================================================
-       FORM RESET
-       ===================================================== */
-
-    function resetDesignForm() {
-
-        const form =
-            $("#designSubmitForm");
-
-
-        form?.reset();
-
-
-        const tags =
-            $("#designTags");
-
-
-        if (tags) {
-
-            tags.value =
-                "[]";
-        }
-
-
-        /*
-         * Clear external tag UI if submit.html
-         * has created it.
-         */
-
-        const tagList =
-            $("#tagList");
-
-
-        if (tagList) {
-
-            tagList.innerHTML =
-                "";
-        }
-
-
-        const descriptionCount =
-            $("#descriptionCount");
-
-
-        if (descriptionCount) {
-
-            descriptionCount.textContent =
-                "0 / 1000";
-        }
-
-
-        const uploadZone =
-            $("#uploadZone");
-
-
-        const uploadPreview =
-            $("#uploadPreview");
-
-
-        if (state.imageObjectUrl) {
-
-            URL.revokeObjectURL(
-                state.imageObjectUrl
-            );
-
-
-            state.imageObjectUrl =
-                null;
-        }
-
-
-        if (uploadZone) {
-
-            uploadZone.style.display =
-                "";
-        }
-
-
-        uploadPreview?.classList.remove(
-            "visible"
+    let element =
+        document.querySelector(
+            "[data-design-message]"
         );
 
 
-        const image =
-            $("#designPreviewImage");
+    if (!element) {
 
-
-        if (image) {
-
-            image.removeAttribute(
-                "src"
-            );
-        }
-
-
-        clearImageError();
-    }
-
-
-    /* =====================================================
-       ERROR/SUCCESS UI
-       ===================================================== */
-
-    function showImageError(
-        message
-    ) {
-
-        const error =
-            $("#imageError");
-
-
-        if (!error) {
-            return;
-        }
-
-
-        error.textContent =
-            message;
-
-
-        error.classList.add(
-            "visible"
-        );
-    }
-
-
-    function clearImageError() {
-
-        const error =
-            $("#imageError");
-
-
-        error?.classList.remove(
-            "visible"
-        );
-
-
-        if (error) {
-
-            error.textContent =
-                "";
-        }
-    }
-
-
-    function showFormSuccess(
-        design
-    ) {
-
-        const element =
-            $("#submissionSuccess");
-
-
-        if (element) {
-
-            element.textContent =
-                `"${design.title}" was published successfully! 🎨`;
-
-
-            element.classList.add(
-                "visible"
-            );
-        }
-
-
-        showToast(
-            "Design published successfully! 🎨",
-            "success"
-        );
-    }
-
-
-    function showFormError(
-        message
-    ) {
-
-        const element =
-            $("#submissionError");
-
-
-        if (element) {
-
-            element.textContent =
-                message;
-
-
-            element.classList.add(
-                "visible"
-            );
-        }
-
-
-        showToast(
-            message,
-            "error"
-        );
-    }
-
-
-    /* =====================================================
-       DELETE UI
-       ===================================================== */
-
-    async function handleDelete(
-        designId
-    ) {
-
-        const design =
-            state.designs.find(
-                item =>
-                    item.id ===
-                    designId
-            );
-
-
-        if (!design) {
-
-            return;
-        }
-
-
-        const confirmed =
-            window.confirm(
-                `Delete "${design.title}"?`
-            );
-
-
-        if (!confirmed) {
-
-            return;
-        }
-
-
-        try {
-
-            await deleteDesign(
-                designId
-            );
-
-
-            showToast(
-                "Design deleted successfully.",
-                "success"
-            );
-
-
-            renderMyDesigns();
-
-        } catch (error) {
-
-            console.error(
-                "Delete design error:",
-                error
-            );
-
-
-            showToast(
-                getDesignErrorMessage(
-                    error
-                ),
-                "error"
-            );
-        }
-    }
-
-
-    /* =====================================================
-       RENDER MY DESIGNS
-       ===================================================== */
-
-    function renderMyDesigns() {
-
-        const container =
-            $("#myDesignsGrid");
-
-
-        if (!container) {
-
-            return;
-        }
-
-
-        container.innerHTML =
-            "";
-
-
-        if (
-            !state.designs.length
-        ) {
-
-            container.innerHTML = `
-
-                <div
-                    class="designs-empty"
-                    style="
-                        grid-column:1/-1;
-                        text-align:center;
-                        padding:50px 20px;
-                    "
-                >
-
-                    <i
-                        class="fa-solid fa-palette"
-                        style="
-                            font-size:28px;
-                            color:#c4b5fd;
-                            margin-bottom:12px;
-                        "
-                    ></i>
-
-
-                    <h3>
-                        No designs yet
-                    </h3>
-
-
-                    <p>
-                        Your creative journey starts here.
-                    </p>
-
-
-                    <a
-                        href="../submit.html"
-                        class="btn btn-primary btn-small"
-                    >
-                        Upload Design
-                    </a>
-
-                </div>
-
-            `;
-
-
-            return;
-        }
-
-
-        state.designs.forEach(
-            design => {
-
-                container.appendChild(
-                    createDesignCard(
-                        design
-                    )
-                );
-
-            }
-        );
-    }
-
-
-    /* =====================================================
-       CREATE DESIGN CARD
-       ===================================================== */
-
-    function createDesignCard(
-        design
-    ) {
-
-        const article =
-            document.createElement(
-                "article"
-            );
-
-
-        article.className =
-            "design-card";
-
-
-        article.dataset.designId =
-            design.id;
-
-
-        const image =
-            design.image_url
-                ? `
-                    <img
-                        src="${escapeAttribute(
-                            design.image_url
-                        )}"
-                        alt="${escapeAttribute(
-                            design.title
-                        )}"
-                        loading="lazy"
-                    >
-                `
-                : `
-                    <div
-                        style="
-                            width:100%;
-                            height:100%;
-                            display:grid;
-                            place-items:center;
-                            background:linear-gradient(
-                                135deg,
-                                #120825,
-                                #153b75
-                            );
-                            color:#c4b5fd;
-                        "
-                    >
-                        <i
-                            class="fa-solid fa-palette"
-                        ></i>
-                    </div>
-                `;
-
-
-        article.innerHTML = `
-
-            <div
-                class="design-card-image"
-            >
-
-                ${image}
-
-            </div>
-
-
-            <div
-                class="design-card-body"
-            >
-
-                <h3>
-                    ${escapeHTML(
-                        design.title ||
-                        "Untitled Design"
-                    )}
-                </h3>
-
-
-                <span>
-                    ${escapeHTML(
-                        formatCategory(
-                            design.category
-                        )
-                    )}
-                </span>
-
-
-                <div
-                    style="
-                        display:flex;
-                        gap:7px;
-                        margin-top:10px;
-                    "
-                >
-
-                    <a
-                        href="../design.html?id=${encodeURIComponent(
-                            design.id
-                        )}"
-                        class="btn btn-secondary btn-small"
-                    >
-
-                        View
-
-                    </a>
-
-
-                    <button
-                        type="button"
-                        class="btn btn-secondary btn-small"
-                        data-delete-design="${escapeAttribute(
-                            design.id
-                        )}"
-                    >
-
-                        Delete
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        `;
-
-
-        article
-            .querySelector(
-                "[data-delete-design]"
-            )
-            ?.addEventListener(
-                "click",
-                () => {
-
-                    handleDelete(
-                        design.id
-                    );
-
-                }
-            );
-
-
-        return article;
-    }
-
-
-    /* =====================================================
-       ERROR MESSAGE
-       ===================================================== */
-
-    function getDesignErrorMessage(
-        error
-    ) {
-
-        if (!error) {
-
-            return (
-                "Unable to complete that action."
-            );
-        }
-
-
-        const message =
-            String(
-                error.message ||
-                error
-            );
-
-
-        const lower =
-            message.toLowerCase();
-
-
-        if (
-            lower.includes(
-                "row-level security"
-            )
-        ) {
-
-            return (
-                "Supabase blocked this action. Please check your account permissions."
-            );
-        }
-
-
-        if (
-            lower.includes(
-                "foreign key"
-            )
-        ) {
-
-            return (
-                "The referenced account or record could not be found."
-            );
-        }
-
-
-        if (
-            lower.includes(
-                "bucket"
-            ) &&
-            lower.includes(
-                "not found"
-            )
-        ) {
-
-            return (
-                "The designs Storage bucket was not found."
-            );
-        }
-
-
-        if (
-            lower.includes(
-                "duplicate"
-            )
-        ) {
-
-            return (
-                "A design with these values already exists."
-            );
-        }
-
-
-        if (
-            lower.includes(
-                "network"
-            )
-        ) {
-
-            return (
-                "Network error. Please check your connection."
-            );
-        }
-
-
-        return message;
-    }
-
-
-    /* =====================================================
-       TOAST
-       ===================================================== */
-
-    function showToast(
-        message,
-        type = "info"
-    ) {
-
-        let container =
-            document.querySelector(
-                ".design-toast-container"
-            );
-
-
-        if (!container) {
-
-            container =
-                document.createElement(
-                    "div"
-                );
-
-
-            container.className =
-                "design-toast-container";
-
-
-            container.style.cssText = `
-                position:fixed;
-                right:18px;
-                bottom:18px;
-                z-index:4000;
-                display:flex;
-                flex-direction:column;
-                gap:8px;
-                max-width:min(
-                    390px,
-                    calc(100vw - 36px)
-                );
-            `;
-
-
-            document.body.appendChild(
-                container
-            );
-        }
-
-
-        const toast =
+        element =
             document.createElement(
                 "div"
             );
 
-
-        const icon =
-            type === "success"
-                ? "fa-check"
-                : type === "error"
-                    ? "fa-triangle-exclamation"
-                    : "fa-info-circle";
-
-
-        const color =
-            type === "success"
-                ? "#86efac"
-                : type === "error"
-                    ? "#fca5a5"
-                    : "#c4b5fd";
-
-
-        toast.style.cssText = `
-            display:flex;
-            align-items:center;
-            gap:10px;
-            padding:13px 14px;
-            border:1px solid rgba(255,255,255,.10);
-            border-radius:13px;
-            background:rgba(10,10,16,.95);
-            color:white;
-            box-shadow:0 20px 50px rgba(0,0,0,.35);
-            backdrop-filter:blur(18px);
-            font:10px/1.5 Inter,sans-serif;
-        `;
-
-
-        toast.innerHTML = `
-
-            <i
-                class="fa-solid ${icon}"
-                style="
-                    color:${color};
-                "
-            ></i>
-
-            <span>
-                ${escapeHTML(
-                    message
-                )}
-            </span>
-
-        `;
-
-
-        container.appendChild(
-            toast
+        element.setAttribute(
+            "data-design-message",
+            ""
         );
 
-
-        setTimeout(
-            () => {
-
-                toast.remove();
-
-            },
-            4000
+        document.body.prepend(
+            element
         );
     }
 
 
-    /* =====================================================
-       FORMATTERS
-       ===================================================== */
+    element.textContent =
+        message;
 
-    function formatCategory(
-        category
-    ) {
 
-        const map = {
+    element.className =
+        `design-message ${type}`;
 
-            branding:
-                "Branding",
 
-            poster:
-                "Poster",
-
-            "ui-ux":
-                "UI / UX",
-
-            illustration:
-                "Illustration",
-
-            logo:
-                "Logo",
-
-            motion:
-                "Motion",
-
-            other:
-                "Other"
-
-        };
-
-
-        return (
-            map[category] ||
-            "Other"
-        );
-    }
-
-
-    function formatBytes(
-        bytes
-    ) {
-
-        if (
-            !Number.isFinite(
-                bytes
-            ) ||
-            bytes <= 0
-        ) {
-
-            return "0 Bytes";
-        }
-
-
-        const units = [
-
-            "Bytes",
-
-            "KB",
-
-            "MB",
-
-            "GB"
-
-        ];
-
-
-        const index =
-            Math.min(
-                Math.floor(
-                    Math.log(bytes) /
-                    Math.log(1024)
-                ),
-                units.length - 1
-            );
-
-
-        return `${(
-            bytes /
-            Math.pow(
-                1024,
-                index
-            )
-        ).toFixed(
-            index === 0
-                ? 0
-                : 2
-        )} ${units[index]}`;
-    }
-
-
-    function getFileExtension(
-        file
-    ) {
-
-        const extension =
-            file.name
-                .split(".")
-                .pop()
-                .toLowerCase();
-
-
-        const allowed = [
-
-            "jpg",
-
-            "jpeg",
-
-            "png",
-
-            "webp",
-
-            "gif"
-
-        ];
-
-
-        if (
-            allowed.includes(
-                extension
-            )
-        ) {
-
-            return extension;
-        }
-
-
-        const mimeMap = {
-
-            "image/jpeg":
-                "jpg",
-
-            "image/png":
-                "png",
-
-            "image/webp":
-                "webp",
-
-            "image/gif":
-                "gif"
-
-        };
-
-
-        return (
-            mimeMap[
-                file.type
-            ] ||
-            "jpg"
-        );
-    }
-
-
-    function generateId() {
-
-        if (
-            typeof crypto !==
-            "undefined" &&
-            typeof crypto.randomUUID ===
-            "function"
-        ) {
-
-            return crypto.randomUUID();
-        }
-
-
-        return (
-            Date.now()
-                .toString(36) +
-            "-" +
-            Math.random()
-                .toString(36)
-                .substring(
-                    2,
-                    10
-                )
-        );
-    }
-
-
-    function extractStoragePath(
-        url,
-        bucket
-    ) {
-
-        if (!url) {
-
-            return null;
-        }
-
-
-        try {
-
-            const publicMarker =
-                `/storage/v1/object/public/${bucket}/`;
-
-
-            const signedMarker =
-                `/storage/v1/object/sign/${bucket}/`;
-
-
-            let index =
-                url.indexOf(
-                    publicMarker
-                );
-
-
-            let marker =
-                publicMarker;
-
-
-            if (
-                index === -1
-            ) {
-
-                index =
-                    url.indexOf(
-                        signedMarker
-                    );
-
-
-                marker =
-                    signedMarker;
-            }
-
-
-            if (
-                index === -1
-            ) {
-
-                return null;
-            }
-
-
-            const path =
-                url.substring(
-                    index +
-                    marker.length
-                );
-
-
-            return decodeURIComponent(
-                path.split("?")[0]
-            );
-
-        } catch {
-
-            return null;
-        }
-    }
-
-
-    /* =====================================================
-       INITIALIZE
-       ===================================================== */
-
-    async function init() {
-
-        if (
-            state.initialized
-        ) {
-
-            return;
-        }
-
-
-        /*
-         * Only initialize on pages that actually
-         * contain design-management elements.
-         */
-
-        const isSubmitPage =
-            Boolean(
-                $("#designSubmitForm")
-            );
-
-
-        const isDesignsPage =
-            Boolean(
-                $("#myDesignsGrid")
-            );
-
-
-        if (
-            !isSubmitPage &&
-            !isDesignsPage
-        ) {
-
-            return;
-        }
-
-
-        state.initialized =
-            true;
-
-
-        /*
-         * Only load the form logic when the
-         * normal design upload form exists.
-         */
-
-        if (
-            isSubmitPage
-        ) {
-
-            await getCurrentUser();
-
-            setupImagePreview();
-
-            setupForm();
-
-        }
-
-
-        /*
-         * My Designs page.
-         */
-
-        if (
-            isDesignsPage
-        ) {
-
-            try {
-
-                await getCurrentUser();
-
-                await loadMyDesigns();
-
-                renderMyDesigns();
-
-            } catch (error) {
-
-                console.error(
-                    "Unable to load My Designs:",
-                    error
-                );
-
-                showToast(
-                    getDesignErrorMessage(
-                        error
-                    ),
-                    "error"
-                );
-            }
-        }
-    }
-
-
-    /* =====================================================
-       CLEANUP
-       ===================================================== */
-
-    window.addEventListener(
-        "pagehide",
-        () => {
-
-            if (
-                state.imageObjectUrl
-            ) {
-
-                URL.revokeObjectURL(
-                    state.imageObjectUrl
-                );
-
-
-                state.imageObjectUrl =
-                    null;
-            }
-
-        }
+    element.classList.remove(
+        "hidden"
     );
 
 
-    /* =====================================================
-       PUBLIC API
-       ===================================================== */
+    clearTimeout(
+        element._timer
+    );
 
-    return {
 
-        state,
+    element._timer =
+        setTimeout(
+            () => {
 
-        init,
+                element.classList.add(
+                    "hidden"
+                );
 
-        getCurrentUser,
-
-        loadMyDesigns,
-
-        loadDesign,
-
-        createDesign,
-
-        updateDesign,
-
-        deleteDesign,
-
-        uploadDesignImage,
-
-        renderMyDesigns,
-
-        validateImageFile,
-
-        validateDesignData,
-
-        isChallengeMode
-
-    };
-
-})();
+            },
+            5000
+        );
+};
 
 
 /* =========================================================
-   GLOBAL EXPORT
+   DESIGN ERROR HANDLER
    ========================================================= */
 
-window.DVDesigns =
-    DVDesigns;
+const getDesignErrorMessage = (
+    error
+) => {
+
+    if (!error) {
+
+        return "Something went wrong.";
+    }
+
+
+    const message =
+        error.message ||
+        String(error);
+
+
+    if (
+        message
+            .toLowerCase()
+            .includes(
+                "row-level security"
+            )
+    ) {
+
+        return (
+            "You don't have permission to perform this action."
+        );
+    }
+
+
+    if (
+        message
+            .toLowerCase()
+            .includes(
+                "duplicate"
+            )
+    ) {
+
+        return (
+            "This design already exists."
+        );
+    }
+
+
+    if (
+        message
+            .toLowerCase()
+            .includes(
+                "payload too large"
+            )
+    ) {
+
+        return (
+            "The image is too large."
+        );
+    }
+
+
+    return message;
+};
+
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+const initDesigns = () => {
+
+    setupDesignUploadForm();
+
+};
+
+
+/* =========================================================
+   PUBLIC API
+   ========================================================= */
+
+window.DVDesigns = {
+
+    uploadDesignImage,
+
+    createDesign,
+
+    publishDesign,
+
+    getDesign,
+
+    getPublicDesigns,
+
+    getMyDesigns,
+
+    getDesignsByDesigner,
+
+    updateDesign,
+
+    replaceDesignImage,
+
+    deleteDesign,
+
+    renderDesignCard,
+
+    loadDesignGrid,
+
+    validateDesignFile,
+
+    showDesignMessage
+
+};
 
 
 /* =========================================================
@@ -3111,12 +1924,7 @@ document.addEventListener(
     "DOMContentLoaded",
     () => {
 
-        DVDesigns.init();
+        initDesigns();
 
     }
 );
-
-
-/* =========================================================
-   DESIGNVERSE DESIGN SYSTEM COMPLETE
-   ========================================================= */

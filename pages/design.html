@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="View a design on DESIGNVERSE — the creative community by BestB Designs."
+    >
+
+    <meta
+        name="theme-color"
+        content="#0b0b0f"
+    >
+
+    <title>Design | DESIGNVERSE</title>
+
+
+    <!-- =====================================================
+         FONTS
+         ===================================================== -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         ICONS
+         ===================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+
+    <!-- =====================================================
+         DESIGNVERSE CSS
+         ===================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/components.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/animations.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/responsive.css"
+    >
+
+
+    <style>
+
+        /* =====================================================
+           DESIGN PAGE
+           ===================================================== */
+
+        .design-page {
+            min-height: 100vh;
+        }
+
+
+        .design-page-container {
+            width: min(
+                1400px,
+                calc(100% - 40px)
+            );
+
+            margin: 0 auto;
+
+            padding:
+                110px
+                0
+                60px;
+        }
+
+
+        /* =====================================================
+           BREADCRUMB
+           ===================================================== */
+
+        .design-breadcrumb {
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            margin-bottom: 28px;
+
+            font-size: 0.9rem;
+
+            color: var(
+                --text-muted,
+                #8d8d99
+            );
+        }
+
+
+        .design-breadcrumb a {
+            color: inherit;
+
+            text-decoration: none;
+
+            transition:
+                color 0.2s ease;
+        }
+
+
+        .design-breadcrumb a:hover {
+            color: var(
+                --primary,
+                #7c5cff
+            );
+        }
+
+
+        .design-breadcrumb i {
+            font-size: 0.7rem;
+        }
+
+
+        /* =====================================================
+           MAIN LAYOUT
+           ===================================================== */
+
+        .design-view {
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1.35fr)
+                minmax(320px, 0.65fr);
+
+            gap: 40px;
+
+            align-items: start;
+        }
+
+
+        /* =====================================================
+           IMAGE AREA
+           ===================================================== */
+
+        .design-image-panel {
+            position: relative;
+
+            overflow: hidden;
+
+            border-radius: 24px;
+
+            background:
+                var(
+                    --surface,
+                    #15151c
+                );
+
+            min-height: 400px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+        }
+
+
+        .design-image-wrapper {
+            width: 100%;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 20px;
+        }
+
+
+        .design-image-wrapper img {
+            display: block;
+
+            width: 100%;
+
+            max-height: 78vh;
+
+            object-fit: contain;
+
+            border-radius: 14px;
+        }
+
+
+        /* =====================================================
+           IMAGE LOADING
+           ===================================================== */
+
+        .design-image-loading {
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 14px;
+
+            min-height: 400px;
+
+            color: var(
+                --text-muted,
+                #8d8d99
+            );
+        }
+
+
+        .design-image-loading i {
+            font-size: 2rem;
+        }
+
+
+        /* =====================================================
+           ERROR STATE
+           ===================================================== */
+
+        .design-error {
+            min-height: 400px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            justify-content: center;
+
+            text-align: center;
+
+            padding: 40px;
+        }
+
+
+        .design-error-icon {
+            width: 70px;
+
+            height: 70px;
+
+            border-radius: 50%;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            margin-bottom: 20px;
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.06
+                );
+
+            font-size: 1.6rem;
+        }
+
+
+        .design-error h2 {
+            margin:
+                0
+                0
+                10px;
+        }
+
+
+        .design-error p {
+            color: var(
+                --text-muted,
+                #8d8d99
+            );
+
+            margin:
+                0
+                0
+                24px;
+        }
+
+
+        /* =====================================================
+           DETAILS
+           ===================================================== */
+
+        .design-details {
+            position: sticky;
+
+            top: 90px;
+        }
+
+
+        .design-category {
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            padding:
+                7px
+                12px;
+
+            border-radius: 999px;
+
+            background:
+                rgba(
+                    124,
+                    92,
+                    255,
+                    0.12
+                );
+
+            color:
+                var(
+                    --primary,
+                    #7c5cff
+                );
+
+            font-size: 0.78rem;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing:
+                0.04em;
+
+            margin-bottom: 16px;
+        }
+
+
+        .design-title {
+            margin:
+                0
+                0
+                16px;
+
+            font-size:
+                clamp(
+                    2rem,
+                    4vw,
+                    3.5rem
+                );
+
+            line-height: 1.05;
+
+            letter-spacing:
+                -0.04em;
+        }
+
+
+        .design-description {
+            margin:
+                0
+                28px;
+
+            color: var(
+                --text-muted,
+                #a1a1ad
+            );
+
+            line-height: 1.7;
+
+            font-size: 1rem;
+
+            white-space: pre-wrap;
+        }
+
+
+        /* =====================================================
+           DESIGNER
+           ===================================================== */
+
+        .design-designer {
+            display: flex;
+
+            align-items: center;
+
+            gap: 14px;
+
+            padding:
+                16px;
+
+            border:
+                1px solid
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.08
+                );
+
+            border-radius: 16px;
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.025
+                );
+
+            margin-bottom: 22px;
+        }
+
+
+        .design-designer-avatar {
+            width: 52px;
+
+            height: 52px;
+
+            border-radius: 50%;
+
+            object-fit: cover;
+
+            flex-shrink: 0;
+        }
+
+
+        .design-designer-avatar-placeholder {
+            width: 52px;
+
+            height: 52px;
+
+            border-radius: 50%;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            flex-shrink: 0;
+
+            background:
+                rgba(
+                    124,
+                    92,
+                    255,
+                    0.14
+                );
+
+            color:
+                var(
+                    --primary,
+                    #7c5cff
+                );
+        }
+
+
+        .design-designer-info {
+            min-width: 0;
+
+            flex: 1;
+        }
+
+
+        .design-designer-name {
+            display: block;
+
+            font-weight: 700;
+
+            margin-bottom: 3px;
+        }
+
+
+        .design-designer-username {
+            display: block;
+
+            color: var(
+                --text-muted,
+                #8d8d99
+            );
+
+            font-size: 0.86rem;
+        }
+
+
+        .design-designer-link {
+            color: inherit;
+
+            text-decoration: none;
+        }
+
+
+        .design-designer-link:hover
+        .design-designer-name {
+            color:
+                var(
+                    --primary,
+                    #7c5cff
+                );
+        }
+
+
+        /* =====================================================
+           ACTIONS
+           ===================================================== */
+
+        .design-actions {
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    2,
+                    minmax(0, 1fr)
+                );
+
+            gap: 12px;
+
+            margin-bottom: 26px;
+        }
+
+
+        .design-action-btn {
+            min-height: 48px;
+
+            border: 1px solid
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.1
+                );
+
+            border-radius: 12px;
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.04
+                );
+
+            color: inherit;
+
+            cursor: pointer;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 8px;
+
+            font: inherit;
+
+            font-weight: 600;
+
+            transition:
+                transform 0.2s ease,
+                background 0.2s ease,
+                border-color 0.2s ease;
+        }
+
+
+        .design-action-btn:hover {
+            transform:
+                translateY(-2px);
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.08
+                );
+
+            border-color:
+                rgba(
+                    124,
+                    92,
+                    255,
+                    0.5
+                );
+        }
+
+
+        .design-action-btn.primary {
+            background:
+                var(
+                    --primary,
+                    #7c5cff
+                );
+
+            border-color:
+                var(
+                    --primary,
+                    #7c5cff
+                );
+
+            color: #fff;
+        }
+
+
+        .design-action-btn.primary:hover {
+            opacity: 0.92;
+        }
+
+
+        /* =====================================================
+           META
+           ===================================================== */
+
+        .design-meta {
+            padding-top: 22px;
+
+            border-top:
+                1px solid
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.08
+                );
+        }
+
+
+        .design-meta-row {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            padding:
+                10px
+                0;
+
+            font-size: 0.9rem;
+        }
+
+
+        .design-meta-label {
+            color: var(
+                --text-muted,
+                #8d8d99
+            );
+        }
+
+
+        .design-meta-value {
+            text-align: right;
+
+            font-weight: 600;
+        }
+
+
+        /* =====================================================
+           TOAST
+           ===================================================== */
+
+        .design-toast {
+            position: fixed;
+
+            left: 50%;
+
+            bottom: 24px;
+
+            transform:
+                translate(
+                    -50%,
+                    120px
+                );
+
+            z-index: 9999;
+
+            padding:
+                13px
+                18px;
+
+            border-radius: 12px;
+
+            background:
+                #181820;
+
+            border:
+                1px solid
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.1
+                );
+
+            box-shadow:
+                0
+                15px
+                40px
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.35
+                );
+
+            transition:
+                transform 0.3s ease;
+
+            max-width:
+                min(
+                    90vw,
+                    500px
+                );
+
+            text-align: center;
+        }
+
+
+        .design-toast.show {
+            transform:
+                translate(
+                    -50%,
+                    0
+                );
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (
+            max-width: 1000px
+        ) {
+
+            .design-view {
+                grid-template-columns:
+                    1fr;
+            }
+
+
+            .design-details {
+                position: static;
+            }
+
+
+            .design-image-wrapper img {
+                max-height:
+                    70vh;
+            }
+
+        }
+
+
+        @media (
+            max-width: 600px
+        ) {
+
+            .design-page-container {
+                width:
+                    min(
+                        100% - 24px,
+                        1400px
+                    );
+
+                padding-top:
+                    90px;
+            }
+
+
+            .design-image-panel {
+                border-radius: 16px;
+
+                min-height:
+                    280px;
+            }
+
+
+            .design-image-wrapper {
+                padding: 10px;
+            }
+
+
+            .design-image-wrapper img {
+                border-radius: 10px;
+
+                max-height:
+                    60vh;
+            }
+
+
+            .design-actions {
+                grid-template-columns:
+                    1fr;
+            }
+
+
+            .design-title {
+                font-size:
+                    2rem;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         NAVIGATION
+         ===================================================== -->
+
+    <header
+        id="site-header"
+        data-component="header"
+    >
+
+        <nav
+            class="navbar"
+            aria-label="Main navigation"
+        >
+
+            <a
+                href="../index.html"
+                class="brand"
+                aria-label="DESIGNVERSE home"
+            >
+
+                <img
+                    src="../assets/logo/designverse-logo.png"
+                    alt="DESIGNVERSE"
+                    class="brand-logo"
+                >
+
+            </a>
+
+
+            <div
+                class="nav-links"
+                id="mainNav"
+            >
+
+                <a
+                    href="explore.html"
+                >
+                    Explore
+                </a>
+
+                <a
+                    href="challenges.html"
+                >
+                    Challenges
+                </a>
+
+                <a
+                    href="designers.html"
+                >
+                    Designers
+                </a>
+
+                <a
+                    href="leaderboard.html"
+                >
+                    Leaderboard
+                </a>
+
+            </div>
+
+
+            <div
+                class="nav-actions"
+            >
+
+                <a
+                    href="auth/login.html"
+                    class="btn btn-primary"
+                    data-auth-login
+                >
+                    Sign In
+                </a>
+
+
+                <button
+                    type="button"
+                    class="nav-menu-toggle"
+                    id="navMenuToggle"
+                    aria-label="Open navigation"
+                    aria-expanded="false"
+                >
+
+                    <i
+                        class="fa-solid fa-bars"
+                    ></i>
+
+                </button>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         MAIN
+         ===================================================== -->
+
+    <main
+        class="design-page"
+    >
+
+        <div
+            class="design-page-container"
+        >
+
+
+            <!-- =================================================
+                 BREADCRUMB
+                 ================================================= -->
+
+            <div
+                class="design-breadcrumb"
+            >
+
+                <a
+                    href="explore.html"
+                >
+                    Explore
+                </a>
+
+                <i
+                    class="fa-solid fa-chevron-right"
+                ></i>
+
+                <span>
+                    Design
+                </span>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 DESIGN VIEW
+                 ================================================= -->
+
+            <section
+                class="design-view"
+                id="designView"
+                aria-live="polite"
+            >
+
+
+                <!-- =================================================
+                     IMAGE
+                     ================================================= -->
+
+                <div
+                    class="design-image-panel"
+                    id="designImagePanel"
+                >
+
+                    <div
+                        class="design-image-loading"
+                        id="designLoading"
+                    >
+
+                        <i
+                            class="fa-solid fa-spinner fa-spin"
+                        ></i>
+
+                        <span>
+                            Loading design...
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     DETAILS
+                     ================================================= -->
+
+                <aside
+                    class="design-details"
+                    id="designDetails"
+                    hidden
+                >
+
+                    <div
+                        class="design-category"
+                        id="designCategory"
+                    ></div>
+
+
+                    <h1
+                        class="design-title"
+                        id="designTitle"
+                    ></h1>
+
+
+                    <p
+                        class="design-description"
+                        id="designDescription"
+                    ></p>
+
+
+                    <!-- Designer -->
+
+                    <a
+                        href="#"
+                        class="design-designer-link"
+                        id="designerLink"
+                    >
+
+                        <div
+                            class="design-designer"
+                        >
+
+                            <div
+                                id="designerAvatar"
+                            ></div>
+
+
+                            <div
+                                class="design-designer-info"
+                            >
+
+                                <span
+                                    class="design-designer-name"
+                                    id="designerName"
+                                ></span>
+
+
+                                <span
+                                    class="design-designer-username"
+                                    id="designerUsername"
+                                ></span>
+
+                            </div>
+
+                        </div>
+
+                    </a>
+
+
+
+                    <!-- Actions -->
+
+                    <div
+                        class="design-actions"
+                    >
+
+                        <button
+                            type="button"
+                            class="design-action-btn primary"
+                            id="likeButton"
+                        >
+
+                            <i
+                                class="fa-regular fa-heart"
+                            ></i>
+
+                            <span>
+                                Like
+                            </span>
+
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="design-action-btn"
+                            id="shareButton"
+                        >
+
+                            <i
+                                class="fa-solid fa-share-nodes"
+                            ></i>
+
+                            <span>
+                                Share
+                            </span>
+
+                        </button>
+
+                    </div>
+
+
+
+                    <!-- Meta -->
+
+                    <div
+                        class="design-meta"
+                    >
+
+                        <div
+                            class="design-meta-row"
+                        >
+
+                            <span
+                                class="design-meta-label"
+                            >
+                                Category
+                            </span>
+
+                            <span
+                                class="design-meta-value"
+                                id="metaCategory"
+                            >
+                                —
+                            </span>
+
+                        </div>
+
+
+                        <div
+                            class="design-meta-row"
+                        >
+
+                            <span
+                                class="design-meta-label"
+                            >
+                                Published
+                            </span>
+
+                            <span
+                                class="design-meta-value"
+                                id="metaDate"
+                            >
+                                —
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </aside>
+
+            </section>
+
+        </div>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         TOAST
+         ===================================================== -->
+
+    <div
+        class="design-toast"
+        id="designToast"
+        role="status"
+        aria-live="polite"
+    ></div>
+
+
+
+    <!-- =====================================================
+         SCRIPTS
+         ===================================================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+    <script
+        src="../js/supabase.js"
+    ></script>
+
+    <script
+        src="../js/app.js"
+    ></script>
+
+    <script
+        src="../js/navigation.js"
+    ></script>
+
+    <script
+        src="../js/utils.js"
+    ></script>
+
+    <script
+        src="../js/auth.js"
+    ></script>
+
+    <script
+        src="../js/profile.js"
+    ></script>
+
+    <script
+        src="../js/designs.js"
+    ></script>
+
+
+
+    <!-- =====================================================
+         PAGE SCRIPT
+         ===================================================== -->
+
+    <script>
+
+        "use strict";
+
+
+        /* =================================================
+           HELPERS
+           ================================================= */
+
+        const $ = (
+            selector
+        ) => document.querySelector(
+            selector
+        );
+
+
+        const escapeHtml = (
+            value
+        ) => {
+
+            return String(
+                value ?? ""
+            )
+                .replace(
+                    /&/g,
+                    "&amp;"
+                )
+                .replace(
+                    /</g,
+                    "&lt;"
+                )
+                .replace(
+                    />/g,
+                    "&gt;"
+                )
+                .replace(
+                    /"/g,
+                    "&quot;"
+                )
+                .replace(
+                    /'/g,
+                    "&#039;"
+                );
+
+        };
+
+
+        const formatDate = (
+            date
+        ) => {
+
+            if (!date) {
+                return "—";
+            }
+
+
+            const parsed =
+                new Date(
+                    date
+                );
+
+
+            if (
+                Number.isNaN(
+                    parsed.getTime()
+                )
+            ) {
+                return "—";
+            }
+
+
+            return new Intl.DateTimeFormat(
+                undefined,
+                {
+                    year:
+                        "numeric",
+
+                    month:
+                        "short",
+
+                    day:
+                        "numeric"
+                }
+            ).format(
+                parsed
+            );
+        };
+
+
+        const showToast = (
+            message
+        ) => {
+
+            const toast =
+                $("#designToast");
+
+
+            if (!toast) {
+                return;
+            }
+
+
+            toast.textContent =
+                message;
+
+
+            toast.classList.add(
+                "show"
+            );
+
+
+            clearTimeout(
+                toast._timer
+            );
+
+
+            toast._timer =
+                setTimeout(
+                    () => {
+
+                        toast.classList.remove(
+                            "show"
+                        );
+
+                    },
+                    2500
+                );
+
+        };
+
+
+        /* =================================================
+           GET DESIGN ID
+           ================================================= */
+
+        const getDesignId = () => {
+
+            const params =
+                new URLSearchParams(
+                    window.location.search
+                );
+
+
+            return params.get(
+                "id"
+            );
+        };
+
+
+        /* =================================================
+           ERROR SCREEN
+           ================================================= */
+
+        const showDesignError = (
+            message
+        ) => {
+
+            const panel =
+                $("#designImagePanel");
+
+
+            const details =
+                $("#designDetails");
+
+
+            if (details) {
+
+                details.hidden =
+                    true;
+            }
+
+
+            if (!panel) {
+                return;
+            }
+
+
+            panel.innerHTML = `
+
+                <div
+                    class="design-error"
+                >
+
+                    <div
+                        class="design-error-icon"
+                    >
+
+                        <i
+                            class="fa-regular fa-image"
+                        ></i>
+
+                    </div>
+
+
+                    <h2>
+                        Design unavailable
+                    </h2>
+
+
+                    <p>
+                        ${escapeHtml(
+                            message
+                        )}
+                    </p>
+
+
+                    <a
+                        href="explore.html"
+                        class="btn btn-primary"
+                    >
+                        Explore Designs
+                    </a>
+
+                </div>
+
+            `;
+
+        };
+
+
+        /* =================================================
+           RENDER DESIGN
+           ================================================= */
+
+        const renderDesign = (
+            design
+        ) => {
+
+            const profile =
+                design.profiles ||
+                {};
+
+
+            const imagePanel =
+                $("#designImagePanel");
+
+
+            const details =
+                $("#designDetails");
+
+
+            if (
+                !imagePanel ||
+                !details
+            ) {
+                return;
+            }
+
+
+            /* ---------------------------------------------
+               Image
+               --------------------------------------------- */
+
+            imagePanel.innerHTML = `
+
+                <div
+                    class="design-image-wrapper"
+                >
+
+                    <img
+                        src="${escapeHtml(
+                            design.image_url
+                        )}"
+                        alt="${escapeHtml(
+                            design.title ||
+                            "DESIGNVERSE design"
+                        )}"
+                    >
+
+                </div>
+
+            `;
+
+
+            /* ---------------------------------------------
+               Category
+               --------------------------------------------- */
+
+            const category =
+                design.category ||
+                "Design";
+
+
+            $("#designCategory").innerHTML = `
+
+                <i
+                    class="fa-solid fa-layer-group"
+                ></i>
+
+                ${escapeHtml(
+                    category
+                )}
+
+            `;
+
+
+            $("#metaCategory")
+                .textContent =
+                    category;
+
+
+            /* ---------------------------------------------
+               Title
+               --------------------------------------------- */
+
+            $("#designTitle")
+                .textContent =
+                    design.title ||
+                    "Untitled Design";
+
+
+            /* ---------------------------------------------
+               Description
+               --------------------------------------------- */
+
+            const description =
+                $("#designDescription");
+
+
+            if (
+                design.description
+            ) {
+
+                description.textContent =
+                    design.description;
+
+                description.hidden =
+                    false;
+
+            } else {
+
+                description.hidden =
+                    true;
+            }
+
+
+            /* ---------------------------------------------
+               Designer
+               --------------------------------------------- */
+
+            const displayName =
+                profile.display_name ||
+                profile.username ||
+                "Designer";
+
+
+            const username =
+                profile.username
+                    ? `@${profile.username}`
+                    : "";
+
+
+            $("#designerName")
+                .textContent =
+                    displayName;
+
+
+            $("#designerUsername")
+                .textContent =
+                    username;
+
+
+            const avatar =
+                $("#designerAvatar");
+
+
+            if (
+                profile.avatar_url
+            ) {
+
+                avatar.innerHTML = `
+
+                    <img
+                        src="${escapeHtml(
+                            profile.avatar_url
+                        )}"
+                        alt="${escapeHtml(
+                            displayName
+                        )}"
+                        class="design-designer-avatar"
+                    >
+
+                `;
+
+            } else {
+
+                avatar.innerHTML = `
+
+                    <div
+                        class="design-designer-avatar-placeholder"
+                    >
+
+                        <i
+                            class="fa-solid fa-user"
+                        ></i>
+
+                    </div>
+
+                `;
+            }
+
+
+            /* ---------------------------------------------
+               Designer profile link
+               --------------------------------------------- */
+
+            const designerLink =
+                $("#designerLink");
+
+
+            if (
+                profile.id
+            ) {
+
+                designerLink.href =
+                    `designer.html?id=${encodeURIComponent(
+                        profile.id
+                    )}`;
+
+            } else {
+
+                designerLink.removeAttribute(
+                    "href"
+                );
+
+                designerLink.style.cursor =
+                    "default";
+            }
+
+
+            /* ---------------------------------------------
+               Date
+               --------------------------------------------- */
+
+            $("#metaDate")
+                .textContent =
+                    formatDate(
+                        design.created_at
+                    );
+
+
+            /* ---------------------------------------------
+               Page title
+               --------------------------------------------- */
+
+            document.title =
+                `${design.title || "Design"} | DESIGNVERSE`;
+
+
+            details.hidden =
+                false;
+
+        };
+
+
+        /* =================================================
+           LOAD DESIGN
+           ================================================= */
+
+        const loadDesignPage =
+            async () => {
+
+                const designId =
+                    getDesignId();
+
+
+                if (!designId) {
+
+                    showDesignError(
+                        "No design was specified."
+                    );
+
+                    return;
+                }
+
+
+                if (
+                    !window.DVDesigns ||
+                    typeof
+                        window.DVDesigns.getDesign !==
+                        "function"
+                ) {
+
+                    showDesignError(
+                        "The design system could not be initialized."
+                    );
+
+                    return;
+                }
+
+
+                try {
+
+                    const design =
+                        await window.DVDesigns
+                            .getDesign(
+                                designId
+                            );
+
+
+                    if (!design) {
+
+                        showDesignError(
+                            "This design could not be found."
+                        );
+
+                        return;
+                    }
+
+
+                    renderDesign(
+                        design
+                    );
+
+
+                } catch (error) {
+
+                    console.error(
+                        "DESIGNVERSE design page error:",
+                        error
+                    );
+
+
+                    showDesignError(
+                        "Something went wrong while loading this design."
+                    );
+
+                }
+
+            };
+
+
+        /* =================================================
+           SHARE
+           ================================================= */
+
+        const setupShare =
+            () => {
+
+                const button =
+                    $("#shareButton");
+
+
+                if (!button) {
+                    return;
+                }
+
+
+                button.addEventListener(
+                    "click",
+                    async () => {
+
+                        const shareData = {
+
+                            title:
+                                document.title,
+
+                            text:
+                                "Check out this design on DESIGNVERSE.",
+
+                            url:
+                                window.location.href
+
+                        };
+
+
+                        try {
+
+                            if (
+                                navigator.share
+                            ) {
+
+                                await navigator.share(
+                                    shareData
+                                );
+
+                            } else if (
+                                navigator.clipboard
+                            ) {
+
+                                await navigator
+                                    .clipboard
+                                    .writeText(
+                                        window.location.href
+                                    );
+
+
+                                showToast(
+                                    "Design link copied!"
+                                );
+
+                            } else {
+
+                                showToast(
+                                    "Copy this page URL to share the design."
+                                );
+                            }
+
+
+                        } catch (error) {
+
+                            /*
+                             * User cancelling the
+                             * native share dialog
+                             * is not an error we
+                             * need to display.
+                             */
+
+                            if (
+                                error.name !==
+                                "AbortError"
+                            ) {
+
+                                console.error(
+                                    "Share error:",
+                                    error
+                                );
+
+                            }
+
+                        }
+
+                    }
+                );
+
+            };
+
+
+        /* =================================================
+           LIKE PLACEHOLDER
+           ================================================= */
+
+        const setupLike =
+            () => {
+
+                const button =
+                    $("#likeButton");
+
+
+                if (!button) {
+                    return;
+                }
+
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        /*
+                         * Voting will be connected
+                         * when voting.js is added.
+                         */
+
+                        showToast(
+                            "Likes are coming with the voting system."
+                        );
+
+                    }
+                );
+
+            };
+
+
+        /* =================================================
+           INITIALIZE PAGE
+           ================================================= */
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            () => {
+
+                loadDesignPage();
+
+                setupShare();
+
+                setupLike();
+
+            }
+        );
+
+    </script>
+
+</body>
+</html>
