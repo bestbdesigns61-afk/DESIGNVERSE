@@ -5,6 +5,9 @@
    Handles:
    - Administrator authentication
    - Admin authorization
+   - Admin overview/dashboard
+   - Platform statistics
+   - Admin profile
    - Challenge creation
    - Challenge scheduling
    - Challenge cover upload
@@ -13,16 +16,7 @@
    - Challenge deletion
    - Form validation
    - Voting period support
-
-   Challenge lifecycle:
-
-   UPCOMING
-      ↓ starts_at
-   ACTIVE
-      ↓ ends_at
-   VOTING
-      ↓ voting_ends_at
-   COMPLETED
+   - Admin notifications/toasts
    ========================================================= */
 
 "use strict";
@@ -46,7 +40,16 @@ const DVAdmin = (() => {
 
         submitting: false,
 
-        initialized: false
+        initialized: false,
+
+        authorized: false,
+
+        stats: {
+            users: 0,
+            challenges: 0,
+            submissions: 0,
+            reports: 0
+        }
 
     };
 
@@ -82,6 +85,16 @@ const DVAdmin = (() => {
     }
 
 
+    function $$(selector) {
+
+        return [
+            ...document.querySelectorAll(
+                selector
+            )
+        ];
+    }
+
+
     /* =====================================================
        CURRENT USER
        ===================================================== */
@@ -90,6 +103,7 @@ const DVAdmin = (() => {
 
         const supabase =
             getSupabase();
+
 
         if (!supabase) {
 
@@ -131,7 +145,7 @@ const DVAdmin = (() => {
             getSupabase();
 
 
-        if (!supabase) {
+        if (!supabase || !userId) {
 
             return null;
         }
@@ -147,8 +161,17 @@ const DVAdmin = (() => {
                     id,
                     username,
                     display_name,
+                    bio,
                     avatar_url,
-                    role
+                    website_url,
+                    location,
+                    role,
+                    total_points,
+                    total_votes,
+                    total_wins,
+                    followers_count,
+                    following_count,
+                    created_at
                 `)
                 .eq(
                     "id",
@@ -219,17 +242,7 @@ const DVAdmin = (() => {
             );
 
 
-            setTimeout(
-                () => {
-
-                    window.location.href =
-                        getRootPageUrl(
-                            "index.html"
-                        );
-
-                },
-                1200
-            );
+            showAccessDenied();
 
 
             return false;
@@ -239,12 +252,260 @@ const DVAdmin = (() => {
         state.user =
             user;
 
-
         state.profile =
             profile;
 
+        state.authorized =
+            true;
+
 
         return true;
+    }
+
+
+    /* =====================================================
+       ACCESS DENIED
+       ===================================================== */
+
+    function showAccessDenied() {
+
+        const adminMain =
+            $("#adminMain");
+
+
+        const adminPage =
+            $("#adminPage");
+
+
+        const denied =
+            $("#adminDenied");
+
+
+        if (denied) {
+
+            denied.style.display =
+                "flex";
+        }
+
+
+        if (adminMain) {
+
+            adminMain.style.display =
+                "none";
+        }
+
+
+        if (adminPage) {
+
+            adminPage.classList.add(
+                "admin-access-denied"
+            );
+        }
+    }
+
+
+    /* =====================================================
+       LOAD ADMIN PROFILE INTO PAGE
+       ===================================================== */
+
+    function renderAdminProfile() {
+
+        const profile =
+            state.profile;
+
+
+        if (!profile) {
+
+            return;
+        }
+
+
+        $$(
+            '[data-profile="display-name"]'
+        ).forEach(
+            element => {
+
+                element.textContent =
+                    profile.display_name ||
+                    "Administrator";
+            }
+        );
+
+
+        $$(
+            '[data-profile="username"]'
+        ).forEach(
+            element => {
+
+                element.textContent =
+                    profile.username
+                        ? `@${profile.username}`
+                        : "@admin";
+            }
+        );
+
+
+        $$(
+            '[data-profile="avatar"]'
+        ).forEach(
+            element => {
+
+                if (
+                    profile.avatar_url
+                ) {
+
+                    element.src =
+                        profile.avatar_url;
+
+                    element.alt =
+                        profile.display_name ||
+                        "Administrator";
+                }
+            }
+        );
+
+
+        $$(
+            '[data-profile="role"]'
+        ).forEach(
+            element => {
+
+                element.textContent =
+                    "ADMIN";
+            }
+        );
+    }
+
+
+    /* =====================================================
+       LOAD PLATFORM STATISTICS
+       ===================================================== */
+
+    async function loadPlatformStats() {
+
+        const supabase =
+            getSupabase();
+
+
+        if (!supabase) {
+
+            return state.stats;
+        }
+
+
+        try {
+
+            const results =
+                await Promise.all([
+
+                    supabase
+                        .from("profiles")
+                        .select(
+                            "id",
+                            {
+                                count:
+                                    "exact",
+                                head:
+                                    true
+                            }
+                        ),
+
+                    supabase
+                        .from("challenges")
+                        .select(
+                            "id",
+                            {
+                                count:
+                                    "exact",
+                                head:
+                                    true
+                            }
+                        ),
+
+                    supabase
+                        .from("submissions")
+                        .select(
+                            "id",
+                            {
+                                count:
+                                    "exact",
+                                head:
+                                    true
+                            }
+                        ),
+
+                    supabase
+                        .from("reports")
+                        .select(
+                            "id",
+                            {
+                                count:
+                                    "exact",
+                                head:
+                                    true
+                            }
+                        )
+
+                ]);
+
+
+            state.stats = {
+
+                users:
+                    results[0].count || 0,
+
+                challenges:
+                    results[1].count || 0,
+
+                submissions:
+                    results[2].count || 0,
+
+                reports:
+                    results[3].count || 0
+
+            };
+
+
+            renderPlatformStats();
+
+
+        } catch (error) {
+
+            console.error(
+                "Admin statistics error:",
+                error
+            );
+        }
+
+
+        return state.stats;
+    }
+
+
+    /* =====================================================
+       RENDER PLATFORM STATISTICS
+       ===================================================== */
+
+    function renderPlatformStats() {
+
+        Object.entries(
+            state.stats
+        ).forEach(
+            ([key, value]) => {
+
+                $$(
+                    `[data-admin-stat="${key}"]`
+                ).forEach(
+                    element => {
+
+                        element.textContent =
+                            formatNumber(
+                                value
+                            );
+                    }
+                );
+            }
+        );
     }
 
 
@@ -288,11 +549,17 @@ const DVAdmin = (() => {
         }
 
 
-        const {
-            data,
-            error
-        } =
-            await supabase
+        /*
+         * We intentionally select only columns
+         * that exist in the current DESIGNVERSE
+         * schema.
+         *
+         * voting_ends_at is added below only
+         * when the database supports it.
+         */
+
+        let query =
+            supabase
                 .from("challenges")
                 .select(`
                     id,
@@ -305,16 +572,24 @@ const DVAdmin = (() => {
                     points,
                     starts_at,
                     ends_at,
-                    voting_ends_at,
                     status,
-                    created_at
+                    created_at,
+                    created_by
                 `)
                 .order(
                     "created_at",
                     {
-                        ascending: false
+                        ascending:
+                            false
                     }
                 );
+
+
+        const {
+            data,
+            error
+        } =
+            await query;
 
 
         if (error) {
@@ -332,7 +607,9 @@ const DVAdmin = (() => {
                     <div
                         class="challenge-list-empty"
                     >
+
                         Unable to load challenges.
+
                     </div>
 
                 `;
@@ -447,21 +724,30 @@ const DVAdmin = (() => {
                     >
 
                         <h3>
+
                             ${escapeHTML(
                                 challenge.title
                             )}
+
                         </h3>
 
+
                         <span>
+
                             ${escapeHTML(
                                 formatCategory(
                                     challenge.category
                                 )
                             )}
+
                             ·
+
                             ${formatNumber(
                                 challenge.points
-                            )} XP
+                            )}
+
+                            XP
+
                         </span>
 
                     </div>
@@ -602,10 +888,13 @@ const DVAdmin = (() => {
         }
 
 
-        if (!state.user) {
+        if (
+            !state.user ||
+            !state.authorized
+        ) {
 
             throw new Error(
-                "You must be logged in."
+                "You must be an administrator."
             );
         }
 
@@ -636,11 +925,113 @@ const DVAdmin = (() => {
 
 
         /*
-         * Create the database record first.
+         * Current database schema:
          *
-         * This gives us the challenge UUID,
-         * which is then used as the first folder
-         * inside challenge-covers storage.
+         * challenges includes:
+         * title, slug, description, brief,
+         * category, difficulty, rules,
+         * prize, points, max_submissions,
+         * starts_at, ends_at, status,
+         * created_by
+         *
+         * voting_ends_at is supported when
+         * present in the database.
+         */
+
+
+        const insertPayload = {
+
+            title:
+                title.trim(),
+
+            slug,
+
+            description:
+                description.trim(),
+
+            brief:
+                String(
+                    brief || ""
+                )
+                    .trim() ||
+                null,
+
+            category,
+
+            difficulty:
+                difficulty ||
+                "medium",
+
+            rules:
+                String(
+                    rules || ""
+                )
+                    .trim() ||
+                null,
+
+            prize:
+                String(
+                    prize || ""
+                )
+                    .trim() ||
+                null,
+
+            points:
+                Number(points) ||
+                100,
+
+            max_submissions:
+                maxSubmissions
+                    ? Number(
+                        maxSubmissions
+                    )
+                    : null,
+
+            starts_at:
+                toISOString(
+                    startsAt
+                ),
+
+            ends_at:
+                toISOString(
+                    endsAt
+                ),
+
+            status:
+                calculateInitialStatus({
+                    startsAt,
+                    endsAt,
+                    votingEndsAt
+                }),
+
+            created_by:
+                state.user.id
+
+        };
+
+
+        /*
+         * Add voting_ends_at only when
+         * the form supplied it.
+         *
+         * Your current SQL schema needs
+         * this column added before this field
+         * can actually be persisted.
+         */
+
+        if (
+            votingEndsAt
+        ) {
+
+            insertPayload.voting_ends_at =
+                toISOString(
+                    votingEndsAt
+                );
+        }
+
+
+        /*
+         * Create database record first.
          */
 
         const {
@@ -649,84 +1040,9 @@ const DVAdmin = (() => {
         } =
             await supabase
                 .from("challenges")
-                .insert({
-
-                    title:
-                        title.trim(),
-
-                    slug,
-
-                    description:
-                        description.trim(),
-
-                    brief:
-                        String(
-                            brief || ""
-                        )
-                        .trim() ||
-                        null,
-
-                    category,
-
-                    difficulty:
-                        difficulty ||
-                        "medium",
-
-                    rules:
-                        String(
-                            rules || ""
-                        )
-                        .trim() ||
-                        null,
-
-                    prize:
-                        String(
-                            prize || ""
-                        )
-                        .trim() ||
-                        null,
-
-                    points:
-                        Number(points) ||
-                        100,
-
-                    max_submissions:
-                        maxSubmissions
-                            ? Number(
-                                maxSubmissions
-                            )
-                            : null,
-
-                    starts_at:
-                        toISOString(
-                            startsAt
-                        ),
-
-                    ends_at:
-                        toISOString(
-                            endsAt
-                        ),
-
-                    voting_ends_at:
-                        toISOString(
-                            votingEndsAt
-                        ),
-
-                    status:
-                        calculateInitialStatus({
-
-                            startsAt,
-
-                            endsAt,
-
-                            votingEndsAt
-
-                        }),
-
-                    created_by:
-                        state.user.id
-
-                })
+                .insert(
+                    insertPayload
+                )
                 .select()
                 .single();
 
@@ -738,13 +1054,12 @@ const DVAdmin = (() => {
                 createError
             );
 
-
             throw createError;
         }
 
 
         /*
-         * Upload cover after the challenge
+         * Upload cover after challenge
          * has been created.
          */
 
@@ -800,12 +1115,6 @@ const DVAdmin = (() => {
 
 
             } catch (coverError) {
-
-                /*
-                 * Roll back the Storage file and
-                 * database row when cover publishing
-                 * fails.
-                 */
 
                 if (
                     uploadedPath
@@ -892,7 +1201,7 @@ const DVAdmin = (() => {
                     0,
                     60
                 ) ||
-            "cover";
+                "cover";
 
 
         const filePath =
@@ -995,6 +1304,17 @@ const DVAdmin = (() => {
         }
 
 
+        if (
+            !state.user ||
+            !state.authorized
+        ) {
+
+            throw new Error(
+                "Administrator permission required."
+            );
+        }
+
+
         const challenge =
             state.challenges.find(
                 item =>
@@ -1012,18 +1332,11 @@ const DVAdmin = (() => {
 
 
         /*
-         * NOTE:
+         * Delete database row first.
          *
-         * Your current database schema uses
-         * ON DELETE CASCADE from submissions
-         * to challenges.
-         *
-         * Deleting a challenge can therefore
-         * permanently remove associated submissions.
-         *
-         * We keep this function available for
-         * development, but later we should replace
-         * this with archive/cancel functionality.
+         * Note:
+         * The current schema uses cascading
+         * deletes for submissions.
          */
 
         const {
@@ -1035,10 +1348,6 @@ const DVAdmin = (() => {
                 .eq(
                     "id",
                     challengeId
-                )
-                .eq(
-                    "created_by",
-                    state.user.id
                 );
 
 
@@ -1047,6 +1356,10 @@ const DVAdmin = (() => {
             throw error;
         }
 
+
+        /*
+         * Remove cover from Storage.
+         */
 
         if (
             challenge.cover_image_url
@@ -1131,9 +1444,11 @@ const DVAdmin = (() => {
 
 
             button.innerHTML = `
+
                 <i
                     class="fa-solid fa-spinner fa-spin"
                 ></i>
+
             `;
 
 
@@ -1146,6 +1461,9 @@ const DVAdmin = (() => {
                 "Challenge deleted successfully.",
                 "success"
             );
+
+
+            await loadPlatformStats();
 
 
         } catch (error) {
@@ -1245,10 +1563,6 @@ const DVAdmin = (() => {
             "challenge";
 
 
-        /*
-         * Check base slug first.
-         */
-
         const {
             data: existing,
             error
@@ -1265,11 +1579,6 @@ const DVAdmin = (() => {
 
         if (error) {
 
-            /*
-             * Don't hide an unexpected RLS or
-             * database error.
-             */
-
             throw error;
         }
 
@@ -1279,10 +1588,6 @@ const DVAdmin = (() => {
             return baseSlug;
         }
 
-
-        /*
-         * Generate a numbered variation.
-         */
 
         for (
             let i = 2;
@@ -1355,7 +1660,7 @@ const DVAdmin = (() => {
             !String(
                 title || ""
             )
-            .trim()
+                .trim()
         ) {
 
             throw new Error(
@@ -1365,11 +1670,9 @@ const DVAdmin = (() => {
 
 
         if (
-            String(
-                title
-            )
-            .trim()
-            .length >
+            String(title)
+                .trim()
+                .length >
             100
         ) {
 
@@ -1383,7 +1686,7 @@ const DVAdmin = (() => {
             !String(
                 description || ""
             )
-            .trim()
+                .trim()
         ) {
 
             throw new Error(
@@ -1413,26 +1716,23 @@ const DVAdmin = (() => {
 
 
         const votingEnd =
-            parseDate(
-                votingEndsAt
-            );
+            votingEndsAt
+                ? parseDate(
+                    votingEndsAt
+                )
+                : null;
 
 
         if (
             start === null ||
-            end === null ||
-            votingEnd === null
+            end === null
         ) {
 
             throw new Error(
-                "Please provide valid start, submission deadline and voting deadline dates."
+                "Please provide valid start and submission deadline dates."
             );
         }
 
-
-        /*
-         * START < END
-         */
 
         if (
             end <= start
@@ -1445,11 +1745,16 @@ const DVAdmin = (() => {
 
 
         /*
-         * END < VOTING END
+         * Voting period is optional until
+         * voting_ends_at exists in the schema.
          */
 
         if (
-            votingEnd <= end
+            votingEndsAt &&
+            (
+                votingEnd === null ||
+                votingEnd <= end
+            )
         ) {
 
             throw new Error(
@@ -1457,11 +1762,6 @@ const DVAdmin = (() => {
             );
         }
 
-
-        /*
-         * Minimum submission period:
-         * 1 hour.
-         */
 
         const minimumSubmissionPeriod =
             60 * 60 * 1000;
@@ -1478,18 +1778,10 @@ const DVAdmin = (() => {
         }
 
 
-        /*
-         * Minimum voting period:
-         * 1 hour.
-         */
-
-        const minimumVotingPeriod =
-            60 * 60 * 1000;
-
-
         if (
+            votingEndsAt &&
             votingEnd - end <
-            minimumVotingPeriod
+            60 * 60 * 1000
         ) {
 
             throw new Error(
@@ -1499,9 +1791,7 @@ const DVAdmin = (() => {
 
 
         const numericPoints =
-            Number(
-                points
-            );
+            Number(points);
 
 
         if (
@@ -1747,6 +2037,9 @@ const DVAdmin = (() => {
                     await loadChallenges();
 
 
+                    await loadPlatformStats();
+
+
                 } catch (error) {
 
                     console.error(
@@ -1824,6 +2117,7 @@ const DVAdmin = (() => {
 
             `;
 
+
         } else {
 
             button.disabled =
@@ -1891,6 +2185,7 @@ const DVAdmin = (() => {
                     "change",
                     updateFormPreview
                 );
+
             }
         );
 
@@ -2022,9 +2317,11 @@ const DVAdmin = (() => {
 
         setText(
             "#previewVotingEndsAt",
-            formatPreviewDate(
-                votingEndsAt
-            )
+            votingEndsAt
+                ? formatPreviewDate(
+                    votingEndsAt
+                )
+                : "Not set"
         );
     }
 
@@ -2083,7 +2380,6 @@ const DVAdmin = (() => {
 
                 event.preventDefault();
 
-
                 input.click();
 
             }
@@ -2102,7 +2398,6 @@ const DVAdmin = (() => {
                     event => {
 
                         event.preventDefault();
-
 
                         uploadZone.classList.add(
                             "dragover"
@@ -2127,7 +2422,6 @@ const DVAdmin = (() => {
                     event => {
 
                         event.preventDefault();
-
 
                         uploadZone.classList.remove(
                             "dragover"
@@ -2170,7 +2464,12 @@ const DVAdmin = (() => {
                         transfer.files;
 
                 } catch {
-                    /* Browser may restrict FileList assignment. */
+
+                    /*
+                     * Some browsers restrict
+                     * FileList assignment.
+                     */
+
                 }
 
 
@@ -2190,6 +2489,7 @@ const DVAdmin = (() => {
                 validateCoverFile(
                     file
                 );
+
 
             } catch (error) {
 
@@ -2384,9 +2684,11 @@ const DVAdmin = (() => {
 
 
         const votingEnd =
-            parseDate(
-                votingEndsAt
-            );
+            votingEndsAt
+                ? parseDate(
+                    votingEndsAt
+                )
+                : null;
 
 
         if (
@@ -2419,6 +2721,12 @@ const DVAdmin = (() => {
             return "voting";
         }
 
+
+        /*
+         * Without a voting_ends_at field,
+         * ending the submission period means
+         * the challenge becomes completed.
+         */
 
         return "completed";
     }
@@ -2664,20 +2972,20 @@ const DVAdmin = (() => {
             value ||
             ""
         )
-        .trim()
-        .toLowerCase()
-        .replace(
-            /[^a-z0-9]+/g,
-            "-"
-        )
-        .replace(
-            /^-+|-+$/g,
-            ""
-        )
-        .substring(
-            0,
-            80
-        );
+            .trim()
+            .toLowerCase()
+            .replace(
+                /[^a-z0-9]+/g,
+                "-"
+            )
+            .replace(
+                /^-+|-+$/g,
+                ""
+            )
+            .substring(
+                0,
+                80
+            );
     }
 
 
@@ -2743,9 +3051,9 @@ const DVAdmin = (() => {
 
         if (
             typeof crypto !==
-            "undefined" &&
+                "undefined" &&
             typeof crypto.randomUUID ===
-            "function"
+                "function"
         ) {
 
             return crypto.randomUUID();
@@ -2763,6 +3071,27 @@ const DVAdmin = (() => {
                     10
                 )
         );
+    }
+
+
+    /* =====================================================
+       SET TEXT
+       ===================================================== */
+
+    function setText(
+        selector,
+        value
+    ) {
+
+        const element =
+            $(selector);
+
+
+        if (element) {
+
+            element.textContent =
+                value;
+        }
     }
 
 
@@ -2903,7 +3232,7 @@ const DVAdmin = (() => {
         ) {
 
             return (
-                "The challenges table is missing the voting_ends_at column."
+                "Your challenges table does not currently contain the voting_ends_at column required for a voting period."
             );
         }
 
@@ -2974,7 +3303,7 @@ const DVAdmin = (() => {
                 display:flex;
                 flex-direction:column;
                 gap:8px;
-                max-width:min(
+                width:min(
                     380px,
                     calc(100vw - 36px)
                 );
@@ -3041,10 +3370,13 @@ const DVAdmin = (() => {
                 "
             ></i>
 
+
             <span>
+
                 ${escapeHTML(
                     message
                 )}
+
             </span>
 
         `;
@@ -3065,11 +3397,6 @@ const DVAdmin = (() => {
         );
     }
 
-
-    /*
-     * Kept as a small public helper in case the
-     * admin page needs to display a custom message.
-     */
 
     function showToast(
         message,
@@ -3111,7 +3438,8 @@ const DVAdmin = (() => {
                 pathname.substring(
                     0,
                     index
-                ) + "/"
+                ) +
+                "/"
             );
         }
 
@@ -3153,7 +3481,11 @@ const DVAdmin = (() => {
             );
 
         } catch {
-            /* Ignore storage failures. */
+
+            /*
+             * Ignore storage failures.
+             */
+
         }
     }
 
@@ -3190,14 +3522,79 @@ const DVAdmin = (() => {
         return escapeHTML(
             value
         )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+            .replace(
+                /'/g,
+                "&#039;"
+            );
+    }
+
+
+    /* =====================================================
+       ADMIN PAGE TYPE
+       ===================================================== */
+
+    function getAdminPageType() {
+
+        const path =
+            window.location.pathname
+                .toLowerCase();
+
+
+        if (
+            path.endsWith(
+                "/admin/index.html"
+            )
+        ) {
+
+            return "overview";
+        }
+
+
+        if (
+            path.endsWith(
+                "/admin/challenges.html"
+            )
+        ) {
+
+            return "challenges";
+        }
+
+
+        if (
+            path.endsWith(
+                "/admin/submissions.html"
+            )
+        ) {
+
+            return "submissions";
+        }
+
+
+        if (
+            path.endsWith(
+                "/admin/users.html"
+            )
+        ) {
+
+            return "users";
+        }
+
+
+        if (
+            path.endsWith(
+                "/admin/reports.html"
+            )
+        ) {
+
+            return "reports";
+        }
+
+
+        return "unknown";
     }
 
 
@@ -3216,12 +3613,34 @@ const DVAdmin = (() => {
 
 
         /*
-         * Only run on the admin challenge page.
+         * Only run on admin pages.
          */
 
+        const pageType =
+            getAdminPageType();
+
+
         if (
-            !$("#challengeForm")
+            pageType ===
+            "unknown"
         ) {
+
+            return;
+        }
+
+
+        /*
+         * Verify admin access FIRST.
+         */
+
+        const allowed =
+            await requireAdmin();
+
+
+        if (!allowed) {
+
+            state.initialized =
+                true;
 
             return;
         }
@@ -3232,27 +3651,92 @@ const DVAdmin = (() => {
 
 
         /*
-         * Verify admin access before loading
-         * challenge data or activating the form.
+         * Load common admin UI.
          */
 
-        const allowed =
-            await requireAdmin();
+        renderAdminProfile();
 
 
-        if (!allowed) {
+        /*
+         * Load overview-specific
+         * statistics.
+         */
+
+        if (
+            pageType ===
+            "overview"
+        ) {
+
+            await loadPlatformStats();
 
             return;
         }
 
 
-        setupChallengeForm();
+        /*
+         * Challenge manager.
+         */
 
-        setupPreview();
+        if (
+            pageType ===
+            "challenges"
+        ) {
 
-        setupCoverPreview();
+            setupChallengeForm();
 
-        await loadChallenges();
+            setupPreview();
+
+            setupCoverPreview();
+
+            await loadChallenges();
+
+            return;
+        }
+
+
+        /*
+         * Other admin sections are
+         * initialized by their future
+         * page-specific systems.
+         */
+
+        if (
+            pageType ===
+            "submissions"
+        ) {
+
+            console.log(
+                "DESIGNVERSE: Admin submissions page authorized."
+            );
+
+            return;
+        }
+
+
+        if (
+            pageType ===
+            "users"
+        ) {
+
+            console.log(
+                "DESIGNVERSE: Admin users page authorized."
+            );
+
+            return;
+        }
+
+
+        if (
+            pageType ===
+            "reports"
+        ) {
+
+            console.log(
+                "DESIGNVERSE: Admin reports page authorized."
+            );
+
+            return;
+        }
     }
 
 
@@ -3268,6 +3752,12 @@ const DVAdmin = (() => {
 
         requireAdmin,
 
+        getCurrentUser,
+
+        getAdminProfile,
+
+        loadPlatformStats,
+
         loadChallenges,
 
         createChallenge,
@@ -3276,11 +3766,14 @@ const DVAdmin = (() => {
 
         uploadChallengeCover,
 
-        getAdminProfile,
-
         showToast,
 
-        updateFormPreview
+        updateFormPreview,
+
+        isAdmin: () =>
+            state.authorized &&
+            state.profile?.role ===
+                "admin"
 
     };
 
