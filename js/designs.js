@@ -84,11 +84,7 @@ const validateDesignFile = (file) => {
     ];
 
 
-    if (
-        !allowedTypes.includes(
-            file.type
-        )
-    ) {
+    if (!allowedTypes.includes(file.type)) {
 
         throw new Error(
             "Please upload a JPG, PNG, WEBP or GIF image."
@@ -100,10 +96,7 @@ const validateDesignFile = (file) => {
         10 * 1024 * 1024;
 
 
-    if (
-        file.size >
-        maxSize
-    ) {
+    if (file.size > maxSize) {
 
         throw new Error(
             "Your design must be smaller than 10 MB."
@@ -119,9 +112,7 @@ const validateDesignFile = (file) => {
    CREATE SAFE FILE NAME
    ========================================================= */
 
-const createDesignFileName = (
-    file
-) => {
+const createDesignFileName = (file) => {
 
     const extension =
         file.name
@@ -131,8 +122,11 @@ const createDesignFileName = (
 
 
     const randomPart =
-        crypto.randomUUID
+        typeof crypto !== "undefined" &&
+        typeof crypto.randomUUID === "function"
+
             ? crypto.randomUUID()
+
             : `${Date.now()}-${Math.random()
                 .toString(36)
                 .slice(2)}`;
@@ -146,9 +140,7 @@ const createDesignFileName = (
    UPLOAD DESIGN IMAGE
    ========================================================= */
 
-const uploadDesignImage = async (
-    file
-) => {
+const uploadDesignImage = async (file) => {
 
     const supabase =
         getDesignSupabase();
@@ -178,9 +170,7 @@ const uploadDesignImage = async (
 
 
     const fileName =
-        createDesignFileName(
-            file
-        );
+        createDesignFileName(file);
 
 
     /*
@@ -204,14 +194,9 @@ const uploadDesignImage = async (
             filePath,
             file,
             {
-                cacheControl:
-                    "3600",
-
-                upsert:
-                    false,
-
-                contentType:
-                    file.type
+                cacheControl: "3600",
+                upsert: false,
+                contentType: file.type
             }
         );
 
@@ -232,9 +217,7 @@ const uploadDesignImage = async (
     } = supabase
         .storage
         .from("designs")
-        .getPublicUrl(
-            filePath
-        );
+        .getPublicUrl(filePath);
 
 
     return {
@@ -317,16 +300,6 @@ const createDesign = async ({
     }
 
 
-    /*
-     * IMPORTANT:
-     *
-     * We use the authenticated user's
-     * ID from Supabase Auth.
-     *
-     * Never accept designer_id
-     * directly from the frontend.
-     */
-
     const designData = {
 
         designer_id:
@@ -355,9 +328,7 @@ const createDesign = async ({
         error
     } = await supabase
         .from("designs")
-        .insert(
-            designData
-        )
+        .insert(designData)
         .select()
         .single();
 
@@ -389,23 +360,11 @@ const publishDesign = async ({
     isPublic = true
 }) => {
 
-    /*
-     * Step 1:
-     * Upload image to Storage.
-     */
-
     const upload =
-        await uploadDesignImage(
-            file
-        );
+        await uploadDesignImage(file);
 
 
     try {
-
-        /*
-         * Step 2:
-         * Create database record.
-         */
 
         const design =
             await createDesign({
@@ -439,9 +398,8 @@ const publishDesign = async ({
     } catch (error) {
 
         /*
-         * If database creation fails
-         * after the image was uploaded,
-         * remove the orphaned image.
+         * Remove uploaded image if
+         * database creation fails.
          */
 
         try {
@@ -475,9 +433,7 @@ const publishDesign = async ({
    GET SINGLE DESIGN
    ========================================================= */
 
-const getDesign = async (
-    designId
-) => {
+const getDesign = async (designId) => {
 
     const supabase =
         getDesignSupabase();
@@ -507,10 +463,7 @@ const getDesign = async (
                 avatar_url
             )
         `)
-        .eq(
-            "id",
-            designId
-        )
+        .eq("id", designId)
         .single();
 
 
@@ -568,8 +521,7 @@ const getPublicDesigns = async ({
             .order(
                 "created_at",
                 {
-                    ascending:
-                        false
+                    ascending: false
                 }
             )
             .range(
@@ -670,8 +622,7 @@ const getMyDesigns = async ({
         .order(
             "created_at",
             {
-                ascending:
-                    false
+                ascending: false
             }
         )
         .range(
@@ -699,9 +650,7 @@ const getMyDesigns = async ({
    GET DESIGNS BY DESIGNER
    ========================================================= */
 
-const getDesignsByDesigner = async (
-    designerId
-) => {
+const getDesignsByDesigner = async (designerId) => {
 
     const supabase =
         getDesignSupabase();
@@ -734,8 +683,7 @@ const getDesignsByDesigner = async (
         .order(
             "created_at",
             {
-                ascending:
-                    false
+                ascending: false
             }
         );
 
@@ -761,7 +709,7 @@ const getDesignsByDesigner = async (
 
 const updateDesign = async (
     designId,
-    updates
+    updates = {}
 ) => {
 
     const supabase =
@@ -833,8 +781,7 @@ const updateDesign = async (
     ) {
 
         cleanUpdates.title =
-            cleanUpdates.title
-                .trim();
+            cleanUpdates.title.trim();
     }
 
 
@@ -844,8 +791,7 @@ const updateDesign = async (
     ) {
 
         cleanUpdates.description =
-            cleanUpdates.description
-                .trim();
+            cleanUpdates.description.trim();
     }
 
 
@@ -855,8 +801,7 @@ const updateDesign = async (
     ) {
 
         cleanUpdates.category =
-            cleanUpdates.category
-                .trim();
+            cleanUpdates.category.trim();
     }
 
 
@@ -869,9 +814,7 @@ const updateDesign = async (
         error
     } = await supabase
         .from("designs")
-        .update(
-            cleanUpdates
-        )
+        .update(cleanUpdates)
         .eq(
             "id",
             designId
@@ -932,19 +875,19 @@ const replaceDesignImage = async (
     }
 
 
-    validateDesignFile(
-        file
-    );
+    if (!designId) {
+
+        throw new Error(
+            "Design ID is required."
+        );
+    }
 
 
-    /*
-     * Get existing design.
-     */
+    validateDesignFile(file);
+
 
     const design =
-        await getDesign(
-            designId
-        );
+        await getDesign(designId);
 
 
     if (!design) {
@@ -966,21 +909,11 @@ const replaceDesignImage = async (
     }
 
 
-    /*
-     * Upload new image.
-     */
-
     const upload =
-        await uploadDesignImage(
-            file
-        );
+        await uploadDesignImage(file);
 
 
     try {
-
-        /*
-         * Update database.
-         */
 
         const {
             data,
@@ -1017,20 +950,26 @@ const replaceDesignImage = async (
         }
 
 
-        /*
-         * Delete old image.
-         */
+        if (design.image_path) {
 
-        if (
-            design.image_path
-        ) {
-
-            await supabase
+            const {
+                error:
+                    oldImageError
+            } = await supabase
                 .storage
                 .from("designs")
                 .remove([
                     design.image_path
                 ]);
+
+
+            if (oldImageError) {
+
+                console.warn(
+                    "Old design image cleanup failed:",
+                    oldImageError
+                );
+            }
         }
 
 
@@ -1038,11 +977,6 @@ const replaceDesignImage = async (
 
 
     } catch (error) {
-
-        /*
-         * Cleanup new image if
-         * database update failed.
-         */
 
         await supabase
             .storage
@@ -1061,9 +995,7 @@ const replaceDesignImage = async (
    DELETE DESIGN
    ========================================================= */
 
-const deleteDesign = async (
-    designId
-) => {
+const deleteDesign = async (designId) => {
 
     const supabase =
         getDesignSupabase();
@@ -1089,15 +1021,16 @@ const deleteDesign = async (
     }
 
 
-    /*
-     * Get design first so we know
-     * which Storage file to remove.
-     */
+    if (!designId) {
+
+        throw new Error(
+            "Design ID is required."
+        );
+    }
+
 
     const design =
-        await getDesign(
-            designId
-        );
+        await getDesign(designId);
 
 
     if (!design) {
@@ -1118,10 +1051,6 @@ const deleteDesign = async (
         );
     }
 
-
-    /*
-     * Delete database record.
-     */
 
     const {
         error
@@ -1149,13 +1078,7 @@ const deleteDesign = async (
     }
 
 
-    /*
-     * Delete Storage file.
-     */
-
-    if (
-        design.image_path
-    ) {
+    if (design.image_path) {
 
         const {
             error:
@@ -1192,7 +1115,12 @@ const renderDesignCard = (
 ) => {
 
     if (!container) {
-        return;
+        return null;
+    }
+
+
+    if (!design) {
+        return null;
     }
 
 
@@ -1231,6 +1159,7 @@ const renderDesignCard = (
     const displayName =
         escapeDesignHtml(
             designer.display_name ||
+            designer.username ||
             "Designer"
         );
 
@@ -1243,23 +1172,67 @@ const renderDesignCard = (
             : "";
 
 
+    /*
+     * IMPORTANT:
+     *
+     * Design detail pages use the
+     * Cloudflare Pages route:
+     *
+     * /design?id=DESIGN_ID
+     */
+
+    const designUrl =
+        `/design?id=${encodeURIComponent(
+            design.id
+        )}`;
+
+
+    const safeImageUrl =
+        escapeDesignAttribute(
+            design.image_url || ""
+        );
+
+
+    const safeTitle =
+        escapeDesignAttribute(
+            design.title ||
+            "Design"
+        );
+
+
+    const avatarHtml =
+        designer.avatar_url
+            ? `
+                <img
+                    src="${escapeDesignAttribute(
+                        designer.avatar_url
+                    )}"
+                    alt="${displayName}"
+                    class="design-card-avatar"
+                    loading="lazy"
+                >
+            `
+            : `
+                <div
+                    class="design-card-avatar-placeholder"
+                    aria-hidden="true"
+                >
+                    <i class="fa-solid fa-user"></i>
+                </div>
+            `;
+
+
     card.innerHTML = `
 
         <a
             class="design-card-image"
-            href="design.html?id=${encodeURIComponent(
-                design.id
-            )}"
+            href="${designUrl}"
+            aria-label="View ${safeTitle}"
         >
 
             <img
-                src="${escapeDesignAttribute(
-                    design.image_url
-                )}"
-                alt="${escapeDesignAttribute(
-                    design.title ||
-                    "Design"
-                )}"
+                src="${safeImageUrl}"
+                alt="${safeTitle}"
                 loading="lazy"
             >
 
@@ -1269,16 +1242,22 @@ const renderDesignCard = (
         <div class="design-card-content">
 
             <h3 class="design-card-title">
-                ${title}
+
+                <a
+                    href="${designUrl}"
+                >
+                    ${title}
+                </a>
+
             </h3>
 
 
             ${
                 description
                     ? `
-                    <p class="design-card-description">
-                        ${description}
-                    </p>
+                        <p class="design-card-description">
+                            ${description}
+                        </p>
                     `
                     : ""
             }
@@ -1286,37 +1265,22 @@ const renderDesignCard = (
 
             <div class="design-card-designer">
 
-                ${
-                    designer.avatar_url
-                        ? `
-                        <img
-                            src="${escapeDesignAttribute(
-                                designer.avatar_url
-                            )}"
-                            alt="${displayName}"
-                            class="design-card-avatar"
-                        >
-                        `
-                        : `
-                        <div class="design-card-avatar-placeholder">
-                            <i class="fa-solid fa-user"></i>
-                        </div>
-                        `
-                }
+                ${avatarHtml}
 
 
-                <div>
+                <div class="design-card-designer-info">
 
                     <span>
                         ${displayName}
                     </span>
 
+
                     ${
                         username
                             ? `
-                            <small>
-                                ${username}
-                            </small>
+                                <small>
+                                    ${username}
+                                </small>
                             `
                             : ""
                     }
@@ -1329,9 +1293,7 @@ const renderDesignCard = (
     `;
 
 
-    container.appendChild(
-        card
-    );
+    container.appendChild(card);
 
 
     return card;
@@ -1342,13 +1304,9 @@ const renderDesignCard = (
    ESCAPE HTML
    ========================================================= */
 
-const escapeDesignHtml = (
-    value
-) => {
+const escapeDesignHtml = (value) => {
 
-    return String(
-        value ?? ""
-    )
+    return String(value ?? "")
         .replace(
             /&/g,
             "&amp;"
@@ -1376,13 +1334,9 @@ const escapeDesignHtml = (
    ESCAPE ATTRIBUTE
    ========================================================= */
 
-const escapeDesignAttribute = (
-    value
-) => {
+const escapeDesignAttribute = (value) => {
 
-    return escapeDesignHtml(
-        value
-    );
+    return escapeDesignHtml(value);
 };
 
 
@@ -1393,6 +1347,7 @@ const escapeDesignAttribute = (
 const loadDesignGrid = async ({
     selector = "[data-design-grid]",
     limit = 24,
+    offset = 0,
     category = "",
     search = "",
     append = false
@@ -1420,64 +1375,99 @@ const loadDesignGrid = async ({
     }
 
 
-    const designs =
-        await getPublicDesigns({
+    try {
 
-            limit,
+        const designs =
+            await getPublicDesigns({
 
-            category,
+                limit,
 
-            search
+                offset,
 
-        });
+                category,
 
+                search
 
-    if (!append) {
-
-        container.innerHTML = "";
-    }
+            });
 
 
-    if (
-        designs.length ===
-        0
-    ) {
+        if (!append) {
+
+            container.innerHTML = "";
+        }
+
+
+        if (designs.length === 0) {
+
+            if (!append) {
+
+                container.innerHTML = `
+                    <div class="design-empty">
+
+                        <i class="fa-regular fa-image"></i>
+
+                        <h3>
+                            No designs found
+                        </h3>
+
+                        <p>
+                            Be the first designer to showcase your work.
+                        </p>
+
+                    </div>
+                `;
+            }
+
+
+            return [];
+        }
+
+
+        designs.forEach(
+            design => {
+
+                renderDesignCard(
+                    design,
+                    container
+                );
+
+            }
+        );
+
+
+        return designs;
+
+
+    } catch (error) {
+
+        console.error(
+            "Load design grid error:",
+            error
+        );
+
 
         if (!append) {
 
             container.innerHTML = `
                 <div class="design-empty">
-                    <i class="fa-regular fa-image"></i>
+
+                    <i class="fa-solid fa-triangle-exclamation"></i>
 
                     <h3>
-                        No designs found
+                        Unable to load designs
                     </h3>
 
                     <p>
-                        Be the first designer to showcase your work.
+                        Please try again later.
                     </p>
+
                 </div>
             `;
-
         }
+
 
         return [];
     }
-
-
-    designs.forEach(
-        design => {
-
-            renderDesignCard(
-                design,
-                container
-            );
-
-        }
-    );
-
-
-    return designs;
 };
 
 
@@ -1485,200 +1475,106 @@ const loadDesignGrid = async ({
    DESIGN UPLOAD FORM
    ========================================================= */
 
-const setupDesignUploadForm =
-    () => {
+const setupDesignUploadForm = () => {
 
-        const form =
-            document.querySelector(
-                "#designUploadForm"
-            );
-
-
-        if (!form) {
-            return;
-        }
+    const form =
+        document.querySelector(
+            "#designUploadForm"
+        );
 
 
-        const fileInput =
-            form.querySelector(
-                "#designFile"
-            );
+    if (!form) {
+        return;
+    }
 
 
-        const preview =
-            form.querySelector(
-                "[data-design-preview]"
-            );
+    const fileInput =
+        form.querySelector(
+            "#designFile"
+        );
 
 
-        const previewImage =
-            form.querySelector(
-                "[data-design-preview-image]"
-            );
+    const preview =
+        form.querySelector(
+            "[data-design-preview]"
+        );
 
 
-        /*
-         * File preview
-         */
-
-        if (fileInput) {
-
-            fileInput.addEventListener(
-                "change",
-                () => {
-
-                    const file =
-                        fileInput.files?.[0];
+    const previewImage =
+        form.querySelector(
+            "[data-design-preview-image]"
+        );
 
 
-                    if (!file) {
-                        return;
-                    }
+    let previewUrl = null;
 
 
-                    try {
+    /* -----------------------------------------------------
+       FILE PREVIEW
+       ----------------------------------------------------- */
 
-                        validateDesignFile(
-                            file
-                        );
+    if (fileInput) {
 
-
-                        if (
-                            preview &&
-                            previewImage
-                        ) {
-
-                            const url =
-                                URL.createObjectURL(
-                                    file
-                                );
-
-
-                            previewImage.src =
-                                url;
-
-
-                            preview.classList.remove(
-                                "hidden"
-                            );
-                        }
-
-
-                    } catch (error) {
-
-                        fileInput.value =
-                            "";
-
-
-                        showDesignMessage(
-                            error.message,
-                            "error"
-                        );
-
-                    }
-
-                }
-            );
-        }
-
-
-        /*
-         * Submit
-         */
-
-        form.addEventListener(
-            "submit",
-            async event => {
-
-                event.preventDefault();
-
-
-                const button =
-                    form.querySelector(
-                        "button[type='submit']"
-                    );
-
+        fileInput.addEventListener(
+            "change",
+            () => {
 
                 const file =
-                    fileInput?.files?.[0];
+                    fileInput.files?.[0];
 
 
-                const title =
-                    form.querySelector(
-                        "#designTitle"
-                    )?.value || "";
+                if (!file) {
 
+                    if (preview) {
+                        preview.classList.add(
+                            "hidden"
+                        );
+                    }
 
-                const description =
-                    form.querySelector(
-                        "#designDescription"
-                    )?.value || "";
-
-
-                const category =
-                    form.querySelector(
-                        "#designCategory"
-                    )?.value || "";
-
-
-                const isPublic =
-                    form.querySelector(
-                        "#designPublic"
-                    )?.checked ??
-                    true;
+                    return;
+                }
 
 
                 try {
 
-                    validateDesignFile(
-                        file
-                    );
-
-
-                    if (button) {
-
-                        button.disabled =
-                            true;
-
-                        button.dataset
-                            .originalText =
-                            button.innerHTML;
-
-                        button.innerHTML = `
-                            <i class="fa-solid fa-spinner fa-spin"></i>
-                            Publishing...
-                        `;
-                    }
-
-
-                    const result =
-                        await publishDesign({
-
-                            file,
-
-                            title,
-
-                            description,
-
-                            category,
-
-                            isPublic
-
-                        });
-
-
-                    showDesignMessage(
-                        "Your design has been published successfully! 🎨",
-                        "success"
-                    );
-
-
-                    form.reset();
+                    validateDesignFile(file);
 
 
                     if (
-                        preview
+                        preview &&
+                        previewImage
                     ) {
+
+                        if (previewUrl) {
+
+                            URL.revokeObjectURL(
+                                previewUrl
+                            );
+                        }
+
+
+                        previewUrl =
+                            URL.createObjectURL(
+                                file
+                            );
+
+
+                        previewImage.src =
+                            previewUrl;
+
+
+                        preview.classList.remove(
+                            "hidden"
+                        );
+                    }
+
+
+                } catch (error) {
+
+                    fileInput.value = "";
+
+
+                    if (preview) {
 
                         preview.classList.add(
                             "hidden"
@@ -1686,56 +1582,173 @@ const setupDesignUploadForm =
                     }
 
 
-                    /*
-                     * Allow dashboard/grid
-                     * to refresh itself.
-                     */
-
-                    document.dispatchEvent(
-                        new CustomEvent(
-                            "designverse:design-created",
-                            {
-                                detail:
-                                    result.design
-                            }
-                        )
-                    );
-
-
-                } catch (error) {
-
-                    console.error(
-                        "Publish design error:",
-                        error
-                    );
-
-
                     showDesignMessage(
-                        getDesignErrorMessage(
-                            error
-                        ),
+                        error.message,
                         "error"
                     );
-
-
-                } finally {
-
-                    if (button) {
-
-                        button.disabled =
-                            false;
-
-                        button.innerHTML =
-                            button.dataset
-                                .originalText ||
-                            "Publish Design";
-                    }
-
                 }
-
             }
         );
-    };
+    }
+
+
+    /* -----------------------------------------------------
+       SUBMIT
+       ----------------------------------------------------- */
+
+    form.addEventListener(
+        "submit",
+        async event => {
+
+            event.preventDefault();
+
+
+            const button =
+                form.querySelector(
+                    "button[type='submit']"
+                );
+
+
+            const file =
+                fileInput?.files?.[0];
+
+
+            const title =
+                form.querySelector(
+                    "#designTitle"
+                )?.value || "";
+
+
+            const description =
+                form.querySelector(
+                    "#designDescription"
+                )?.value || "";
+
+
+            const category =
+                form.querySelector(
+                    "#designCategory"
+                )?.value || "";
+
+
+            const isPublic =
+                form.querySelector(
+                    "#designPublic"
+                )?.checked ??
+                true;
+
+
+            try {
+
+                validateDesignFile(file);
+
+
+                if (button) {
+
+                    button.disabled =
+                        true;
+
+
+                    button.dataset
+                        .originalText =
+                        button.innerHTML;
+
+
+                    button.innerHTML = `
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                        Publishing...
+                    `;
+                }
+
+
+                const result =
+                    await publishDesign({
+
+                        file,
+
+                        title,
+
+                        description,
+
+                        category,
+
+                        isPublic
+
+                    });
+
+
+                showDesignMessage(
+                    "Your design has been published successfully! 🎨",
+                    "success"
+                );
+
+
+                form.reset();
+
+
+                if (preview) {
+
+                    preview.classList.add(
+                        "hidden"
+                    );
+                }
+
+
+                if (previewUrl) {
+
+                    URL.revokeObjectURL(
+                        previewUrl
+                    );
+
+                    previewUrl =
+                        null;
+                }
+
+
+                document.dispatchEvent(
+                    new CustomEvent(
+                        "designverse:design-created",
+                        {
+                            detail:
+                                result.design
+                        }
+                    )
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Publish design error:",
+                    error
+                );
+
+
+                showDesignMessage(
+                    getDesignErrorMessage(
+                        error
+                    ),
+                    "error"
+                );
+
+
+            } finally {
+
+                if (button) {
+
+                    button.disabled =
+                        false;
+
+
+                    button.innerHTML =
+                        button.dataset
+                            .originalText ||
+                        "Publish Design";
+                }
+            }
+        }
+    );
+};
 
 
 /* =========================================================
@@ -1760,10 +1773,12 @@ const showDesignMessage = (
                 "div"
             );
 
+
         element.setAttribute(
             "data-design-message",
             ""
         );
+
 
         document.body.prepend(
             element
@@ -1807,9 +1822,7 @@ const showDesignMessage = (
    DESIGN ERROR HANDLER
    ========================================================= */
 
-const getDesignErrorMessage = (
-    error
-) => {
+const getDesignErrorMessage = (error) => {
 
     if (!error) {
 
@@ -1822,12 +1835,17 @@ const getDesignErrorMessage = (
         String(error);
 
 
+    const lowerMessage =
+        message.toLowerCase();
+
+
     if (
-        message
-            .toLowerCase()
-            .includes(
-                "row-level security"
-            )
+        lowerMessage.includes(
+            "row-level security"
+        ) ||
+        lowerMessage.includes(
+            "violates row-level security policy"
+        )
     ) {
 
         return (
@@ -1837,11 +1855,9 @@ const getDesignErrorMessage = (
 
 
     if (
-        message
-            .toLowerCase()
-            .includes(
-                "duplicate"
-            )
+        lowerMessage.includes(
+            "duplicate"
+        )
     ) {
 
         return (
@@ -1851,15 +1867,43 @@ const getDesignErrorMessage = (
 
 
     if (
-        message
-            .toLowerCase()
-            .includes(
-                "payload too large"
-            )
+        lowerMessage.includes(
+            "payload too large"
+        )
     ) {
 
         return (
             "The image is too large."
+        );
+    }
+
+
+    if (
+        lowerMessage.includes(
+            "file size"
+        ) ||
+        lowerMessage.includes(
+            "maximum allowed size"
+        )
+    ) {
+
+        return (
+            "The image is too large."
+        );
+    }
+
+
+    if (
+        lowerMessage.includes(
+            "not authenticated"
+        ) ||
+        lowerMessage.includes(
+            "jwt"
+        )
+    ) {
+
+        return (
+            "Your session has expired. Please log in again."
         );
     }
 
@@ -1911,7 +1955,9 @@ window.DVDesigns = {
 
     validateDesignFile,
 
-    showDesignMessage
+    showDesignMessage,
+
+    getDesignErrorMessage
 
 };
 
