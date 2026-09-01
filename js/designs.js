@@ -1,6 +1,29 @@
 /* =========================================================
    DESIGNVERSE — DESIGNS SYSTEM
    js/designs.js
+
+   Database schema used:
+
+   designs
+   ├── id
+   ├── designer_id
+   ├── title
+   ├── description
+   ├── category
+   ├── image_url
+   ├── thumbnail_url
+   ├── tags
+   ├── views
+   ├── likes_count
+   ├── votes_count
+   ├── is_public
+   ├── created_at
+   └── updated_at
+
+   IMPORTANT:
+   - There is NO image_path column.
+   - Storage paths are handled separately from the
+     database record.
    ========================================================= */
 
 "use strict";
@@ -29,8 +52,11 @@ const getDesignSupabase = () => {
    HELPERS
    ========================================================= */
 
-const designQuery = (selector) => {
-    return document.querySelector(selector);
+const designQuery = (selector, parent = document) => {
+
+    return parent.querySelector(
+        selector
+    );
 };
 
 
@@ -39,14 +65,17 @@ const getDesignUser = async () => {
     const supabase =
         getDesignSupabase();
 
+
     if (!supabase) {
         return null;
     }
+
 
     const {
         data,
         error
     } = await supabase.auth.getUser();
+
 
     if (error) {
 
@@ -58,7 +87,8 @@ const getDesignUser = async () => {
         return null;
     }
 
-    return data.user || null;
+
+    return data?.user || null;
 };
 
 
@@ -77,14 +107,23 @@ const validateDesignFile = (file) => {
 
 
     const allowedTypes = [
+
         "image/jpeg",
+
         "image/png",
+
         "image/webp",
+
         "image/gif"
+
     ];
 
 
-    if (!allowedTypes.includes(file.type)) {
+    if (
+        !allowedTypes.includes(
+            file.type
+        )
+    ) {
 
         throw new Error(
             "Please upload a JPG, PNG, WEBP or GIF image."
@@ -92,11 +131,22 @@ const validateDesignFile = (file) => {
     }
 
 
+    /*
+     * Supabase Storage bucket:
+     * designs
+     *
+     * Maximum:
+     * 10 MB
+     */
+
     const maxSize =
         10 * 1024 * 1024;
 
 
-    if (file.size > maxSize) {
+    if (
+        file.size >
+        maxSize
+    ) {
 
         throw new Error(
             "Your design must be smaller than 10 MB."
@@ -109,10 +159,62 @@ const validateDesignFile = (file) => {
 
 
 /* =========================================================
+   TAG NORMALIZATION
+   ========================================================= */
+
+const normalizeDesignTags = (
+    tags
+) => {
+
+    if (!tags) {
+        return [];
+    }
+
+
+    if (
+        Array.isArray(tags)
+    ) {
+
+        return tags
+            .map(
+                tag =>
+                    String(tag)
+                        .trim()
+                        .toLowerCase()
+            )
+            .filter(Boolean);
+
+    }
+
+
+    if (
+        typeof tags ===
+        "string"
+    ) {
+
+        return tags
+            .split(",")
+            .map(
+                tag =>
+                    tag
+                        .trim()
+                        .toLowerCase()
+            )
+            .filter(Boolean);
+    }
+
+
+    return [];
+};
+
+
+/* =========================================================
    CREATE SAFE FILE NAME
    ========================================================= */
 
-const createDesignFileName = (file) => {
+const createDesignFileName = (
+    file
+) => {
 
     const extension =
         file.name
@@ -122,8 +224,12 @@ const createDesignFileName = (file) => {
 
 
     const randomPart =
-        typeof crypto !== "undefined" &&
-        typeof crypto.randomUUID === "function"
+        (
+            typeof crypto !==
+            "undefined" &&
+            typeof crypto.randomUUID ===
+            "function"
+        )
 
             ? crypto.randomUUID()
 
@@ -132,7 +238,74 @@ const createDesignFileName = (file) => {
                 .slice(2)}`;
 
 
-    return `design-${randomPart}.${extension}`;
+    return (
+        `design-${randomPart}.${extension}`
+    );
+};
+
+
+/* =========================================================
+   CREATE STORAGE PATH
+   ========================================================= */
+
+const createDesignStoragePath = (
+    userId,
+    fileName
+) => {
+
+    return (
+        `${userId}/${fileName}`
+    );
+};
+
+
+/* =========================================================
+   GET STORAGE PATH FROM PUBLIC URL
+   ========================================================= */
+
+/*
+ * Since `designs` does not have an image_path
+ * column, we derive the Storage path from
+ * the public URL when cleanup is necessary.
+ *
+ * Expected public URL:
+ *
+ * .../storage/v1/object/public/designs/USER_UUID/file.webp
+ */
+
+const getDesignStoragePathFromUrl = (
+    imageUrl
+) => {
+
+    if (!imageUrl) {
+        return null;
+    }
+
+
+    const marker =
+        "/storage/v1/object/public/designs/";
+
+
+    const index =
+        imageUrl.indexOf(
+            marker
+        );
+
+
+    if (
+        index === -1
+    ) {
+
+        return null;
+    }
+
+
+    return decodeURIComponent(
+        imageUrl.substring(
+            index +
+            marker.length
+        )
+    );
 };
 
 
@@ -140,7 +313,9 @@ const createDesignFileName = (file) => {
    UPLOAD DESIGN IMAGE
    ========================================================= */
 
-const uploadDesignImage = async (file) => {
+const uploadDesignImage = async (
+    file
+) => {
 
     const supabase =
         getDesignSupabase();
@@ -166,23 +341,22 @@ const uploadDesignImage = async (file) => {
     }
 
 
-    validateDesignFile(file);
+    validateDesignFile(
+        file
+    );
 
 
     const fileName =
-        createDesignFileName(file);
+        createDesignFileName(
+            file
+        );
 
-
-    /*
-     * Storage structure:
-     *
-     * designs/
-     *   USER_UUID/
-     *       design-xxxxx.webp
-     */
 
     const filePath =
-        `${user.id}/${fileName}`;
+        createDesignStoragePath(
+            user.id,
+            fileName
+        );
 
 
     const {
@@ -194,9 +368,16 @@ const uploadDesignImage = async (file) => {
             filePath,
             file,
             {
-                cacheControl: "3600",
-                upsert: false,
-                contentType: file.type
+
+                cacheControl:
+                    "3600",
+
+                upsert:
+                    false,
+
+                contentType:
+                    file.type
+
             }
         );
 
@@ -217,7 +398,43 @@ const uploadDesignImage = async (file) => {
     } = supabase
         .storage
         .from("designs")
-        .getPublicUrl(filePath);
+        .getPublicUrl(
+            filePath
+        );
+
+
+    if (
+        !data?.publicUrl
+    ) {
+
+        /*
+         * Clean up the uploaded
+         * object if a public URL
+         * could not be generated.
+         */
+
+        try {
+
+            await supabase
+                .storage
+                .from("designs")
+                .remove([
+                    filePath
+                ]);
+
+        } catch (cleanupError) {
+
+            console.warn(
+                "Storage cleanup failed:",
+                cleanupError
+            );
+        }
+
+
+        throw new Error(
+            "Unable to create the design image URL."
+        );
+    }
 
 
     return {
@@ -239,9 +456,10 @@ const uploadDesignImage = async (file) => {
 const createDesign = async ({
     title,
     description = "",
-    category = "",
+    category,
     imageUrl,
-    imagePath = "",
+    thumbnailUrl = null,
+    tags = [],
     isPublic = true
 }) => {
 
@@ -270,24 +488,41 @@ const createDesign = async ({
 
 
     title =
-        String(title || "")
-            .trim();
+        String(
+            title || ""
+        ).trim();
 
 
     description =
-        String(description || "")
-            .trim();
+        String(
+            description || ""
+        ).trim();
 
 
     category =
-        String(category || "")
-            .trim();
+        String(
+            category || ""
+        ).trim();
+
+
+    const normalizedTags =
+        normalizeDesignTags(
+            tags
+        );
 
 
     if (!title) {
 
         throw new Error(
             "Please enter a design title."
+        );
+    }
+
+
+    if (!category) {
+
+        throw new Error(
+            "Please select a design category."
         );
     }
 
@@ -299,6 +534,15 @@ const createDesign = async ({
         );
     }
 
+
+    /*
+     * These are the real columns
+     * in the current designs table.
+     *
+     * Deliberately NOT included:
+     *
+     * image_path
+     */
 
     const designData = {
 
@@ -314,11 +558,16 @@ const createDesign = async ({
         image_url:
             imageUrl,
 
-        image_path:
-            imagePath,
+        thumbnail_url:
+            thumbnailUrl,
+
+        tags:
+            normalizedTags,
 
         is_public:
-            Boolean(isPublic)
+            Boolean(
+                isPublic
+            )
 
     };
 
@@ -328,7 +577,9 @@ const createDesign = async ({
         error
     } = await supabase
         .from("designs")
-        .insert(designData)
+        .insert(
+            designData
+        )
         .select()
         .single();
 
@@ -349,22 +600,35 @@ const createDesign = async ({
 
 
 /* =========================================================
-   UPLOAD + CREATE DESIGN
+   PUBLISH DESIGN
    ========================================================= */
 
 const publishDesign = async ({
     file,
     title,
     description = "",
-    category = "",
+    category,
+    tags = [],
     isPublic = true
 }) => {
 
+    /*
+     * Step 1:
+     * Upload image.
+     */
+
     const upload =
-        await uploadDesignImage(file);
+        await uploadDesignImage(
+            file
+        );
 
 
     try {
+
+        /*
+         * Step 2:
+         * Create database record.
+         */
 
         const design =
             await createDesign({
@@ -378,8 +642,10 @@ const publishDesign = async ({
                 imageUrl:
                     upload.url,
 
-                imagePath:
-                    upload.path,
+                thumbnailUrl:
+                    null,
+
+                tags,
 
                 isPublic
 
@@ -398,8 +664,8 @@ const publishDesign = async ({
     } catch (error) {
 
         /*
-         * Remove uploaded image if
-         * database creation fails.
+         * If database creation fails,
+         * remove the uploaded image.
          */
 
         try {
@@ -418,7 +684,7 @@ const publishDesign = async ({
         } catch (cleanupError) {
 
             console.error(
-                "Storage cleanup error:",
+                "Uploaded image cleanup failed:",
                 cleanupError
             );
         }
@@ -433,7 +699,9 @@ const publishDesign = async ({
    GET SINGLE DESIGN
    ========================================================= */
 
-const getDesign = async (designId) => {
+const getDesign = async (
+    designId
+) => {
 
     const supabase =
         getDesignSupabase();
@@ -455,15 +723,34 @@ const getDesign = async (designId) => {
     } = await supabase
         .from("designs")
         .select(`
-            *,
+            id,
+            designer_id,
+            title,
+            description,
+            category,
+            image_url,
+            thumbnail_url,
+            tags,
+            views,
+            likes_count,
+            votes_count,
+            is_public,
+            created_at,
+            updated_at,
             profiles:designer_id (
                 id,
                 username,
                 display_name,
-                avatar_url
+                avatar_url,
+                bio,
+                website_url,
+                location
             )
         `)
-        .eq("id", designId)
+        .eq(
+            "id",
+            designId
+        )
         .single();
 
 
@@ -478,6 +765,12 @@ const getDesign = async (designId) => {
     }
 
 
+    /*
+     * Private designs are available
+     * to their owners through the
+     * existing designs RLS policy.
+     */
+
     return data;
 };
 
@@ -490,7 +783,9 @@ const getPublicDesigns = async ({
     limit = 24,
     offset = 0,
     category = "",
-    search = ""
+    search = "",
+    orderBy = "created_at",
+    ascending = false
 } = {}) => {
 
     const supabase =
@@ -502,11 +797,67 @@ const getPublicDesigns = async ({
     }
 
 
+    const safeLimit =
+        Math.max(
+            1,
+            Math.min(
+                Number(limit) || 24,
+                100
+            )
+        );
+
+
+    const safeOffset =
+        Math.max(
+            0,
+            Number(offset) || 0
+        );
+
+
+    const allowedOrderColumns = [
+
+        "created_at",
+
+        "views",
+
+        "likes_count",
+
+        "votes_count",
+
+        "title"
+
+    ];
+
+
+    if (
+        !allowedOrderColumns.includes(
+            orderBy
+        )
+    ) {
+
+        orderBy =
+            "created_at";
+    }
+
+
     let query =
         supabase
             .from("designs")
             .select(`
-                *,
+                id,
+                designer_id,
+                title,
+                description,
+                category,
+                image_url,
+                thumbnail_url,
+                tags,
+                views,
+                likes_count,
+                votes_count,
+                is_public,
+                created_at,
+                updated_at,
                 profiles:designer_id (
                     id,
                     username,
@@ -519,14 +870,19 @@ const getPublicDesigns = async ({
                 true
             )
             .order(
-                "created_at",
+                orderBy,
                 {
-                    ascending: false
+                    ascending:
+                        Boolean(
+                            ascending
+                        )
                 }
             )
             .range(
-                offset,
-                offset + limit - 1
+                safeOffset,
+                safeOffset +
+                safeLimit -
+                1
             );
 
 
@@ -543,7 +899,9 @@ const getPublicDesigns = async ({
     if (search) {
 
         const safeSearch =
-            search
+            String(
+                search
+            )
                 .trim()
                 .replace(
                     /[%_]/g,
@@ -609,12 +967,44 @@ const getMyDesigns = async ({
     }
 
 
+    const safeLimit =
+        Math.max(
+            1,
+            Math.min(
+                Number(limit) || 50,
+                100
+            )
+        );
+
+
+    const safeOffset =
+        Math.max(
+            0,
+            Number(offset) || 0
+        );
+
+
     const {
         data,
         error
     } = await supabase
         .from("designs")
-        .select("*")
+        .select(`
+            id,
+            designer_id,
+            title,
+            description,
+            category,
+            image_url,
+            thumbnail_url,
+            tags,
+            views,
+            likes_count,
+            votes_count,
+            is_public,
+            created_at,
+            updated_at
+        `)
         .eq(
             "designer_id",
             user.id
@@ -622,12 +1012,15 @@ const getMyDesigns = async ({
         .order(
             "created_at",
             {
-                ascending: false
+                ascending:
+                    false
             }
         )
         .range(
-            offset,
-            offset + limit - 1
+            safeOffset,
+            safeOffset +
+            safeLimit -
+            1
         );
 
 
@@ -650,7 +1043,13 @@ const getMyDesigns = async ({
    GET DESIGNS BY DESIGNER
    ========================================================= */
 
-const getDesignsByDesigner = async (designerId) => {
+const getDesignsByDesigner = async (
+    designerId,
+    {
+        limit = 50,
+        offset = 0
+    } = {}
+) => {
 
     const supabase =
         getDesignSupabase();
@@ -666,12 +1065,44 @@ const getDesignsByDesigner = async (designerId) => {
     }
 
 
+    const safeLimit =
+        Math.max(
+            1,
+            Math.min(
+                Number(limit) || 50,
+                100
+            )
+        );
+
+
+    const safeOffset =
+        Math.max(
+            0,
+            Number(offset) || 0
+        );
+
+
     const {
         data,
         error
     } = await supabase
         .from("designs")
-        .select("*")
+        .select(`
+            id,
+            designer_id,
+            title,
+            description,
+            category,
+            image_url,
+            thumbnail_url,
+            tags,
+            views,
+            likes_count,
+            votes_count,
+            is_public,
+            created_at,
+            updated_at
+        `)
         .eq(
             "designer_id",
             designerId
@@ -683,8 +1114,15 @@ const getDesignsByDesigner = async (designerId) => {
         .order(
             "created_at",
             {
-                ascending: false
+                ascending:
+                    false
             }
+        )
+        .range(
+            safeOffset,
+            safeOffset +
+            safeLimit -
+            1
         );
 
 
@@ -700,6 +1138,43 @@ const getDesignsByDesigner = async (designerId) => {
 
 
     return data || [];
+};
+
+
+/* =========================================================
+   INCREMENT DESIGN VIEWS
+   ========================================================= */
+
+/*
+ * This function does NOT directly update
+ * views from the browser.
+ *
+ * The current RLS policy shown for `designs`
+ * only defines owner updates. Therefore we
+ * leave view increments for a database
+ * function/RPC later rather than bypassing RLS.
+ */
+
+const incrementDesignViews = async (
+    designId
+) => {
+
+    if (!designId) {
+        return null;
+    }
+
+
+    /*
+     * Placeholder until we create a
+     * secure Supabase RPC for view counts.
+     */
+
+    console.info(
+        "DESIGNVERSE: view increment will be handled by a secure database RPC."
+    );
+
+
+    return null;
 };
 
 
@@ -745,10 +1220,19 @@ const updateDesign = async (
 
 
     const allowedFields = [
+
         "title",
+
         "description",
+
         "category",
+
+        "thumbnail_url",
+
+        "tags",
+
         "is_public"
+
     ];
 
 
@@ -781,7 +1265,8 @@ const updateDesign = async (
     ) {
 
         cleanUpdates.title =
-            cleanUpdates.title.trim();
+            cleanUpdates.title
+                .trim();
     }
 
 
@@ -791,7 +1276,8 @@ const updateDesign = async (
     ) {
 
         cleanUpdates.description =
-            cleanUpdates.description.trim();
+            cleanUpdates.description
+                .trim();
     }
 
 
@@ -801,20 +1287,57 @@ const updateDesign = async (
     ) {
 
         cleanUpdates.category =
-            cleanUpdates.category.trim();
+            cleanUpdates.category
+                .trim();
+    }
+
+
+    if (
+        Object.prototype
+            .hasOwnProperty
+            .call(
+                cleanUpdates,
+                "tags"
+            )
+    ) {
+
+        cleanUpdates.tags =
+            normalizeDesignTags(
+                cleanUpdates.tags
+            );
+    }
+
+
+    if (
+        Object.keys(
+            cleanUpdates
+        ).length === 0
+    ) {
+
+        throw new Error(
+            "No changes were provided."
+        );
     }
 
 
     cleanUpdates.updated_at =
-        new Date().toISOString();
+        new Date()
+            .toISOString();
 
+
+    /*
+     * Ownership is enforced by
+     * both the query and Supabase RLS.
+     */
 
     const {
         data,
         error
     } = await supabase
         .from("designs")
-        .update(cleanUpdates)
+        .update(
+            cleanUpdates
+        )
         .eq(
             "id",
             designId
@@ -845,6 +1368,18 @@ const updateDesign = async (
 /* =========================================================
    REPLACE DESIGN IMAGE
    ========================================================= */
+
+/*
+ * There is no image_path column.
+ *
+ * We therefore:
+ *
+ * 1. Read the existing image_url.
+ * 2. Upload the replacement.
+ * 3. Update image_url.
+ * 4. Derive the OLD Storage path from image_url.
+ * 5. Remove the old Storage object.
+ */
 
 const replaceDesignImage = async (
     designId,
@@ -883,11 +1418,15 @@ const replaceDesignImage = async (
     }
 
 
-    validateDesignFile(file);
+    validateDesignFile(
+        file
+    );
 
 
     const design =
-        await getDesign(designId);
+        await getDesign(
+            designId
+        );
 
 
     if (!design) {
@@ -909,11 +1448,32 @@ const replaceDesignImage = async (
     }
 
 
+    const oldImageUrl =
+        design.image_url;
+
+
+    const oldStoragePath =
+        getDesignStoragePathFromUrl(
+            oldImageUrl
+        );
+
+
+    /*
+     * Upload replacement first.
+     */
+
     const upload =
-        await uploadDesignImage(file);
+        await uploadDesignImage(
+            file
+        );
 
 
     try {
+
+        /*
+         * Update the real image_url
+         * column only.
+         */
 
         const {
             data,
@@ -924,9 +1484,6 @@ const replaceDesignImage = async (
 
                 image_url:
                     upload.url,
-
-                image_path:
-                    upload.path,
 
                 updated_at:
                     new Date()
@@ -950,24 +1507,33 @@ const replaceDesignImage = async (
         }
 
 
-        if (design.image_path) {
+        /*
+         * Remove the old Storage object
+         * after the database update succeeds.
+         */
+
+        if (
+            oldStoragePath &&
+            oldStoragePath !==
+                upload.path
+        ) {
 
             const {
                 error:
-                    oldImageError
+                    storageError
             } = await supabase
                 .storage
                 .from("designs")
                 .remove([
-                    design.image_path
+                    oldStoragePath
                 ]);
 
 
-            if (oldImageError) {
+            if (storageError) {
 
                 console.warn(
                     "Old design image cleanup failed:",
-                    oldImageError
+                    storageError
                 );
             }
         }
@@ -978,12 +1544,27 @@ const replaceDesignImage = async (
 
     } catch (error) {
 
-        await supabase
-            .storage
-            .from("designs")
-            .remove([
-                upload.path
-            ]);
+        /*
+         * Database update failed.
+         * Remove the newly uploaded object.
+         */
+
+        try {
+
+            await supabase
+                .storage
+                .from("designs")
+                .remove([
+                    upload.path
+                ]);
+
+        } catch (cleanupError) {
+
+            console.warn(
+                "Replacement image cleanup failed:",
+                cleanupError
+            );
+        }
 
 
         throw error;
@@ -995,7 +1576,9 @@ const replaceDesignImage = async (
    DELETE DESIGN
    ========================================================= */
 
-const deleteDesign = async (designId) => {
+const deleteDesign = async (
+    designId
+) => {
 
     const supabase =
         getDesignSupabase();
@@ -1030,7 +1613,9 @@ const deleteDesign = async (designId) => {
 
 
     const design =
-        await getDesign(designId);
+        await getDesign(
+            designId
+        );
 
 
     if (!design) {
@@ -1051,6 +1636,16 @@ const deleteDesign = async (designId) => {
         );
     }
 
+
+    const storagePath =
+        getDesignStoragePathFromUrl(
+            design.image_url
+        );
+
+
+    /*
+     * Delete database record first.
+     */
 
     const {
         error
@@ -1078,7 +1673,11 @@ const deleteDesign = async (designId) => {
     }
 
 
-    if (design.image_path) {
+    /*
+     * Then remove the Storage object.
+     */
+
+    if (storagePath) {
 
         const {
             error:
@@ -1087,7 +1686,7 @@ const deleteDesign = async (designId) => {
             .storage
             .from("designs")
             .remove([
-                design.image_path
+                storagePath
             ]);
 
 
@@ -1102,6 +1701,34 @@ const deleteDesign = async (designId) => {
 
 
     return true;
+};
+
+
+/* =========================================================
+   FORMAT CATEGORY
+   ========================================================= */
+
+const formatDesignCategory = (
+    category
+) => {
+
+    if (!category) {
+        return "Design";
+    }
+
+
+    return String(
+        category
+    )
+        .replace(
+            /[-_]+/g,
+            " "
+        )
+        .replace(
+            /\b\w/g,
+            character =>
+                character.toUpperCase()
+        );
 };
 
 
@@ -1125,7 +1752,8 @@ const renderDesignCard = (
 
 
     const designer =
-        design.profiles || {};
+        design.profiles ||
+        {};
 
 
     const card =
@@ -1140,6 +1768,12 @@ const renderDesignCard = (
 
     card.dataset.designId =
         design.id;
+
+
+    const designUrl =
+        `/design?id=${encodeURIComponent(
+            design.id
+        )}`;
 
 
     const title =
@@ -1172,24 +1806,15 @@ const renderDesignCard = (
             : "";
 
 
-    /*
-     * IMPORTANT:
-     *
-     * Design detail pages use the
-     * Cloudflare Pages route:
-     *
-     * /design?id=DESIGN_ID
-     */
-
-    const designUrl =
-        `/design?id=${encodeURIComponent(
-            design.id
-        )}`;
+    const imageUrl =
+        design.thumbnail_url ||
+        design.image_url ||
+        "";
 
 
     const safeImageUrl =
         escapeDesignAttribute(
-            design.image_url || ""
+            imageUrl
         );
 
 
@@ -1202,6 +1827,7 @@ const renderDesignCard = (
 
     const avatarHtml =
         designer.avatar_url
+
             ? `
                 <img
                     src="${escapeDesignAttribute(
@@ -1212,12 +1838,17 @@ const renderDesignCard = (
                     loading="lazy"
                 >
             `
+
             : `
                 <div
                     class="design-card-avatar-placeholder"
                     aria-hidden="true"
                 >
-                    <i class="fa-solid fa-user"></i>
+
+                    <i
+                        class="fa-solid fa-user"
+                    ></i>
+
                 </div>
             `;
 
@@ -1239,14 +1870,20 @@ const renderDesignCard = (
         </a>
 
 
-        <div class="design-card-content">
+        <div
+            class="design-card-content"
+        >
 
-            <h3 class="design-card-title">
+            <h3
+                class="design-card-title"
+            >
 
                 <a
                     href="${designUrl}"
                 >
+
                     ${title}
+
                 </a>
 
             </h3>
@@ -1255,7 +1892,9 @@ const renderDesignCard = (
             ${
                 description
                     ? `
-                        <p class="design-card-description">
+                        <p
+                            class="design-card-description"
+                        >
                             ${description}
                         </p>
                     `
@@ -1263,12 +1902,16 @@ const renderDesignCard = (
             }
 
 
-            <div class="design-card-designer">
+            <div
+                class="design-card-designer"
+            >
 
                 ${avatarHtml}
 
 
-                <div class="design-card-designer-info">
+                <div
+                    class="design-card-designer-info"
+                >
 
                     <span>
                         ${displayName}
@@ -1289,11 +1932,58 @@ const renderDesignCard = (
 
             </div>
 
+
+            <div
+                class="design-card-stats"
+            >
+
+                ${
+                    Number(
+                        design.likes_count
+                    ) > 0
+
+                        ? `
+                            <span>
+                                <i class="fa-regular fa-heart"></i>
+                                ${escapeDesignHtml(
+                                    formatDesignNumber(
+                                        design.likes_count
+                                    )
+                                )}
+                            </span>
+                        `
+                        : ""
+                }
+
+
+                ${
+                    Number(
+                        design.votes_count
+                    ) > 0
+
+                        ? `
+                            <span>
+                                <i class="fa-solid fa-trophy"></i>
+                                ${escapeDesignHtml(
+                                    formatDesignNumber(
+                                        design.votes_count
+                                    )
+                                )}
+                            </span>
+                        `
+                        : ""
+                }
+
+            </div>
+
         </div>
+
     `;
 
 
-    container.appendChild(card);
+    container.appendChild(
+        card
+    );
 
 
     return card;
@@ -1301,12 +1991,68 @@ const renderDesignCard = (
 
 
 /* =========================================================
+   FORMAT NUMBERS
+   ========================================================= */
+
+const formatDesignNumber = (
+    value
+) => {
+
+    const number =
+        Number(value) || 0;
+
+
+    if (
+        number >= 1000000
+    ) {
+
+        return (
+            `${(
+                number / 1000000
+            ).toFixed(
+                number % 1000000 ===
+                0
+                    ? 0
+                    : 1
+            )}M`
+        );
+    }
+
+
+    if (
+        number >= 1000
+    ) {
+
+        return (
+            `${(
+                number / 1000
+            ).toFixed(
+                number % 1000 ===
+                0
+                    ? 0
+                    : 1
+            )}K`
+        );
+    }
+
+
+    return String(
+        number
+    );
+};
+
+
+/* =========================================================
    ESCAPE HTML
    ========================================================= */
 
-const escapeDesignHtml = (value) => {
+const escapeDesignHtml = (
+    value
+) => {
 
-    return String(value ?? "")
+    return String(
+        value ?? ""
+    )
         .replace(
             /&/g,
             "&amp;"
@@ -1334,9 +2080,13 @@ const escapeDesignHtml = (value) => {
    ESCAPE ATTRIBUTE
    ========================================================= */
 
-const escapeDesignAttribute = (value) => {
+const escapeDesignAttribute = (
+    value
+) => {
 
-    return escapeDesignHtml(value);
+    return escapeDesignHtml(
+        value
+    );
 };
 
 
@@ -1345,12 +2095,25 @@ const escapeDesignAttribute = (value) => {
    ========================================================= */
 
 const loadDesignGrid = async ({
-    selector = "[data-design-grid]",
+    selector =
+        "[data-design-grid]",
+
     limit = 24,
+
     offset = 0,
+
     category = "",
+
     search = "",
+
+    orderBy =
+        "created_at",
+
+    ascending =
+        false,
+
     append = false
+
 } = {}) => {
 
     const container =
@@ -1367,9 +2130,18 @@ const loadDesignGrid = async ({
     if (!append) {
 
         container.innerHTML = `
-            <div class="design-loading">
-                <i class="fa-solid fa-spinner fa-spin"></i>
-                <span>Loading designs...</span>
+            <div
+                class="design-loading"
+            >
+
+                <i
+                    class="fa-solid fa-spinner fa-spin"
+                ></i>
+
+                <span>
+                    Loading designs...
+                </span>
+
             </div>
         `;
     }
@@ -1386,7 +2158,11 @@ const loadDesignGrid = async ({
 
                 category,
 
-                search
+                search,
+
+                orderBy,
+
+                ascending
 
             });
 
@@ -1397,21 +2173,31 @@ const loadDesignGrid = async ({
         }
 
 
-        if (designs.length === 0) {
+        if (
+            designs.length ===
+            0
+        ) {
 
             if (!append) {
 
                 container.innerHTML = `
-                    <div class="design-empty">
+                    <div
+                        class="design-empty"
+                    >
 
-                        <i class="fa-regular fa-image"></i>
+                        <i
+                            class="fa-regular fa-image"
+                        ></i>
+
 
                         <h3>
                             No designs found
                         </h3>
 
+
                         <p>
-                            Be the first designer to showcase your work.
+                            Be the first designer
+                            to showcase your work.
                         </p>
 
                     </div>
@@ -1449,13 +2235,19 @@ const loadDesignGrid = async ({
         if (!append) {
 
             container.innerHTML = `
-                <div class="design-empty">
+                <div
+                    class="design-empty"
+                >
 
-                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <i
+                        class="fa-solid fa-triangle-exclamation"
+                    ></i>
+
 
                     <h3>
                         Unable to load designs
                     </h3>
+
 
                     <p>
                         Please try again later.
@@ -1506,7 +2298,8 @@ const setupDesignUploadForm = () => {
         );
 
 
-    let previewUrl = null;
+    let previewUrl =
+        null;
 
 
     /* -----------------------------------------------------
@@ -1526,6 +2319,7 @@ const setupDesignUploadForm = () => {
                 if (!file) {
 
                     if (preview) {
+
                         preview.classList.add(
                             "hidden"
                         );
@@ -1537,7 +2331,9 @@ const setupDesignUploadForm = () => {
 
                 try {
 
-                    validateDesignFile(file);
+                    validateDesignFile(
+                        file
+                    );
 
 
                     if (
@@ -1571,7 +2367,8 @@ const setupDesignUploadForm = () => {
 
                 } catch (error) {
 
-                    fileInput.value = "";
+                    fileInput.value =
+                        "";
 
 
                     if (preview) {
@@ -1587,6 +2384,7 @@ const setupDesignUploadForm = () => {
                         "error"
                     );
                 }
+
             }
         );
     }
@@ -1631,6 +2429,18 @@ const setupDesignUploadForm = () => {
                 )?.value || "";
 
 
+            const tagsInput =
+                form.querySelector(
+                    "#designTags"
+                )?.value || "";
+
+
+            const tags =
+                normalizeDesignTags(
+                    tagsInput
+                );
+
+
             const isPublic =
                 form.querySelector(
                     "#designPublic"
@@ -1640,7 +2450,9 @@ const setupDesignUploadForm = () => {
 
             try {
 
-                validateDesignFile(file);
+                validateDesignFile(
+                    file
+                );
 
 
                 if (button) {
@@ -1655,7 +2467,10 @@ const setupDesignUploadForm = () => {
 
 
                     button.innerHTML = `
-                        <i class="fa-solid fa-spinner fa-spin"></i>
+                        <i
+                            class="fa-solid fa-spinner fa-spin"
+                        ></i>
+
                         Publishing...
                     `;
                 }
@@ -1671,6 +2486,8 @@ const setupDesignUploadForm = () => {
                         description,
 
                         category,
+
+                        tags,
 
                         isPublic
 
@@ -1699,6 +2516,7 @@ const setupDesignUploadForm = () => {
                     URL.revokeObjectURL(
                         previewUrl
                     );
+
 
                     previewUrl =
                         null;
@@ -1745,7 +2563,9 @@ const setupDesignUploadForm = () => {
                             .originalText ||
                         "Publish Design";
                 }
+
             }
+
         }
     );
 };
@@ -1778,6 +2598,10 @@ const showDesignMessage = (
             "data-design-message",
             ""
         );
+
+
+        element.className =
+            "design-message";
 
 
         document.body.prepend(
@@ -1819,20 +2643,26 @@ const showDesignMessage = (
 
 
 /* =========================================================
-   DESIGN ERROR HANDLER
+   ERROR HANDLER
    ========================================================= */
 
-const getDesignErrorMessage = (error) => {
+const getDesignErrorMessage = (
+    error
+) => {
 
     if (!error) {
 
-        return "Something went wrong.";
+        return (
+            "Something went wrong."
+        );
     }
 
 
     const message =
-        error.message ||
-        String(error);
+        String(
+            error.message ||
+            error
+        );
 
 
     const lowerMessage =
@@ -1857,6 +2687,9 @@ const getDesignErrorMessage = (error) => {
     if (
         lowerMessage.includes(
             "duplicate"
+        ) ||
+        lowerMessage.includes(
+            "unique"
         )
     ) {
 
@@ -1869,21 +2702,12 @@ const getDesignErrorMessage = (error) => {
     if (
         lowerMessage.includes(
             "payload too large"
-        )
-    ) {
-
-        return (
-            "The image is too large."
-        );
-    }
-
-
-    if (
-        lowerMessage.includes(
-            "file size"
         ) ||
         lowerMessage.includes(
             "maximum allowed size"
+        ) ||
+        lowerMessage.includes(
+            "file size"
         )
     ) {
 
@@ -1895,10 +2719,22 @@ const getDesignErrorMessage = (error) => {
 
     if (
         lowerMessage.includes(
-            "not authenticated"
-        ) ||
+            "invalid input"
+        )
+    ) {
+
+        return (
+            "Some of the design information is invalid."
+        );
+    }
+
+
+    if (
         lowerMessage.includes(
             "jwt"
+        ) ||
+        lowerMessage.includes(
+            "not authenticated"
         )
     ) {
 
@@ -1949,11 +2785,21 @@ window.DVDesigns = {
 
     deleteDesign,
 
+    incrementDesignViews,
+
     renderDesignCard,
 
     loadDesignGrid,
 
     validateDesignFile,
+
+    normalizeDesignTags,
+
+    getDesignStoragePathFromUrl,
+
+    formatDesignCategory,
+
+    formatDesignNumber,
 
     showDesignMessage,
 

@@ -3,11 +3,6 @@
 
 <head>
 
-    <!-- =====================================================
-         DESIGNVERSE
-         Upload Studio
-         ===================================================== -->
-
     <meta charset="UTF-8">
 
     <meta
@@ -22,20 +17,17 @@
 
     <meta
         name="description"
-        content="Upload and publish your creative work on DESIGNVERSE."
+        content="Submit your creative work to DESIGNVERSE and compete with designers around the Verse."
     >
 
-    <title>Upload Design — DESIGNVERSE</title>
+    <title>Submit Design — DESIGNVERSE</title>
 
 
     <!-- =====================================================
          FONTS
          ===================================================== -->
 
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
 
     <link
         rel="preconnect"
@@ -44,13 +36,13 @@
     >
 
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
         rel="stylesheet"
     >
 
 
     <!-- =====================================================
-         ICONS
+         FONT AWESOME
          ===================================================== -->
 
     <link
@@ -85,633 +77,433 @@
 
 
     <!-- =====================================================
-         PAGE STYLES
+         PAGE-SPECIFIC STYLES
          ===================================================== -->
 
     <style>
 
-        :root {
-            --submit-sidebar-width: 250px;
-        }
-
-
-        body {
-            margin: 0;
-        }
-
-
         /* =================================================
-           PAGE
+           SUBMIT PAGE
            ================================================= */
 
         .submit-page {
             min-height: 100vh;
-
-            padding-top: 82px;
         }
 
-
-        /* =================================================
-           SIDEBAR
-           ================================================= */
-
-        .dashboard-sidebar {
-
-            position: fixed;
-
-            top: 82px;
-            left: 0;
-            bottom: 0;
-
-            width:
-                var(--submit-sidebar-width);
-
-            padding:
-                22px 16px;
-
-            overflow-y: auto;
-
-            border-right:
-                1px solid
-                var(--border);
-
-            background:
-                rgba(5,5,8,0.86);
-
-            backdrop-filter:
-                blur(22px);
-
-            -webkit-backdrop-filter:
-                blur(22px);
-
-            z-index: 900;
-
-            transition:
-                transform 300ms ease;
-        }
-
-
-        .dashboard-sidebar-title {
-
-            padding:
-                0 12px 10px;
-
-            color:
-                var(--text-muted);
-
-            font-size: 9px;
-
-            font-weight: 800;
-
-            letter-spacing:
-                0.15em;
-
-            text-transform:
-                uppercase;
-        }
-
-
-        .dashboard-nav {
-
-            display: flex;
-
-            flex-direction:
-                column;
-
-            gap: 5px;
-        }
-
-
-        .dashboard-nav a {
-
-            min-height: 44px;
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 11px;
-
-            padding:
-                0 12px;
-
-            border-radius: 11px;
-
-            color:
-                var(--text-muted);
-
-            font-size: 12px;
-
-            font-weight: 600;
-
-            transition:
-                background 180ms ease,
-                color 180ms ease,
-                transform 180ms ease;
-        }
-
-
-        .dashboard-nav a i {
-
-            width: 18px;
-
-            text-align: center;
-
-            font-size: 13px;
-        }
-
-
-        .dashboard-nav a:hover {
-
-            color: white;
-
-            background:
-                rgba(255,255,255,0.05);
-
-            transform:
-                translateX(2px);
-        }
-
-
-        .dashboard-nav a.active {
-
-            color: white;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    rgba(124,58,237,0.18),
-                    rgba(37,99,235,0.09)
-                );
-
-            border:
-                1px solid
-                rgba(124,58,237,0.22);
-        }
-
-
-        .dashboard-sidebar-divider {
-
-            height: 1px;
-
-            margin:
-                20px 8px;
-
-            background:
-                var(--border);
-        }
-
-
-        .dashboard-logout {
-
-            color:
-                #fca5a5 !important;
-        }
-
-
-        .dashboard-logout:hover {
-
-            background:
-                rgba(239,68,68,0.08)
-                !important;
-        }
-
-
-        /* =================================================
-           MAIN
-           ================================================= */
 
         .submit-main {
-
-            width:
-                calc(
-                    100% -
-                    var(--submit-sidebar-width)
-                );
-
-            margin-left:
-                var(--submit-sidebar-width);
-
             padding:
-                34px;
+                120px
+                0
+                80px;
         }
 
 
         .submit-container {
-
             width:
-                min(100%, 1250px);
+                min(
+                    1100px,
+                    calc(100% - 32px)
+                );
 
-            margin-inline: auto;
+            margin:
+                0 auto;
         }
 
 
         /* =================================================
-           HEADER
+           PAGE HEADER
            ================================================= */
 
         .submit-header {
+            max-width: 760px;
 
-            margin-bottom: 25px;
+            margin:
+                0 auto
+                45px;
+
+            text-align: center;
         }
 
 
         .submit-eyebrow {
-
             display: inline-flex;
 
             align-items: center;
 
-            gap: 7px;
+            gap: 8px;
 
-            margin-bottom: 9px;
+            margin-bottom: 14px;
 
-            color:
-                #c4b5fd;
+            font-size: 0.78rem;
 
-            font-size: 9px;
-
-            font-weight: 800;
+            font-weight: 700;
 
             letter-spacing:
-                0.15em;
+                0.08em;
 
             text-transform:
                 uppercase;
-        }
-
-
-        .submit-eyebrow i {
 
             color:
-                #a855f7;
+                var(
+                    --primary,
+                    #7c5cff
+                );
         }
 
 
         .submit-header h1 {
-
-            margin:
-                0 0 8px;
-
-            font-size:
-                clamp(
-                    30px,
-                    4vw,
-                    48px
-                );
-
-            letter-spacing:
-                -0.06em;
-        }
-
-
-        .submit-header p {
-
-            max-width:
-                680px;
-
-            margin: 0;
-
-            color:
-                var(--text-muted);
-
-            font-size: 12px;
-
-            line-height:
-                1.7;
-        }
-
-
-        /* =================================================
-           LAYOUT
-           ================================================= */
-
-        .submit-layout {
-
-            display: grid;
-
-            grid-template-columns:
-                minmax(0, 1.1fr)
-                minmax(320px, 0.9fr);
-
-            gap: 20px;
-
-            align-items:
-                start;
-        }
-
-
-        /* =================================================
-           CARDS
-           ================================================= */
-
-        .submit-card {
-
-            padding:
-                24px;
-
-            border:
-                1px solid
-                var(--border);
-
-            border-radius:
-                var(--radius-xl);
-
-            background:
-                rgba(255,255,255,0.035);
-
-            box-shadow:
-                0 20px 60px
-                rgba(0,0,0,0.18);
-        }
-
-
-        .submit-card + .submit-card {
-
-            margin-top:
-                20px;
-        }
-
-
-        .submit-card-header {
-
-            display: flex;
-
-            align-items:
-                flex-start;
-
-            justify-content:
-                space-between;
-
-            gap: 15px;
-
-            margin-bottom: 20px;
-        }
-
-
-        .submit-card-header h2 {
-
-            margin: 0 0 5px;
-
-            font-size: 18px;
-        }
-
-
-        .submit-card-header p {
-
-            margin: 0;
-
-            color:
-                var(--text-muted);
-
-            font-size: 10px;
-
-            line-height:
-                1.6;
-        }
-
-
-        .step-number {
-
-            width: 32px;
-
-            height: 32px;
-
-            display: grid;
-
-            place-items: center;
-
-            flex-shrink: 0;
-
-            border-radius: 10px;
-
-            background:
-                rgba(124,58,237,0.12);
-
-            border:
-                1px solid
-                rgba(168,85,247,0.18);
-
-            color:
-                #c4b5fd;
+            margin: 0 0 14px;
 
             font-family:
                 "Space Grotesk",
                 sans-serif;
 
-            font-size: 12px;
+            font-size:
+                clamp(
+                    2.2rem,
+                    5vw,
+                    4rem
+                );
 
-            font-weight: 700;
+            line-height:
+                1.05;
+
+            letter-spacing:
+                -0.04em;
+        }
+
+
+        .submit-header p {
+            margin: 0;
+
+            color:
+                var(
+                    --text-muted,
+                    #9b9ba7
+                );
+
+            line-height:
+                1.7;
+
+            font-size:
+                1rem;
         }
 
 
         /* =================================================
-           UPLOAD AREA
+           FORM LAYOUT
            ================================================= */
 
-        .upload-zone {
-
-            position: relative;
-
-            min-height:
-                340px;
-
-            display: flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                center;
-
-            padding:
-                25px;
-
-            overflow: hidden;
-
-            border:
-                1px dashed
-                rgba(168,85,247,0.35);
-
-            border-radius:
-                18px;
-
-            background:
-                radial-gradient(
-                    circle at 50% 10%,
-                    rgba(124,58,237,0.10),
-                    transparent 45%
-                ),
-                rgba(255,255,255,0.025);
-
-            cursor: pointer;
-
-            transition:
-                border-color 200ms ease,
-                background 200ms ease,
-                transform 200ms ease;
-        }
-
-
-        .upload-zone:hover {
-
-            border-color:
-                rgba(168,85,247,0.65);
-
-            background:
-                radial-gradient(
-                    circle at 50% 10%,
-                    rgba(124,58,237,0.16),
-                    transparent 45%
-                ),
-                rgba(255,255,255,0.035);
-        }
-
-
-        .upload-zone.dragover {
-
-            border-color:
-                #a78bfa;
-
-            background:
-                rgba(124,58,237,0.10);
-
-            transform:
-                scale(1.01);
-        }
-
-
-        .upload-zone-content {
-
-            display: flex;
-
-            flex-direction:
-                column;
-
-            align-items:
-                center;
-
-            text-align: center;
-
-            pointer-events:
-                none;
-        }
-
-
-        .upload-icon {
-
-            width: 72px;
-
-            height: 72px;
-
+        .submit-form {
             display: grid;
 
-            place-items: center;
+            grid-template-columns:
+                minmax(0, 1.15fr)
+                minmax(320px, 0.85fr);
 
-            margin-bottom:
-                17px;
+            gap: 28px;
+
+            align-items: start;
+        }
+
+
+        .submit-card {
+            padding: 26px;
 
             border:
                 1px solid
-                rgba(168,85,247,0.20);
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.08
+                );
 
-            border-radius:
-                20px;
-
-            background:
-                rgba(124,58,237,0.10);
-
-            color:
-                #c4b5fd;
-
-            font-size:
-                25px;
-        }
-
-
-        .upload-zone h3 {
-
-            margin:
-                0 0 7px;
-
-            font-size:
-                17px;
-        }
-
-
-        .upload-zone p {
-
-            max-width:
-                390px;
-
-            margin:
-                0 0 12px;
-
-            color:
-                var(--text-muted);
-
-            font-size:
-                10px;
-
-            line-height:
-                1.6;
-        }
-
-
-        .upload-browse {
-
-            display: inline-flex;
-
-            align-items:
-                center;
-
-            gap: 7px;
-
-            padding:
-                9px 13px;
-
-            border-radius:
-                10px;
+            border-radius: 22px;
 
             background:
-                rgba(124,58,237,0.12);
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.03
+                );
 
-            border:
-                1px solid
-                rgba(168,85,247,0.18);
+            box-shadow:
+                0
+                20px
+                60px
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.15
+                );
+        }
 
-            color:
-                #c4b5fd;
+
+        .submit-card + .submit-card {
+            margin-top: 18px;
+        }
+
+
+        .submit-card-title {
+            margin:
+                0
+                0
+                6px;
 
             font-size:
-                10px;
+                1.1rem;
 
             font-weight:
                 700;
         }
 
 
-        .upload-requirements {
-
-            margin-top:
-                13px;
+        .submit-card-description {
+            margin:
+                0
+                20px;
 
             color:
-                var(--text-muted);
+                var(
+                    --text-muted,
+                    #92929d
+                );
 
             font-size:
-                8px;
+                0.9rem;
+
+            line-height:
+                1.6;
         }
 
 
-        #designImageInput {
+        /* =================================================
+           FORM GROUP
+           ================================================= */
 
+        .submit-field {
+            margin-bottom: 20px;
+        }
+
+
+        .submit-field:last-child {
+            margin-bottom: 0;
+        }
+
+
+        .submit-label {
+            display: block;
+
+            margin-bottom: 8px;
+
+            font-size:
+                0.88rem;
+
+            font-weight:
+                700;
+        }
+
+
+        .submit-label span {
+            color:
+                var(
+                    --text-muted,
+                    #888894
+                );
+
+            font-weight:
+                400;
+        }
+
+
+        .submit-input,
+        .submit-textarea,
+        .submit-select {
+            width: 100%;
+
+            box-sizing: border-box;
+
+            border:
+                1px solid
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.1
+                );
+
+            border-radius: 12px;
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.04
+                );
+
+            color:
+                inherit;
+
+            padding:
+                13px
+                14px;
+
+            font:
+                inherit;
+
+            outline: none;
+
+            transition:
+                border-color
+                0.2s ease,
+                background
+                0.2s ease,
+                box-shadow
+                0.2s ease;
+        }
+
+
+        .submit-input:focus,
+        .submit-textarea:focus,
+        .submit-select:focus {
+            border-color:
+                rgba(
+                    124,
+                    92,
+                    255,
+                    0.75
+                );
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.06
+                );
+
+            box-shadow:
+                0
+                0
+                0
+                4px
+                rgba(
+                    124,
+                    92,
+                    255,
+                    0.1
+                );
+        }
+
+
+        .submit-textarea {
+            resize:
+                vertical;
+
+            min-height:
+                130px;
+
+            line-height:
+                1.6;
+        }
+
+
+        .submit-select {
+            appearance:
+                auto;
+        }
+
+
+        /* =================================================
+           UPLOAD ZONE
+           ================================================= */
+
+        .upload-zone {
+            position: relative;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            justify-content: center;
+
+            min-height:
+                360px;
+
+            padding: 28px;
+
+            border:
+                2px dashed
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.12
+                );
+
+            border-radius: 18px;
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.02
+                );
+
+            text-align: center;
+
+            cursor: pointer;
+
+            transition:
+                border-color
+                0.2s ease,
+                background
+                0.2s ease,
+                transform
+                0.2s ease;
+        }
+
+
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color:
+                rgba(
+                    124,
+                    92,
+                    255,
+                    0.8
+                );
+
+            background:
+                rgba(
+                    124,
+                    92,
+                    255,
+                    0.06
+                );
+
+            transform:
+                translateY(
+                    -2px
+                );
+        }
+
+
+        .upload-zone input {
             position: absolute;
 
             inset: 0;
 
             width: 100%;
-
             height: 100%;
 
             opacity: 0;
@@ -720,465 +512,205 @@
         }
 
 
-        /* =================================================
-           IMAGE PREVIEW
-           ================================================= */
-
-        .upload-preview {
-
-            display: none;
-
-            position: relative;
-
-            overflow: hidden;
-
-            border-radius:
-                17px;
-
-            background:
-                #08080d;
-        }
-
-
-        .upload-preview.visible {
-
-            display: block;
-        }
-
-
-        .upload-preview-image {
-
-            width: 100%;
-
-            max-height:
-                560px;
-
-            display: block;
-
-            margin-inline: auto;
-
-            object-fit: contain;
-
-            background:
-                #08080d;
-        }
-
-
-        .preview-overlay {
-
-            position: absolute;
-
-            left: 12px;
-
-            right: 12px;
-
-            bottom: 12px;
+        .upload-icon {
+            width: 74px;
+            height: 74px;
 
             display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            margin-bottom: 18px;
+
+            border-radius: 20px;
+
+            background:
+                rgba(
+                    124,
+                    92,
+                    255,
+                    0.13
+                );
+
+            color:
+                var(
+                    --primary,
+                    #7c5cff
+                );
+
+            font-size:
+                1.65rem;
+        }
+
+
+        .upload-zone h3 {
+            margin:
+                0
+                0
+                8px;
+
+            font-size:
+                1.05rem;
+        }
+
+
+        .upload-zone p {
+            max-width:
+                460px;
+
+            margin:
+                0
+                0
+                12px;
+
+            color:
+                var(
+                    --text-muted,
+                    #8d8d99
+                );
+
+            line-height:
+                1.6;
+
+            font-size:
+                0.9rem;
+        }
+
+
+        .upload-formats {
+            font-size:
+                0.78rem;
+
+            color:
+                var(
+                    --text-muted,
+                    #777783
+                );
+        }
+
+
+        /* =================================================
+           PREVIEW
+           ================================================= */
+
+        .design-preview {
+            display:
+                none;
+
+            position:
+                relative;
+
+            overflow:
+                hidden;
+
+            margin-top:
+                18px;
+
+            border-radius:
+                16px;
+
+            background:
+                #0d0d12;
+        }
+
+
+        .design-preview.show {
+            display:
+                block;
+        }
+
+
+        .design-preview img {
+            display:
+                block;
+
+            width:
+                100%;
+
+            max-height:
+                430px;
+
+            object-fit:
+                contain;
+
+            margin:
+                0 auto;
+        }
+
+
+        .design-preview-remove {
+            position:
+                absolute;
+
+            top:
+                12px;
+
+            right:
+                12px;
+
+            width:
+                38px;
+
+            height:
+                38px;
+
+            border:
+                1px solid
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.12
+                );
+
+            border-radius:
+                50%;
+
+            background:
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.65
+                );
+
+            color:
+                #fff;
+
+            cursor:
+                pointer;
+
+            display:
+                flex;
 
             align-items:
                 center;
 
             justify-content:
-                space-between;
-
-            gap: 10px;
-
-            padding:
-                9px 10px;
-
-            border:
-                1px solid
-                rgba(255,255,255,0.10);
-
-            border-radius:
-                11px;
-
-            background:
-                rgba(5,5,8,0.75);
-
-            backdrop-filter:
-                blur(12px);
-        }
-
-
-        .preview-file-info {
-
-            min-width: 0;
-
-            display: flex;
-
-            flex-direction:
-                column;
-
-            gap: 3px;
-        }
-
-
-        .preview-file-name {
-
-            overflow: hidden;
-
-            color: white;
-
-            font-size:
-                10px;
-
-            font-weight: 600;
-
-            text-overflow:
-                ellipsis;
-
-            white-space:
-                nowrap;
-        }
-
-
-        .preview-file-size {
-
-            color:
-                var(--text-muted);
-
-            font-size:
-                8px;
-        }
-
-
-        .preview-change {
-
-            flex-shrink: 0;
-
-            display: inline-flex;
-
-            align-items:
                 center;
 
-            gap: 6px;
-
-            padding:
-                8px 10px;
-
-            border:
-                1px solid
-                rgba(255,255,255,0.12);
-
-            border-radius:
-                9px;
-
-            background:
-                rgba(255,255,255,0.05);
-
-            color: white;
-
-            font-size:
-                9px;
-
-            cursor: pointer;
-        }
-
-
-        .preview-change:hover {
-
-            background:
-                rgba(124,58,237,0.35);
+            z-index:
+                2;
         }
 
 
         /* =================================================
-           FORM
+           TAGS
            ================================================= */
 
-        .form-grid {
-
-            display: grid;
-
-            grid-template-columns:
-                1fr 1fr;
-
-            gap: 15px;
-        }
-
-
-        .form-group {
-
-            display: flex;
-
-            flex-direction:
-                column;
-
-            gap: 7px;
-        }
-
-
-        .form-group.full {
-
-            grid-column:
-                1 / -1;
-        }
-
-
-        .form-label {
-
-            color:
-                rgba(255,255,255,0.85);
-
-            font-size:
-                10px;
-
-            font-weight:
-                700;
-        }
-
-
-        .form-label span {
-
-            color:
-                var(--text-muted);
-
-            font-weight:
-                400;
-        }
-
-
-        .form-input,
-        .form-select,
-        .form-textarea {
-
-            width: 100%;
-
-            border:
-                1px solid
-                var(--border);
-
-            border-radius:
-                11px;
-
-            outline: none;
-
-            background:
-                rgba(255,255,255,0.035);
-
-            color:
-                white;
-
-            font-family:
-                "Inter",
-                sans-serif;
-
-            font-size:
-                11px;
-
-            transition:
-                border-color 180ms ease,
-                background 180ms ease,
-                box-shadow 180ms ease;
-        }
-
-
-        .form-input,
-        .form-select {
-
-            height:
-                45px;
-
-            padding:
-                0 13px;
-        }
-
-
-        .form-textarea {
-
-            min-height:
-                125px;
-
-            padding:
-                12px 13px;
-
-            resize:
-                vertical;
-
-            line-height:
-                1.6;
-        }
-
-
-        .form-input::placeholder,
-        .form-textarea::placeholder {
-
-            color:
-                var(--text-muted);
-        }
-
-
-        .form-input:focus,
-        .form-select:focus,
-        .form-textarea:focus {
-
-            border-color:
-                rgba(168,85,247,0.55);
-
-            background:
-                rgba(255,255,255,0.05);
-
-            box-shadow:
-                0 0 0 3px
-                rgba(124,58,237,0.08);
-        }
-
-
-        .form-select option {
-
-            color: white;
-
-            background:
-                #0b0b11;
-        }
-
-
-        .character-count {
-
-            align-self:
-                flex-end;
-
+        .tag-help {
             margin-top:
-                -2px;
-
-            color:
-                var(--text-muted);
+                7px;
 
             font-size:
-                8px;
-        }
-
-
-        /* =================================================
-           TAG INPUT
-           ================================================= */
-
-        .tag-input-wrapper {
-
-            display: flex;
-
-            flex-wrap:
-                wrap;
-
-            gap: 7px;
-
-            min-height:
-                45px;
-
-            padding:
-                7px 10px;
-
-            border:
-                1px solid
-                var(--border);
-
-            border-radius:
-                11px;
-
-            background:
-                rgba(255,255,255,0.035);
-        }
-
-
-        .tag-input-wrapper:focus-within {
-
-            border-color:
-                rgba(168,85,247,0.55);
-
-            box-shadow:
-                0 0 0 3px
-                rgba(124,58,237,0.08);
-        }
-
-
-        .tag-list {
-
-            display: contents;
-        }
-
-
-        .design-tag {
-
-            display: inline-flex;
-
-            align-items:
-                center;
-
-            gap: 6px;
-
-            padding:
-                6px 8px;
-
-            border-radius:
-                8px;
-
-            background:
-                rgba(124,58,237,0.12);
-
-            border:
-                1px solid
-                rgba(168,85,247,0.18);
+                0.76rem;
 
             color:
-                #c4b5fd;
-
-            font-size:
-                8px;
-        }
-
-
-        .design-tag button {
-
-            width:
-                15px;
-
-            height:
-                15px;
-
-            display: grid;
-
-            place-items:
-                center;
-
-            padding: 0;
-
-            border: 0;
-
-            background:
-                transparent;
-
-            color:
-                inherit;
-
-            cursor: pointer;
-        }
-
-
-        #tagInput {
-
-            min-width:
-                110px;
-
-            flex: 1;
-
-            height:
-                29px;
-
-            padding: 0;
-
-            border: 0;
-
-            outline: none;
-
-            background:
-                transparent;
-
-            color: white;
-
-            font-size:
-                10px;
+                var(
+                    --text-muted,
+                    #7d7d88
+                );
         }
 
 
@@ -1186,429 +718,306 @@
            VISIBILITY
            ================================================= */
 
-        .visibility-options {
-
-            display: grid;
-
-            grid-template-columns:
-                1fr 1fr;
-
-            gap: 10px;
-        }
-
-
         .visibility-option {
-
-            position: relative;
-
-            display: block;
-
-            cursor: pointer;
-        }
-
-
-        .visibility-option input {
-
-            position: absolute;
-
-            opacity: 0;
-
-            pointer-events: none;
-        }
-
-
-        .visibility-content {
-
-            display: flex;
+            display:
+                flex;
 
             align-items:
-                center;
+                flex-start;
 
-            gap: 10px;
-
-            min-height:
-                58px;
-
-            padding:
-                10px 12px;
-
-            border:
-                1px solid
-                var(--border);
-
-            border-radius:
+            gap:
                 12px;
 
-            background:
-                rgba(255,255,255,0.025);
-
-            transition:
-                border-color 180ms ease,
-                background 180ms ease;
-        }
-
-
-        .visibility-option input:checked +
-        .visibility-content {
-
-            border-color:
-                rgba(168,85,247,0.50);
-
-            background:
-                rgba(124,58,237,0.09);
-        }
-
-
-        .visibility-icon {
-
-            width:
-                33px;
-
-            height:
-                33px;
-
-            display: grid;
-
-            place-items:
-                center;
-
-            flex-shrink: 0;
-
-            border-radius:
-                9px;
-
-            background:
-                rgba(124,58,237,0.10);
-
-            color:
-                #c4b5fd;
-        }
-
-
-        .visibility-text {
-
-            display: flex;
-
-            flex-direction:
-                column;
-
-            gap: 3px;
-        }
-
-
-        .visibility-text strong {
-
-            color: white;
-
-            font-size:
-                10px;
-        }
-
-
-        .visibility-text span {
-
-            color:
-                var(--text-muted);
-
-            font-size:
-                8px;
-
-            line-height:
-                1.45;
-        }
-
-
-        /* =================================================
-           CHALLENGE
-           ================================================= */
-
-        .challenge-box {
-
             padding:
-                13px;
+                14px;
 
             border:
                 1px solid
-                var(--border);
-
-            border-radius:
-                12px;
-
-            background:
-                rgba(255,255,255,0.025);
-        }
-
-
-        .challenge-box-row {
-
-            display: flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                space-between;
-
-            gap: 12px;
-        }
-
-
-        .challenge-box-info {
-
-            display: flex;
-
-            align-items:
-                center;
-
-            gap: 10px;
-
-            min-width:
-                0;
-        }
-
-
-        .challenge-box-icon {
-
-            width:
-                35px;
-
-            height:
-                35px;
-
-            display: grid;
-
-            place-items:
-                center;
-
-            flex-shrink: 0;
-
-            border-radius:
-                10px;
-
-            background:
-                rgba(124,58,237,0.12);
-
-            color:
-                #c4b5fd;
-        }
-
-
-        .challenge-box-info strong {
-
-            display: block;
-
-            color: white;
-
-            font-size:
-                10px;
-        }
-
-
-        .challenge-box-info span {
-
-            display: block;
-
-            margin-top:
-                3px;
-
-            color:
-                var(--text-muted);
-
-            font-size:
-                8px;
-        }
-
-
-        /* =================================================
-           SUBMIT ACTIONS
-           ================================================= */
-
-        .submit-actions {
-
-            display: flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                space-between;
-
-            gap: 12px;
-
-            margin-top:
-                20px;
-
-            padding-top:
-                20px;
-
-            border-top:
-                1px solid
-                var(--border);
-        }
-
-
-        .submit-actions-note {
-
-            max-width:
-                370px;
-
-            color:
-                var(--text-muted);
-
-            font-size:
-                8px;
-
-            line-height:
-                1.55;
-        }
-
-
-        .submit-actions-buttons {
-
-            display: flex;
-
-            align-items:
-                center;
-
-            gap: 9px;
-        }
-
-
-        /* =================================================
-           VALIDATION
-           ================================================= */
-
-        .field-error {
-
-            display: none;
-
-            color:
-                #fca5a5;
-
-            font-size:
-                8px;
-        }
-
-
-        .field-error.visible {
-
-            display: block;
-        }
-
-
-        .form-input.error,
-        .form-select.error,
-        .form-textarea.error {
-
-            border-color:
-                rgba(239,68,68,0.60);
-        }
-
-
-        /* =================================================
-           TIPS CARD
-           ================================================= */
-
-        .submit-tips {
-
-            padding:
-                16px;
-
-            border:
-                1px solid
-                rgba(56,189,248,0.12);
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.08
+                );
 
             border-radius:
                 14px;
 
             background:
-                rgba(56,189,248,0.035);
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.02
+                );
         }
 
 
-        .submit-tips h3 {
-
-            margin:
-                0 0 9px;
-
-            color:
-                #bae6fd;
-
-            font-size:
-                11px;
+        .visibility-option input {
+            margin-top:
+                3px;
         }
 
 
-        .submit-tips ul {
-
-            margin:
-                0;
-
-            padding-left:
-                18px;
-        }
-
-
-        .submit-tips li {
+        .visibility-option strong {
+            display:
+                block;
 
             margin-bottom:
-                6px;
-
-            color:
-                var(--text-muted);
+                3px;
 
             font-size:
-                8px;
+                0.88rem;
+        }
+
+
+        .visibility-option span {
+            color:
+                var(
+                    --text-muted,
+                    #84848f
+                );
+
+            font-size:
+                0.8rem;
 
             line-height:
                 1.5;
         }
 
 
-        .submit-tips li:last-child {
+        /* =================================================
+           PUBLISH AREA
+           ================================================= */
 
-            margin-bottom: 0;
+        .submit-footer {
+            margin-top:
+                22px;
+
+            padding-top:
+                22px;
+
+            border-top:
+                1px solid
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.08
+                );
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            gap:
+                16px;
+        }
+
+
+        .submit-footer-note {
+            color:
+                var(
+                    --text-muted,
+                    #82828e
+                );
+
+            font-size:
+                0.8rem;
+
+            line-height:
+                1.5;
+        }
+
+
+        .submit-button {
+            min-width:
+                180px;
         }
 
 
         /* =================================================
-           MOBILE SIDEBAR
+           MESSAGE
            ================================================= */
 
-        .dashboard-mobile-toggle {
+        .submit-message {
+            margin-bottom:
+                20px;
 
-            display: none;
+            padding:
+                13px
+                15px;
 
-            position: fixed;
+            border-radius:
+                12px;
 
-            left: 15px;
+            display:
+                none;
 
-            bottom: 16px;
+            font-size:
+                0.88rem;
 
-            width: 46px;
+            line-height:
+                1.5;
+        }
 
-            height: 46px;
 
-            place-items:
+        .submit-message.show {
+            display:
+                block;
+        }
+
+
+        .submit-message.success {
+            border:
+                1px solid
+                rgba(
+                    60,
+                    200,
+                    130,
+                    0.25
+                );
+
+            background:
+                rgba(
+                    60,
+                    200,
+                    130,
+                    0.08
+                );
+        }
+
+
+        .submit-message.error {
+            border:
+                1px solid
+                rgba(
+                    255,
+                    90,
+                    90,
+                    0.25
+                );
+
+            background:
+                rgba(
+                    255,
+                    90,
+                    90,
+                    0.08
+                );
+        }
+
+
+        /* =================================================
+           REQUIRE LOGIN
+           ================================================= */
+
+        .submit-login-required {
+            max-width:
+                650px;
+
+            margin:
+                60px auto;
+
+            text-align:
                 center;
+
+            padding:
+                45px
+                25px;
 
             border:
                 1px solid
-                var(--border);
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.08
+                );
 
             border-radius:
-                14px;
+                22px;
 
             background:
-                rgba(10,10,16,0.90);
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.03
+                );
+        }
 
-            color: white;
 
-            box-shadow:
-                0 15px 40px
-                rgba(0,0,0,0.45);
+        .submit-login-required-icon {
+            width:
+                72px;
 
-            z-index: 1200;
+            height:
+                72px;
+
+            margin:
+                0
+                auto
+                18px;
+
+            border-radius:
+                50%;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            background:
+                rgba(
+                    124,
+                    92,
+                    255,
+                    0.12
+                );
+
+            color:
+                var(
+                    --primary,
+                    #7c5cff
+                );
+
+            font-size:
+                1.5rem;
+        }
+
+
+        .submit-login-required h2 {
+            margin:
+                0
+                0
+                10px;
+        }
+
+
+        .submit-login-required p {
+            margin:
+                0
+                0
+                22px;
+
+            color:
+                var(
+                    --text-muted,
+                    #8b8b96
+                );
+
+            line-height:
+                1.6;
         }
 
 
@@ -1616,88 +1025,62 @@
            RESPONSIVE
            ================================================= */
 
-        @media (max-width: 1050px) {
+        @media (
+            max-width: 900px
+        ) {
 
-            :root {
-                --submit-sidebar-width:
-                    220px;
-            }
-
-
-            .submit-main {
-
-                padding:
-                    27px;
-            }
-
-
-            .submit-layout {
-
+            .submit-form {
                 grid-template-columns:
                     1fr;
             }
+
+            .upload-zone {
+                min-height:
+                    300px;
+            }
+
         }
 
 
-        @media (max-width: 850px) {
-
-            .dashboard-sidebar {
-
-                transform:
-                    translateX(-105%);
-            }
-
-
-            .dashboard-sidebar.open {
-
-                transform:
-                    translateX(0);
-            }
-
+        @media (
+            max-width: 600px
+        ) {
 
             .submit-main {
+                padding:
+                    95px
+                    0
+                    55px;
+            }
 
-                width: 100%;
 
-                margin-left: 0;
+            .submit-container {
+                width:
+                    calc(
+                        100% - 24px
+                    );
+            }
+
+
+            .submit-card {
+                padding:
+                    18px;
+
+                border-radius:
+                    17px;
+            }
+
+
+            .upload-zone {
+                min-height:
+                    260px;
 
                 padding:
-                    24px 18px 80px;
+                    22px;
             }
 
 
-            .dashboard-mobile-toggle {
-
-                display: grid;
-            }
-        }
-
-
-        @media (max-width: 620px) {
-
-            .form-grid {
-
-                grid-template-columns:
-                    1fr;
-            }
-
-
-            .form-group.full {
-
-                grid-column:
-                    auto;
-            }
-
-
-            .visibility-options {
-
-                grid-template-columns:
-                    1fr;
-            }
-
-
-            .submit-actions {
-
+            .submit-footer {
                 flex-direction:
                     column;
 
@@ -1706,91 +1089,11 @@
             }
 
 
-            .submit-actions-buttons {
-
-                width: 100%;
-            }
-
-
-            .submit-actions-buttons
-            .btn {
-
-                flex: 1;
-            }
-
-
-            .upload-zone {
-
-                min-height:
-                    300px;
-            }
-        }
-
-
-        @media (max-width: 450px) {
-
-            .submit-main {
-
-                padding:
-                    20px 13px 80px;
-            }
-
-
-            .submit-card {
-
-                padding:
-                    18px;
-
-                border-radius:
-                    18px;
-            }
-
-
-            .upload-zone {
-
-                min-height:
-                    260px;
-
-                padding:
-                    18px;
-            }
-
-
-            .upload-icon {
-
+            .submit-button {
                 width:
-                    60px;
-
-                height:
-                    60px;
+                    100%;
             }
-        }
 
-
-        @media (hover: none) and (pointer: coarse) {
-
-            .upload-zone:hover {
-
-                transform: none;
-            }
-        }
-
-
-        @media (prefers-reduced-motion: reduce) {
-
-            *,
-            *::before,
-            *::after {
-
-                animation-duration:
-                    0.01ms !important;
-
-                animation-iteration-count:
-                    1 !important;
-
-                transition-duration:
-                    0.01ms !important;
-            }
         }
 
     </style>
@@ -1798,7 +1101,7 @@
 </head>
 
 
-<body data-protected>
+<body class="submit-page">
 
 
     <!-- =====================================================
@@ -1812,1090 +1115,507 @@
 
         <nav class="navbar container">
 
+
+            <!-- LOGO -->
+
             <a
                 href="../index.html"
-                class="brand"
+                class="navbar-brand"
                 aria-label="DESIGNVERSE Home"
             >
 
-                <div class="brand-icon">
-                    <span>DV</span>
-                </div>
-
-
-                <div class="brand-text">
-
-                    <span class="brand-name">
-                        DESIGNVERSE
-                    </span>
-
-                    <span class="brand-subtitle">
-                        BY BESTB DESIGNS
-                    </span>
-
-                </div>
+                <img
+                    src="../assets/logo/designverse-logo.jpg"
+                    alt="DESIGNVERSE"
+                    class="navbar-logo navbar-logo-full"
+                >
 
             </a>
 
 
+            <!-- DESKTOP NAV -->
+
             <div class="desktop-nav">
 
-                <a href="explore.html">
+                <a href="./explore.html">
                     Explore
                 </a>
 
-                <a href="challenges.html">
+                <a href="./challenges.html">
                     Challenges
                 </a>
 
-                <a href="leaderboard.html">
+                <a href="./leaderboard.html">
                     Leaderboard
                 </a>
 
-                <a href="designers.html">
+                <a href="./designers.html">
                     Designers
                 </a>
 
             </div>
 
 
+            <!-- ACTIONS -->
+
             <div class="nav-actions">
 
                 <a
-                    href="dashboard/dashboard.html"
-                    class="btn btn-secondary btn-small"
+                    href="./dashboard/dashboard.html"
+                    class="nav-login"
+                    data-auth-dashboard
+                >
+                    Dashboard
+                </a>
+
+
+                <a
+                    href="./auth/login.html"
+                    class="btn btn-primary btn-small"
+                    data-auth-login
+                >
+                    Sign In
+                </a>
+
+
+                <button
+                    type="button"
+                    class="mobile-menu-button"
+                    id="mobile-menu-button"
+                    aria-label="Open navigation menu"
+                    aria-expanded="false"
                 >
 
-                    <i
-                        class="fa-solid fa-chart-pie"
-                    ></i>
+                    <i class="fa-solid fa-bars"></i>
 
-                    Dashboard
-
-                </a>
+                </button>
 
             </div>
 
         </nav>
 
+
+        <!-- MOBILE NAV -->
+
+        <div
+            class="mobile-nav"
+            id="mobile-nav"
+            aria-hidden="true"
+        >
+
+            <a href="./explore.html">
+                <i class="fa-solid fa-compass"></i>
+                Explore
+            </a>
+
+            <a href="./challenges.html">
+                <i class="fa-solid fa-fire"></i>
+                Challenges
+            </a>
+
+            <a href="./leaderboard.html">
+                <i class="fa-solid fa-trophy"></i>
+                Leaderboard
+            </a>
+
+            <a href="./designers.html">
+                <i class="fa-solid fa-users"></i>
+                Designers
+            </a>
+
+            <a href="./dashboard/dashboard.html">
+                <i class="fa-solid fa-table-columns"></i>
+                Dashboard
+            </a>
+
+        </div>
+
     </header>
 
 
     <!-- =====================================================
-         PAGE
+         MAIN
          ===================================================== -->
 
-    <div class="submit-page">
+    <main class="submit-main">
+
+        <div class="submit-container">
 
 
-        <!-- =================================================
-             SIDEBAR
-             ================================================= -->
+            <!-- PAGE HEADER -->
 
-        <aside
-            class="dashboard-sidebar"
-            id="dashboardSidebar"
-            aria-label="Dashboard navigation"
-        >
+            <header class="submit-header">
 
-            <div
-                class="dashboard-sidebar-title"
+                <div class="submit-eyebrow">
+
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+
+                    THE CREATIVE ARENA
+
+                </div>
+
+
+                <h1>
+                    Submit Your Design
+                </h1>
+
+
+                <p>
+                    Put your work in the Verse.
+                    Share your creativity, get feedback,
+                    earn votes and level up.
+                </p>
+
+            </header>
+
+
+            <!-- AUTH CHECK -->
+
+            <section
+                id="loginRequired"
+                class="submit-login-required"
+                hidden
             >
-                Workspace
-            </div>
+
+                <div class="submit-login-required-icon">
+
+                    <i class="fa-solid fa-lock"></i>
+
+                </div>
 
 
-            <nav class="dashboard-nav">
-
-                <a
-                    href="dashboard/dashboard.html"
-                >
-
-                    <i
-                        class="fa-solid fa-chart-pie"
-                    ></i>
-
-                    Dashboard
-
-                </a>
+                <h2>
+                    Sign in to submit
+                </h2>
 
 
-                <a
-                    href="dashboard/my-designs.html"
-                >
-
-                    <i
-                        class="fa-solid fa-palette"
-                    ></i>
-
-                    My Designs
-
-                </a>
+                <p>
+                    You need a DESIGNVERSE account
+                    before you can publish your work.
+                </p>
 
 
                 <a
-                    href="dashboard/my-challenges.html"
+                    href="./auth/login.html"
+                    class="btn btn-primary"
                 >
 
-                    <i
-                        class="fa-solid fa-fire"
-                    ></i>
+                    Sign In
 
-                    My Challenges
+                    <i class="fa-solid fa-arrow-right"></i>
 
                 </a>
 
-
-                <a
-                    href="submit.html"
-                    class="active"
-                >
-
-                    <i
-                        class="fa-solid fa-cloud-arrow-up"
-                    ></i>
-
-                    Submit Design
-
-                </a>
-
-            </nav>
+            </section>
 
 
-            <div
-                class="dashboard-sidebar-divider"
-            ></div>
+            <!-- SUBMISSION AREA -->
 
-
-            <div
-                class="dashboard-sidebar-title"
+            <section
+                id="submitArea"
             >
-                Discover
-            </div>
 
+                <div
+                    class="submit-message"
+                    id="submitMessage"
+                    role="status"
+                    aria-live="polite"
+                ></div>
 
-            <nav class="dashboard-nav">
-
-                <a href="explore.html">
-
-                    <i
-                        class="fa-solid fa-compass"
-                    ></i>
-
-                    Explore
-
-                </a>
-
-
-                <a href="challenges.html">
-
-                    <i
-                        class="fa-solid fa-bolt"
-                    ></i>
-
-                    Challenges
-
-                </a>
-
-
-                <a href="leaderboard.html">
-
-                    <i
-                        class="fa-solid fa-trophy"
-                    ></i>
-
-                    Leaderboard
-
-                </a>
-
-
-                <a href="designers.html">
-
-                    <i
-                        class="fa-solid fa-users"
-                    ></i>
-
-                    Designers
-
-                </a>
-
-            </nav>
-
-
-            <div
-                class="dashboard-sidebar-divider"
-            ></div>
-
-
-            <nav class="dashboard-nav">
-
-                <a
-                    href="dashboard/notifications.html"
-                >
-
-                    <i
-                        class="fa-regular fa-bell"
-                    ></i>
-
-                    Notifications
-
-                </a>
-
-
-                <a
-                    href="dashboard/settings.html"
-                >
-
-                    <i
-                        class="fa-solid fa-gear"
-                    ></i>
-
-                    Settings
-
-                </a>
-
-
-                <a
-                    href="#"
-                    class="dashboard-logout"
-                    data-logout
-                >
-
-                    <i
-                        class="fa-solid fa-arrow-right-from-bracket"
-                    ></i>
-
-                    Sign Out
-
-                </a>
-
-            </nav>
-
-        </aside>
-
-
-        <!-- =================================================
-             MOBILE SIDEBAR
-             ================================================= -->
-
-        <button
-            type="button"
-            class="dashboard-mobile-toggle"
-            id="dashboardMobileToggle"
-            aria-label="Open dashboard menu"
-            aria-expanded="false"
-        >
-
-            <i
-                class="fa-solid fa-bars"
-            ></i>
-
-        </button>
-
-
-        <!-- =================================================
-             MAIN
-             ================================================= -->
-
-        <main class="submit-main">
-
-            <div class="submit-container">
-
-
-                <!-- =========================================
-                     HEADER
-                     ========================================= -->
-
-                <header
-                    class="submit-header"
-                >
-
-                    <div
-                        class="submit-eyebrow"
-                    >
-
-                        <i
-                            class="fa-solid fa-wand-magic-sparkles"
-                        ></i>
-
-                        DESIGNVERSE UPLOAD STUDIO
-
-                    </div>
-
-
-                    <h1>
-                        Bring your design
-                        into the Verse.
-                    </h1>
-
-
-                    <p>
-
-                        Upload your work, tell the
-                        community what inspired it,
-                        and prepare it for your next
-                        challenge.
-
-                    </p>
-
-                </header>
-
-
-                <!-- =========================================
-                     SUBMIT FORM
-                     ========================================= -->
 
                 <form
-                    id="designSubmitForm"
+                    class="submit-form"
+                    id="designUploadForm"
                     novalidate
                 >
 
 
-                    <div
-                        class="submit-layout"
-                    >
+                    <!-- =========================================
+                         LEFT — IMAGE
+                         ========================================= -->
+
+                    <div>
 
 
-                        <!-- =================================
-                             LEFT COLUMN
-                             ================================= -->
+                        <div class="submit-card">
 
-                        <div>
+                            <h2
+                                class="submit-card-title"
+                            >
+                                Your Artwork
+                            </h2>
 
 
-                            <!-- IMAGE -->
+                            <p
+                                class="submit-card-description"
+                            >
+                                Upload the design you want to
+                                showcase in DESIGNVERSE.
+                            </p>
 
-                            <section
-                                class="submit-card"
+
+                            <!-- UPLOAD -->
+
+                            <label
+                                class="upload-zone"
+                                id="uploadZone"
                             >
 
-                                <div
-                                    class="submit-card-header"
+                                <input
+                                    type="file"
+                                    id="designFile"
+                                    name="designFile"
+                                    accept="image/jpeg,image/png,image/webp,image/gif"
+                                    required
                                 >
 
-                                    <div>
 
-                                        <h2>
-                                            Artwork
-                                        </h2>
+                                <div class="upload-icon">
 
-                                        <p>
-                                            Upload the main image
-                                            for your design.
-                                        </p>
-
-                                    </div>
-
-
-                                    <span
-                                        class="step-number"
-                                    >
-                                        01
-                                    </span>
+                                    <i
+                                        class="fa-solid fa-cloud-arrow-up"
+                                    ></i>
 
                                 </div>
 
 
-                                <!-- UPLOAD ZONE -->
+                                <h3>
+                                    Drop your design here
+                                </h3>
 
-                                <div
-                                    class="upload-zone"
-                                    id="uploadZone"
+
+                                <p>
+                                    Or tap to browse your device.
+                                    Your artwork can be up to
+                                    <strong>10 MB</strong>.
+                                </p>
+
+
+                                <span
+                                    class="upload-formats"
                                 >
+                                    JPG · PNG · WEBP · GIF
+                                </span>
 
-                                    <input
-                                        type="file"
-                                        id="designImageInput"
-                                        name="image"
-                                        accept="image/jpeg,image/png,image/webp,image/gif"
-                                    >
+                            </label>
 
 
-                                    <div
-                                        class="upload-zone-content"
-                                        id="uploadZoneContent"
-                                    >
+                            <!-- PREVIEW -->
 
-                                        <div
-                                            class="upload-icon"
-                                        >
-
-                                            <i
-                                                class="fa-solid fa-cloud-arrow-up"
-                                            ></i>
-
-                                        </div>
-
-
-                                        <h3>
-                                            Drop your design here
-                                        </h3>
-
-
-                                        <p>
-
-                                            Drag and drop your
-                                            artwork or tap below
-                                            to browse your device.
-
-                                        </p>
-
-
-                                        <span
-                                            class="upload-browse"
-                                        >
-
-                                            <i
-                                                class="fa-regular fa-folder-open"
-                                            ></i>
-
-                                            Choose Image
-
-                                        </span>
-
-
-                                        <span
-                                            class="upload-requirements"
-                                        >
-
-                                            JPG, PNG, WEBP or GIF
-                                            · Maximum 10 MB
-
-                                        </span>
-
-                                    </div>
-
-                                </div>
-
-
-                                <!-- PREVIEW -->
-
-                                <div
-                                    class="upload-preview"
-                                    id="uploadPreview"
-                                >
-
-                                    <img
-                                        src=""
-                                        alt="Design preview"
-                                        class="upload-preview-image"
-                                        id="designPreviewImage"
-                                    >
-
-
-                                    <div
-                                        class="preview-overlay"
-                                    >
-
-                                        <div
-                                            class="preview-file-info"
-                                        >
-
-                                            <span
-                                                class="preview-file-name"
-                                                id="previewFileName"
-                                            >
-                                                Design
-                                            </span>
-
-                                            <span
-                                                class="preview-file-size"
-                                                id="previewFileSize"
-                                            >
-                                                0 MB
-                                            </span>
-
-                                        </div>
-
-
-                                        <button
-                                            type="button"
-                                            class="preview-change"
-                                            id="changeImageButton"
-                                        >
-
-                                            <i
-                                                class="fa-solid fa-image"
-                                            ></i>
-
-                                            Change
-
-                                        </button>
-
-                                    </div>
-
-                                </div>
-
-
-                                <div
-                                    class="field-error"
-                                    id="imageError"
-                                ></div>
-
-                            </section>
-
-
-                            <!-- DESIGN INFORMATION -->
-
-                            <section
-                                class="submit-card"
+                            <div
+                                class="design-preview"
+                                data-design-preview
+                                id="designPreview"
                             >
 
-                                <div
-                                    class="submit-card-header"
+                                <button
+                                    type="button"
+                                    class="design-preview-remove"
+                                    id="removePreview"
+                                    aria-label="Remove selected image"
                                 >
 
-                                    <div>
+                                    <i
+                                        class="fa-solid fa-xmark"
+                                    ></i>
 
-                                        <h2>
-                                            Design Information
-                                        </h2>
-
-                                        <p>
-                                            Give your work a strong
-                                            identity.
-                                        </p>
-
-                                    </div>
+                                </button>
 
 
-                                    <span
-                                        class="step-number"
-                                    >
-                                        02
-                                    </span>
-
-                                </div>
-
-
-                                <div
-                                    class="form-grid"
+                                <img
+                                    src=""
+                                    alt="Design preview"
+                                    data-design-preview-image
+                                    id="designPreviewImage"
                                 >
 
-
-                                    <!-- TITLE -->
-
-                                    <div
-                                        class="form-group full"
-                                    >
-
-                                        <label
-                                            class="form-label"
-                                            for="designTitle"
-                                        >
-
-                                            Design title
-
-                                            <span>
-                                                Required
-                                            </span>
-
-                                        </label>
-
-
-                                        <input
-                                            type="text"
-                                            id="designTitle"
-                                            name="title"
-                                            class="form-input"
-                                            maxlength="80"
-                                            placeholder="Give your design a name..."
-                                            required
-                                        >
-
-
-                                        <span
-                                            class="field-error"
-                                            id="titleError"
-                                        ></span>
-
-                                    </div>
-
-
-                                    <!-- CATEGORY -->
-
-                                    <div
-                                        class="form-group"
-                                    >
-
-                                        <label
-                                            class="form-label"
-                                            for="designCategory"
-                                        >
-
-                                            Category
-
-                                            <span>
-                                                Required
-                                            </span>
-
-                                        </label>
-
-
-                                        <select
-                                            id="designCategory"
-                                            name="category"
-                                            class="form-select"
-                                            required
-                                        >
-
-                                            <option
-                                                value=""
-                                            >
-                                                Select category
-                                            </option>
-
-                                            <option
-                                                value="branding"
-                                            >
-                                                Branding
-                                            </option>
-
-                                            <option
-                                                value="poster"
-                                            >
-                                                Poster
-                                            </option>
-
-                                            <option
-                                                value="ui-ux"
-                                            >
-                                                UI / UX
-                                            </option>
-
-                                            <option
-                                                value="illustration"
-                                            >
-                                                Illustration
-                                            </option>
-
-                                            <option
-                                                value="logo"
-                                            >
-                                                Logo
-                                            </option>
-
-                                            <option
-                                                value="motion"
-                                            >
-                                                Motion
-                                            </option>
-
-                                            <option
-                                                value="other"
-                                            >
-                                                Other
-                                            </option>
-
-                                        </select>
-
-
-                                        <span
-                                            class="field-error"
-                                            id="categoryError"
-                                        ></span>
-
-                                    </div>
-
-
-                                    <!-- DESCRIPTION -->
-
-                                    <div
-                                        class="form-group full"
-                                    >
-
-                                        <label
-                                            class="form-label"
-                                            for="designDescription"
-                                        >
-
-                                            Description
-
-                                            <span>
-                                                Optional
-                                            </span>
-
-                                        </label>
-
-
-                                        <textarea
-                                            id="designDescription"
-                                            name="description"
-                                            class="form-textarea"
-                                            maxlength="1000"
-                                            placeholder="Tell the community about your concept, process or inspiration..."
-                                        ></textarea>
-
-
-                                        <span
-                                            class="character-count"
-                                            id="descriptionCount"
-                                        >
-                                            0 / 1000
-                                        </span>
-
-                                    </div>
-
-
-                                    <!-- TAGS -->
-
-                                    <div
-                                        class="form-group full"
-                                    >
-
-                                        <label
-                                            class="form-label"
-                                            for="tagInput"
-                                        >
-
-                                            Tags
-
-                                            <span>
-                                                Press Enter after each tag
-                                            </span>
-
-                                        </label>
-
-
-                                        <div
-                                            class="tag-input-wrapper"
-                                            id="tagInputWrapper"
-                                        >
-
-                                            <div
-                                                class="tag-list"
-                                                id="tagList"
-                                            ></div>
-
-
-                                            <input
-                                                type="text"
-                                                id="tagInput"
-                                                placeholder="e.g. futuristic"
-                                                maxlength="24"
-                                                autocomplete="off"
-                                            >
-
-                                        </div>
-
-
-                                        <input
-                                            type="hidden"
-                                            id="designTags"
-                                            name="tags"
-                                            value=""
-                                        >
-
-                                    </div>
-
-                                </div>
-
-                            </section>
+                            </div>
 
                         </div>
 
 
-                        <!-- =================================
-                             RIGHT COLUMN
-                             ================================= -->
+                        <!-- DESIGN INFORMATION -->
 
-                        <div>
+                        <div class="submit-card">
 
-
-                            <!-- VISIBILITY -->
-
-                            <section
-                                class="submit-card"
+                            <h2
+                                class="submit-card-title"
                             >
-
-                                <div
-                                    class="submit-card-header"
-                                >
-
-                                    <div>
-
-                                        <h2>
-                                            Visibility
-                                        </h2>
-
-                                        <p>
-                                            Decide who can see your work.
-                                        </p>
-
-                                    </div>
+                                Design Information
+                            </h2>
 
 
-                                    <span
-                                        class="step-number"
-                                    >
-                                        03
-                                    </span>
-
-                                </div>
-
-
-                                <div
-                                    class="visibility-options"
-                                >
-
-
-                                    <label
-                                        class="visibility-option"
-                                    >
-
-                                        <input
-                                            type="radio"
-                                            name="visibility"
-                                            value="public"
-                                            checked
-                                        >
-
-
-                                        <span
-                                            class="visibility-content"
-                                        >
-
-                                            <span
-                                                class="visibility-icon"
-                                            >
-
-                                                <i
-                                                    class="fa-solid fa-globe"
-                                                ></i>
-
-                                            </span>
-
-
-                                            <span
-                                                class="visibility-text"
-                                            >
-
-                                                <strong>
-                                                    Public
-                                                </strong>
-
-                                                <span>
-                                                    Visible to the
-                                                    DESIGNVERSE community.
-                                                </span>
-
-                                            </span>
-
-                                        </span>
-
-                                    </label>
-
-
-                                    <label
-                                        class="visibility-option"
-                                    >
-
-                                        <input
-                                            type="radio"
-                                            name="visibility"
-                                            value="private"
-                                        >
-
-
-                                        <span
-                                            class="visibility-content"
-                                        >
-
-                                            <span
-                                                class="visibility-icon"
-                                            >
-
-                                                <i
-                                                    class="fa-solid fa-lock"
-                                                ></i>
-
-                                            </span>
-
-
-                                            <span
-                                                class="visibility-text"
-                                            >
-
-                                                <strong>
-                                                    Private
-                                                </strong>
-
-                                                <span>
-                                                    Only you can
-                                                    view it.
-                                                </span>
-
-                                            </span>
-
-                                        </span>
-
-                                    </label>
-
-                                </div>
-
-                            </section>
-
-
-                            <!-- CHALLENGE -->
-
-                            <section
-                                class="submit-card"
+                            <p
+                                class="submit-card-description"
                             >
+                                Tell the community what you created.
+                            </p>
 
-                                <div
-                                    class="submit-card-header"
+
+                            <!-- TITLE -->
+
+                            <div class="submit-field">
+
+                                <label
+                                    class="submit-label"
+                                    for="designTitle"
                                 >
-
-                                    <div>
-
-                                        <h2>
-                                            Challenge
-                                        </h2>
-
-                                        <p>
-                                            Connect your work to
-                                            a DESIGNVERSE challenge.
-                                        </p>
-
-                                    </div>
-
-
-                                    <span
-                                        class="step-number"
-                                    >
-                                        04
+                                    Design Title
+                                    <span>
+                                        *
                                     </span>
+                                </label>
 
-                                </div>
 
-
-                                <div
-                                    class="challenge-box"
+                                <input
+                                    type="text"
+                                    id="designTitle"
+                                    name="title"
+                                    class="submit-input"
+                                    maxlength="120"
+                                    placeholder="e.g. Neon Future"
+                                    autocomplete="off"
+                                    required
                                 >
 
-                                    <div
-                                        class="challenge-box-row"
-                                    >
-
-                                        <div
-                                            class="challenge-box-info"
-                                        >
-
-                                            <div
-                                                class="challenge-box-icon"
-                                            >
-
-                                                <i
-                                                    class="fa-solid fa-trophy"
-                                                ></i>
-
-                                            </div>
+                            </div>
 
 
-                                            <div>
+                            <!-- DESCRIPTION -->
 
-                                                <strong>
-                                                    No challenge selected
-                                                </strong>
+                            <div class="submit-field">
 
-                                                <span>
-                                                    You can submit this
-                                                    design to a challenge
-                                                    later.
-                                                </span>
+                                <label
+                                    class="submit-label"
+                                    for="designDescription"
+                                >
+                                    Description
+                                    <span>
+                                        (optional)
+                                    </span>
+                                </label>
 
-                                            </div>
 
-                                        </div>
+                                <textarea
+                                    id="designDescription"
+                                    name="description"
+                                    class="submit-textarea"
+                                    maxlength="2000"
+                                    placeholder="Tell us about your concept, process or inspiration..."
+                                ></textarea>
 
-                                    </div>
+                            </div>
 
-                                </div>
+
+                            <!-- CATEGORY -->
+
+                            <div class="submit-field">
+
+                                <label
+                                    class="submit-label"
+                                    for="designCategory"
+                                >
+                                    Category
+                                    <span>
+                                        *
+                                    </span>
+                                </label>
 
 
                                 <select
-                                    id="challengeSelect"
-                                    name="challenge_id"
-                                    class="form-select"
-                                    style="
-                                        margin-top:12px;
-                                    "
+                                    id="designCategory"
+                                    name="category"
+                                    class="submit-select"
+                                    required
                                 >
 
                                     <option
                                         value=""
                                     >
-                                        No challenge
+                                        Select a category
+                                    </option>
+
+                                    <option value="branding">
+                                        Branding
+                                    </option>
+
+                                    <option value="logo-design">
+                                        Logo Design
+                                    </option>
+
+                                    <option value="poster">
+                                        Poster
+                                    </option>
+
+                                    <option value="social-media">
+                                        Social Media
+                                    </option>
+
+                                    <option value="ui-ux">
+                                        UI / UX
+                                    </option>
+
+                                    <option value="illustration">
+                                        Illustration
+                                    </option>
+
+                                    <option value="typography">
+                                        Typography
+                                    </option>
+
+                                    <option value="packaging">
+                                        Packaging
+                                    </option>
+
+                                    <option value="motion">
+                                        Motion
+                                    </option>
+
+                                    <option value="3d">
+                                        3D Design
+                                    </option>
+
+                                    <option value="other">
+                                        Other
                                     </option>
 
                                 </select>
 
-                            </section>
+                            </div>
 
 
-                            <!-- TIPS -->
+                            <!-- TAGS -->
 
-                            <section
-                                class="submit-card"
-                            >
+                            <div class="submit-field">
 
-                                <div
-                                    class="submit-card-header"
+                                <label
+                                    class="submit-label"
+                                    for="designTags"
                                 >
-
-                                    <div>
-
-                                        <h2>
-                                            Creator Tips
-                                        </h2>
-
-                                    </div>
-
-                                    <span
-                                        class="step-number"
-                                    >
-                                        ✦
+                                    Tags
+                                    <span>
+                                        (optional)
                                     </span>
+                                </label>
 
-                                </div>
+
+                                <input
+                                    type="text"
+                                    id="designTags"
+                                    name="tags"
+                                    class="submit-input"
+                                    maxlength="300"
+                                    placeholder="branding, minimal, modern"
+                                >
 
 
                                 <div
-                                    class="submit-tips"
+                                    class="tag-help"
                                 >
-
-                                    <h3>
-                                        Make your submission stand out.
-                                    </h3>
-
-
-                                    <ul>
-
-                                        <li>
-                                            Use a clear,
-                                            descriptive title.
-                                        </li>
-
-                                        <li>
-                                            Add relevant tags so
-                                            people can discover it.
-                                        </li>
-
-                                        <li>
-                                            Tell the story behind
-                                            the design when useful.
-                                        </li>
-
-                                        <li>
-                                            Upload your best-quality
-                                            version of the artwork.
-                                        </li>
-
-                                    </ul>
-
+                                    Separate tags with commas.
                                 </div>
 
-                            </section>
+                            </div>
 
                         </div>
 
@@ -2903,52 +1623,163 @@
 
 
                     <!-- =========================================
-                         ACTIONS
+                         RIGHT — PUBLISH
                          ========================================= -->
 
-                    <div
-                        class="submit-actions"
-                    >
-
-                        <p
-                            class="submit-actions-note"
-                        >
-
-                            By publishing this design,
-                            you confirm that you own the
-                            work or have permission to share it.
-
-                        </p>
+                    <div>
 
 
-                        <div
-                            class="submit-actions-buttons"
-                        >
+                        <div class="submit-card">
 
-                            <button
-                                type="button"
-                                class="btn btn-secondary"
-                                id="cancelSubmitButton"
+                            <h2
+                                class="submit-card-title"
+                            >
+                                Publish
+                            </h2>
+
+
+                            <p
+                                class="submit-card-description"
+                            >
+                                Choose who can see your work.
+                            </p>
+
+
+                            <!-- VISIBILITY -->
+
+                            <div class="submit-field">
+
+                                <label
+                                    class="submit-label"
+                                >
+                                    Visibility
+                                </label>
+
+
+                                <label
+                                    class="visibility-option"
+                                >
+
+                                    <input
+                                        type="checkbox"
+                                        id="designPublic"
+                                        name="isPublic"
+                                        checked
+                                    >
+
+
+                                    <span>
+
+                                        <strong>
+                                            Public Design
+                                        </strong>
+
+                                        <span>
+                                            Your design can appear in
+                                            Explore, profiles and
+                                            community feeds.
+                                        </span>
+
+                                    </span>
+
+                                </label>
+
+                            </div>
+
+
+                            <!-- INFO -->
+
+                            <div
+                                class="submit-card"
+                                style="
+                                    margin-top:18px;
+                                    padding:16px;
+                                "
                             >
 
-                                Cancel
+                                <div
+                                    style="
+                                        display:flex;
+                                        gap:12px;
+                                        align-items:flex-start;
+                                    "
+                                >
 
-                            </button>
+                                    <i
+                                        class="fa-solid fa-circle-info"
+                                        style="
+                                            margin-top:3px;
+                                            opacity:.75;
+                                        "
+                                    ></i>
 
 
-                            <button
-                                type="submit"
-                                class="btn btn-primary"
-                                id="publishDesignButton"
-                            >
+                                    <div>
 
-                                <i
-                                    class="fa-solid fa-rocket"
-                                ></i>
+                                        <strong
+                                            style="
+                                                display:block;
+                                                margin-bottom:5px;
+                                            "
+                                        >
+                                            Before you publish
+                                        </strong>
 
-                                Publish Design
 
-                            </button>
+                                        <p
+                                            style="
+                                                margin:0;
+                                                color:var(--text-muted,#888894);
+                                                font-size:.8rem;
+                                                line-height:1.6;
+                                            "
+                                        >
+                                            Make sure your artwork is
+                                            your own work and that it
+                                            follows DESIGNVERSE
+                                            community guidelines.
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- SUBMIT -->
+
+                            <div class="submit-footer">
+
+                                <div
+                                    class="submit-footer-note"
+                                >
+
+                                    <i
+                                        class="fa-solid fa-shield-halved"
+                                    ></i>
+
+                                    Your account owns
+                                    published designs.
+
+                                </div>
+
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary submit-button"
+                                    id="publishDesignBtn"
+                                >
+
+                                    <i
+                                        class="fa-solid fa-rocket"
+                                    ></i>
+
+                                    Publish Design
+
+                                </button>
+
+                            </div>
 
                         </div>
 
@@ -2956,11 +1787,114 @@
 
                 </form>
 
+            </section>
+
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+         ===================================================== -->
+
+    <footer class="site-footer">
+
+        <div class="container">
+
+            <div class="footer-main">
+
+
+                <div class="footer-brand">
+
+                    <a
+                        href="../index.html"
+                        class="brand"
+                    >
+
+                        <img
+                            src="../assets/logo/designverse-logo.jpg"
+                            alt="DESIGNVERSE"
+                            class="brand-logo"
+                        >
+
+                    </a>
+
+
+                    <p>
+                        Design Is A Sport.
+                    </p>
+
+                </div>
+
+
+                <div class="footer-links">
+
+                    <div>
+
+                        <h3>
+                            Discover
+                        </h3>
+
+                        <a href="./explore.html">
+                            Explore
+                        </a>
+
+                        <a href="./challenges.html">
+                            Challenges
+                        </a>
+
+                        <a href="./leaderboard.html">
+                            Leaderboard
+                        </a>
+
+                        <a href="./designers.html">
+                            Designers
+                        </a>
+
+                    </div>
+
+
+                    <div>
+
+                        <h3>
+                            Account
+                        </h3>
+
+                        <a href="./dashboard/dashboard.html">
+                            Dashboard
+                        </a>
+
+                        <a href="./auth/settings.html">
+                            Settings
+                        </a>
+
+                    </div>
+
+                </div>
+
             </div>
 
-        </main>
 
-    </div>
+            <div class="footer-bottom">
+
+                <p>
+                    ©
+                    <span id="currentYear"></span>
+                    BestB Designs.
+                    All rights reserved.
+                </p>
+
+
+                <p>
+                    DESIGNVERSE
+                </p>
+
+            </div>
+
+        </div>
+
+    </footer>
 
 
     <!-- =====================================================
@@ -2973,12 +1907,12 @@
 
 
     <script
-        src="../js/utils.js"
+        src="../js/supabase.js"
     ></script>
 
 
     <script
-        src="../js/supabase.js"
+        src="../js/utils.js"
     ></script>
 
 
@@ -3002,104 +1936,23 @@
     ></script>
 
 
+    <script
+        src="../js/app.js"
+    ></script>
+
+
     <!-- =====================================================
-         UPLOAD PAGE INTERACTIONS
+         SUBMIT PAGE LOGIC
          ===================================================== -->
 
     <script>
 
-        /* =================================================
-           MOBILE SIDEBAR
-           ================================================= */
-
-        const sidebar =
-            document.getElementById(
-                "dashboardSidebar"
-            );
-
-
-        const sidebarToggle =
-            document.getElementById(
-                "dashboardMobileToggle"
-            );
-
-
-        sidebarToggle?.addEventListener(
-            "click",
-            () => {
-
-                const open =
-                    sidebar.classList.toggle(
-                        "open"
-                    );
-
-
-                sidebarToggle.setAttribute(
-                    "aria-expanded",
-                    String(open)
-                );
-
-
-                sidebarToggle.innerHTML =
-                    open
-                        ? '<i class="fa-solid fa-xmark"></i>'
-                        : '<i class="fa-solid fa-bars"></i>';
-
-            }
-        );
-
-
-        sidebar
-            ?.querySelectorAll("a")
-            .forEach(
-                link => {
-
-                    link.addEventListener(
-                        "click",
-                        () => {
-
-                            if (
-                                window.innerWidth <=
-                                850
-                            ) {
-
-                                sidebar.classList.remove(
-                                    "open"
-                                );
-
-
-                                sidebarToggle?.setAttribute(
-                                    "aria-expanded",
-                                    "false"
-                                );
-
-
-                                if (
-                                    sidebarToggle
-                                ) {
-
-                                    sidebarToggle.innerHTML =
-                                        '<i class="fa-solid fa-bars"></i>';
-                                }
-
-                            }
-
-                        }
-                    );
-
-                }
-            );
+        "use strict";
 
 
         /* =================================================
-           IMAGE UPLOAD PREVIEW
+           ELEMENTS
            ================================================= */
-
-        const imageInput =
-            document.getElementById(
-                "designImageInput"
-            );
-
 
         const uploadZone =
             document.getElementById(
@@ -3107,15 +1960,15 @@
             );
 
 
-        const uploadZoneContent =
+        const fileInput =
             document.getElementById(
-                "uploadZoneContent"
+                "designFile"
             );
 
 
-        const uploadPreview =
+        const preview =
             document.getElementById(
-                "uploadPreview"
+                "designPreview"
             );
 
 
@@ -3125,215 +1978,256 @@
             );
 
 
-        const previewFileName =
+        const removePreview =
             document.getElementById(
-                "previewFileName"
+                "removePreview"
             );
 
 
-        const previewFileSize =
+        const submitArea =
             document.getElementById(
-                "previewFileSize"
+                "submitArea"
             );
 
 
-        const imageError =
+        const loginRequired =
             document.getElementById(
-                "imageError"
+                "loginRequired"
             );
 
 
-        const changeImageButton =
+        const submitMessage =
             document.getElementById(
-                "changeImageButton"
+                "submitMessage"
             );
 
 
-        let previewObjectUrl =
+        const form =
+            document.getElementById(
+                "designUploadForm"
+            );
+
+
+        const publishButton =
+            document.getElementById(
+                "publishDesignBtn"
+            );
+
+
+        let previewUrl =
             null;
 
 
-        function showImageError(message) {
+        /* =================================================
+           MESSAGE
+           ================================================= */
 
-            if (!imageError) return;
+        const showMessage = (
+            message,
+            type = "error"
+        ) => {
 
-            imageError.textContent =
+            if (!submitMessage) {
+                return;
+            }
+
+
+            submitMessage.textContent =
                 message;
 
-            imageError.classList.add(
-                "visible"
-            );
-        }
+
+            submitMessage.className =
+                `submit-message show ${type}`;
+
+        };
 
 
-        function clearImageError() {
+        const hideMessage = () => {
 
-            imageError?.classList.remove(
-                "visible"
-            );
-
-            if (imageError) {
-                imageError.textContent =
-                    "";
-            }
-        }
-
-
-        function formatBytes(bytes) {
-
-            if (
-                !Number.isFinite(bytes) ||
-                bytes <= 0
-            ) {
-
-                return "0 Bytes";
+            if (!submitMessage) {
+                return;
             }
 
 
-            const units = [
-                "Bytes",
-                "KB",
-                "MB",
-                "GB"
-            ];
+            submitMessage.className =
+                "submit-message";
+
+            submitMessage.textContent =
+                "";
+
+        };
 
 
-            const index =
-                Math.floor(
-                    Math.log(bytes) /
-                    Math.log(1024)
+        /* =================================================
+           AUTH CHECK
+           ================================================= */
+
+        const checkAuthentication =
+            async () => {
+
+                try {
+
+                    const session =
+                        await window.DVAuth
+                            ?.getCurrentSession?.();
+
+
+                    if (!session) {
+
+                        submitArea.hidden =
+                            true;
+
+                        loginRequired.hidden =
+                            false;
+
+                        return false;
+                    }
+
+
+                    submitArea.hidden =
+                        false;
+
+                    loginRequired.hidden =
+                        true;
+
+                    return true;
+
+
+                } catch (error) {
+
+                    console.error(
+                        "Submit auth check error:",
+                        error
+                    );
+
+
+                    submitArea.hidden =
+                        true;
+
+                    loginRequired.hidden =
+                        false;
+
+                    return false;
+                }
+            };
+
+
+        /* =================================================
+           PREVIEW
+           ================================================= */
+
+        const clearPreview = () => {
+
+            if (previewUrl) {
+
+                URL.revokeObjectURL(
+                    previewUrl
                 );
 
-
-            return `${(
-                bytes /
-                Math.pow(
-                    1024,
-                    index
-                )
-            ).toFixed(
-                index === 0 ? 0 : 2
-            )} ${units[index]}`;
-        }
+                previewUrl =
+                    null;
+            }
 
 
-        function handleSelectedFile(
+            previewImage.src =
+                "";
+
+
+            preview.classList.remove(
+                "show"
+            );
+
+
+            fileInput.value =
+                "";
+
+        };
+
+
+        const displayPreview = (
             file
-        ) {
-
-            clearImageError();
-
+        ) => {
 
             if (!file) {
                 return;
             }
 
 
-            const allowedTypes = [
-                "image/jpeg",
-                "image/png",
-                "image/webp",
-                "image/gif"
-            ];
-
-
-            const maxSize =
-                10 * 1024 * 1024;
-
-
             if (
-                !allowedTypes.includes(
-                    file.type
-                )
+                !window.DVDesigns
             ) {
-
-                showImageError(
-                    "Please upload a JPG, PNG, WEBP or GIF image."
-                );
-
-                imageInput.value =
-                    "";
 
                 return;
             }
 
 
-            if (
-                file.size >
-                maxSize
-            ) {
+            try {
 
-                showImageError(
-                    "Your image is larger than the 10 MB limit."
+                window.DVDesigns
+                    .validateDesignFile(
+                        file
+                    );
+
+
+            } catch (error) {
+
+                showMessage(
+                    error.message,
+                    "error"
                 );
 
-                imageInput.value =
-                    "";
+                clearPreview();
 
                 return;
             }
 
 
-            if (
-                previewObjectUrl
-            ) {
+            hideMessage();
+
+
+            if (previewUrl) {
 
                 URL.revokeObjectURL(
-                    previewObjectUrl
+                    previewUrl
                 );
             }
 
 
-            previewObjectUrl =
+            previewUrl =
                 URL.createObjectURL(
                     file
                 );
 
 
             previewImage.src =
-                previewObjectUrl;
+                previewUrl;
 
 
-            previewFileName.textContent =
-                file.name;
-
-
-            previewFileSize.textContent =
-                formatBytes(
-                    file.size
-                );
-
-
-            uploadZone.style.display =
-                "none";
-
-
-            uploadPreview.classList.add(
-                "visible"
+            preview.classList.add(
+                "show"
             );
-        }
+
+        };
 
 
-        imageInput?.addEventListener(
+        /* =================================================
+           FILE INPUT
+           ================================================= */
+
+        fileInput?.addEventListener(
             "change",
-            event => {
-
-                const file =
-                    event.target.files?.[0];
-
-                handleSelectedFile(
-                    file
-                );
-
-            }
-        );
-
-
-        changeImageButton?.addEventListener(
-            "click",
             () => {
 
-                imageInput?.click();
+                const file =
+                    fileInput.files?.[0];
+
+
+                if (file) {
+
+                    displayPreview(
+                        file
+                    );
+                }
 
             }
         );
@@ -3355,12 +2249,15 @@
 
                         event.preventDefault();
 
+                        event.stopPropagation();
+
                         uploadZone.classList.add(
                             "dragover"
                         );
 
                     }
                 );
+
             }
         );
 
@@ -3377,12 +2274,15 @@
 
                         event.preventDefault();
 
+                        event.stopPropagation();
+
                         uploadZone.classList.remove(
                             "dragover"
                         );
 
                     }
                 );
+
             }
         );
 
@@ -3401,31 +2301,39 @@
                 }
 
 
+                /*
+                 * Transfer the selected
+                 * file into the input so
+                 * designs.js receives
+                 * the same file.
+                 */
+
                 try {
 
-                    const dataTransfer =
+                    const transfer =
                         new DataTransfer();
 
 
-                    dataTransfer.items.add(
+                    transfer.items.add(
                         file
                     );
 
 
-                    imageInput.files =
-                        dataTransfer.files;
+                    fileInput.files =
+                        transfer.files;
 
 
-                } catch {
-                    /*
-                     * Preview still works even if
-                     * the browser prevents assigning
-                     * the FileList.
-                     */
+                } catch (error) {
+
+                    console.warn(
+                        "Unable to sync dropped file with input:",
+                        error
+                    );
+
                 }
 
 
-                handleSelectedFile(
+                displayPreview(
                     file
                 );
 
@@ -3434,242 +2342,160 @@
 
 
         /* =================================================
-           DESCRIPTION COUNTER
+           REMOVE PREVIEW
            ================================================= */
 
-        const description =
-            document.getElementById(
-                "designDescription"
-            );
+        removePreview?.addEventListener(
+            "click",
+            event => {
 
+                event.preventDefault();
 
-        const descriptionCount =
-            document.getElementById(
-                "descriptionCount"
-            );
+                event.stopPropagation();
 
+                clearPreview();
 
-        description?.addEventListener(
-            "input",
-            () => {
+                hideMessage();
 
-                const length =
-                    description.value.length;
-
-
-                descriptionCount.textContent =
-                    `${length} / 1000`;
             }
         );
 
 
         /* =================================================
-           TAG SYSTEM
+           SUBMIT
            ================================================= */
 
-        const tagInput =
-            document.getElementById(
-                "tagInput"
-            );
-
-
-        const tagList =
-            document.getElementById(
-                "tagList"
-            );
-
-
-        const hiddenTags =
-            document.getElementById(
-                "designTags"
-            );
-
-
-        const tags = [];
-
-
-        function updateTagInput() {
-
-            hiddenTags.value =
-                JSON.stringify(
-                    tags
-                );
-        }
-
-
-        function renderTags() {
-
-            tagList.innerHTML =
-                "";
-
-
-            tags.forEach(
-                (
-                    tag,
-                    index
-                ) => {
-
-                    const element =
-                        document.createElement(
-                            "span"
-                        );
-
-
-                    element.className =
-                        "design-tag";
-
-
-                    element.innerHTML = `
-
-                        <span>
-                            #${tag}
-                        </span>
-
-                        <button
-                            type="button"
-                            aria-label="Remove ${tag}"
-                            data-remove-tag="${index}"
-                        >
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
-
-                    `;
-
-
-                    tagList.appendChild(
-                        element
-                    );
-                }
-            );
-
-
-            updateTagInput();
-        }
-
-
-        function addTag(value) {
-
-            const cleaned =
-                String(value || "")
-                    .trim()
-                    .toLowerCase()
-                    .replace(
-                        /^#/,
-                        ""
-                    )
-                    .replace(
-                        /\s+/g,
-                        "-"
-                    );
-
-
-            if (!cleaned) {
-                return;
-            }
-
-
-            if (
-                cleaned.length >
-                24
-            ) {
-                return;
-            }
-
-
-            if (
-                tags.includes(
-                    cleaned
-                )
-            ) {
-                return;
-            }
-
-
-            if (
-                tags.length >= 8
-            ) {
-                return;
-            }
-
-
-            tags.push(
-                cleaned
-            );
-
-
-            tagInput.value =
-                "";
-
-
-            renderTags();
-        }
-
-
-        tagInput?.addEventListener(
-            "keydown",
+        form?.addEventListener(
+            "submit",
             event => {
 
-                if (
-                    event.key === "Enter" ||
-                    event.key === ","
-                ) {
+                /*
+                 * designs.js already owns
+                 * the actual submit handler.
+                 *
+                 * This listener only performs
+                 * front-end validation and does
+                 * NOT call preventDefault().
+                 */
+
+                hideMessage();
+
+
+                const file =
+                    fileInput?.files?.[0];
+
+
+                const title =
+                    document.getElementById(
+                        "designTitle"
+                    )?.value
+                    ?.trim();
+
+
+                const category =
+                    document.getElementById(
+                        "designCategory"
+                    )?.value
+                    ?.trim();
+
+
+                if (!file) {
 
                     event.preventDefault();
 
-                    addTag(
-                        tagInput.value
+                    showMessage(
+                        "Please select a design image.",
+                        "error"
                     );
 
-                }
-
-
-                if (
-                    event.key === "Backspace" &&
-                    !tagInput.value &&
-                    tags.length
-                ) {
-
-                    tags.pop();
-
-                    renderTags();
-
-                }
-
-            }
-        );
-
-
-        tagList?.addEventListener(
-            "click",
-            event => {
-
-                const button =
-                    event.target.closest(
-                        "[data-remove-tag]"
-                    );
-
-
-                if (!button) {
                     return;
                 }
 
 
-                const index =
-                    Number(
-                        button.dataset.removeTag
+                if (!title) {
+
+                    event.preventDefault();
+
+                    showMessage(
+                        "Please enter a design title.",
+                        "error"
                     );
 
+                    return;
+                }
+
+
+                if (!category) {
+
+                    event.preventDefault();
+
+                    showMessage(
+                        "Please select a category.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+
+                /*
+                 * Validation passes.
+                 *
+                 * Do not preventDefault here.
+                 * designs.js will handle the
+                 * actual submission.
+                 */
+
+            }
+        );
+
+
+        /* =================================================
+           LISTEN FOR SUCCESS
+           ================================================= */
+
+        document.addEventListener(
+            "designverse:design-created",
+            event => {
+
+                const design =
+                    event.detail;
+
+
+                console.log(
+                    "DESIGNVERSE design created:",
+                    design
+                );
+
+
+                showMessage(
+                    "Design published successfully! Redirecting...",
+                    "success"
+                );
+
+
+                /*
+                 * Give Supabase a moment to
+                 * finish returning the record,
+                 * then open the new design.
+                 */
 
                 if (
-                    Number.isInteger(index)
+                    design?.id
                 ) {
 
-                    tags.splice(
-                        index,
-                        1
+                    setTimeout(
+                        () => {
+
+                            window.location.href =
+                                `/design?id=${encodeURIComponent(
+                                    design.id
+                                )}`;
+
+                        },
+                        900
                     );
 
-                    renderTags();
                 }
 
             }
@@ -3677,67 +2503,50 @@
 
 
         /* =================================================
-           CANCEL
+           CURRENT YEAR
            ================================================= */
 
-        document
-            .getElementById(
-                "cancelSubmitButton"
-            )
-            ?.addEventListener(
-                "click",
-                () => {
-
-                    window.location.href =
-                        "dashboard/my-designs.html";
-
-                }
+        const currentYear =
+            document.getElementById(
+                "currentYear"
             );
 
 
-        /* =================================================
-           FORM SUBMIT PLACEHOLDER
-           ================================================= */
+        if (currentYear) {
 
-        /*
-         * designs.js will take over the actual
-         * Supabase upload/publish operation.
-         *
-         * This handler only prevents accidental
-         * browser submission until that logic
-         * is connected.
-         */
+            currentYear.textContent =
+                new Date()
+                    .getFullYear();
 
-        document
-            .getElementById(
-                "designSubmitForm"
-            )
-            ?.addEventListener(
-                "submit",
-                event => {
-
-                    event.preventDefault();
-
-                }
-            );
+        }
 
 
         /* =================================================
-           CLEANUP
+           INITIALIZE
            ================================================= */
 
-        window.addEventListener(
-            "beforeunload",
-            () => {
+        document.addEventListener(
+            "DOMContentLoaded",
+            async () => {
 
-                if (
-                    previewObjectUrl
-                ) {
+                const authenticated =
+                    await checkAuthentication();
 
-                    URL.revokeObjectURL(
-                        previewObjectUrl
-                    );
+
+                if (!authenticated) {
+                    return;
                 }
+
+
+                /*
+                 * Make sure the user's
+                 * session exists before
+                 * allowing submission.
+                 */
+
+                console.log(
+                    "DESIGNVERSE submit page ready."
+                );
 
             }
         );
@@ -3745,4 +2554,5 @@
     </script>
 
 </body>
+
 </html>
