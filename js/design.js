@@ -517,6 +517,135 @@ const DVDesignPage = (() => {
 
 
     /* =====================================================
+       LIKE
+       ===================================================== */
+
+    async function toggleLike() {
+
+        const designId = getDesignId();
+
+        if (!designId) return;
+
+        if (!window.DVDesigns || typeof window.DVDesigns.toggleDesignLike !== "function") {
+            showDesignToast("Unable to like design. Please try again.", "error");
+            return;
+        }
+
+        const button = $("#designLikeBtn");
+
+        if (button) button.disabled = true;
+
+        try {
+
+            const result = await window.DVDesigns.toggleDesignLike(designId);
+
+            state.liked = result.liked;
+
+            renderLikeButton();
+
+            if (result.liked) {
+                showDesignToast("You liked this design! ❤️", "success");
+            } else {
+                showDesignToast("Like removed.", "success");
+            }
+
+        } catch (error) {
+
+            console.error("DESIGNVERSE like error:", error);
+
+            showDesignToast(
+                error?.message || "Unable to like design.",
+                "error"
+            );
+
+        } finally {
+
+            if (button) button.disabled = false;
+        }
+    }
+
+
+    function renderLikeButton() {
+
+        const button = $("#designLikeBtn");
+
+        if (!button) return;
+
+        const icon = $("#designLikeIcon");
+
+        if (state.liked) {
+            button.classList.add("active");
+            icon?.classList.remove("fa-regular");
+            icon?.classList.add("fa-solid");
+        } else {
+            button.classList.remove("active");
+            icon?.classList.remove("fa-solid");
+            icon?.classList.add("fa-regular");
+        }
+    }
+
+
+    async function loadLikeState() {
+
+        const designId = getDesignId();
+
+        if (!designId) return;
+
+        if (!window.DVDesigns) return;
+
+        /* Load like count */
+
+        if (typeof window.DVDesigns.getLikeCount === "function") {
+
+            try {
+
+                const count = await window.DVDesigns.getLikeCount(designId);
+
+                setText("#designLikeCount", formatLikeCount(count));
+
+            } catch (error) {
+
+                console.warn("Load like count error:", error);
+            }
+        }
+
+        /* Load whether user liked */
+
+        if (typeof window.DVDesigns.getUserLikes === "function") {
+
+            try {
+
+                const likedIds = await window.DVDesigns.getUserLikes([designId]);
+
+                state.liked = likedIds.includes(designId);
+
+                renderLikeButton();
+
+            } catch (error) {
+
+                console.warn("Load user like error:", error);
+            }
+        }
+    }
+
+
+    function formatLikeCount(count) {
+
+        if (!count || count < 1) return "0";
+
+        if (count >= 1000000) {
+            return (count / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
+        }
+
+        if (count >= 1000) {
+            return (count / 1000).toFixed(1).replace(/\.0$/, "") + "K";
+        }
+
+        return String(count);
+    }
+
+
+    /* =====================================================
        BOOKMARK / SAVE
        ===================================================== */
 
@@ -980,6 +1109,12 @@ const DVDesignPage = (() => {
             });
         });
 
+        /* Like */
+
+        $("#designLikeBtn")?.addEventListener("click", () => {
+            toggleLike();
+        });
+
         /* Bookmark */
 
         $("#designBookmarkBtn")?.addEventListener("click", () => {
@@ -1053,6 +1188,8 @@ const DVDesignPage = (() => {
             renderDesign(design);
 
             loadBookmarkState();
+
+            loadLikeState();
 
             setupEvents();
 

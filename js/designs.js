@@ -450,6 +450,180 @@ const uploadDesignImage = async (
 
 
 /* =========================================================
+   LIKE / UNLIKE A DESIGN
+   ========================================================= */
+
+const likeDesign = async (designId) => {
+
+    const supabase =
+        getDesignSupabase();
+
+    if (!supabase) {
+        throw new Error("Supabase is unavailable.");
+    }
+
+    const user =
+        await getDesignUser();
+
+    if (!user) {
+        throw new Error("Please log in to like designs.");
+    }
+
+    const { error } = await supabase
+        .from("likes")
+        .insert({
+            design_id: designId,
+            user_id: user.id
+        });
+
+    if (error) {
+
+        if (
+            error.code === "23505" ||
+            String(error.message).toLowerCase().includes("duplicate")
+        ) {
+            return { liked: true };
+        }
+
+        throw error;
+    }
+
+    await supabase
+        .from("designs")
+        .update({
+            likes_count:
+                supabase.rpc ?
+                undefined :
+                undefined
+        })
+        .eq("id", designId);
+
+    await supabase.rpc("increment_design_likes", {
+        design_id_input: designId
+    }).then(() => {}).catch(() => {});
+
+    return { liked: true };
+};
+
+
+const unlikeDesign = async (designId) => {
+
+    const supabase =
+        getDesignSupabase();
+
+    if (!supabase) {
+        throw new Error("Supabase is unavailable.");
+    }
+
+    const user =
+        await getDesignUser();
+
+    if (!user) {
+        throw new Error("Please log in.");
+    }
+
+    const { error } = await supabase
+        .from("likes")
+        .delete()
+        .eq("design_id", designId)
+        .eq("user_id", user.id);
+
+    if (error) throw error;
+
+    await supabase.rpc("decrement_design_likes", {
+        design_id_input: designId
+    }).then(() => {}).catch(() => {});
+
+    return { liked: false };
+};
+
+
+const toggleDesignLike = async (designId) => {
+
+    const supabase =
+        getDesignSupabase();
+
+    if (!supabase) {
+        throw new Error("Supabase is unavailable.");
+    }
+
+    const user =
+        await getDesignUser();
+
+    if (!user) {
+        throw new Error("Please log in to like designs.");
+    }
+
+    const { data: existing } = await supabase
+        .from("likes")
+        .select("id")
+        .eq("design_id", designId)
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+    if (existing) {
+
+        await unlikeDesign(designId);
+
+        return { liked: false };
+
+    }
+
+    await likeDesign(designId);
+
+    return { liked: true };
+};
+
+
+const getLikeCount = async (designId) => {
+
+    const supabase =
+        getDesignSupabase();
+
+    if (!supabase || !designId) return 0;
+
+    const { count, error } = await supabase
+        .from("likes")
+        .select("id", {
+            count: "exact",
+            head: true
+        })
+        .eq("design_id", designId);
+
+    if (error) return 0;
+
+    return count || 0;
+};
+
+
+const getUserLikes = async (designIds) => {
+
+    const supabase =
+        getDesignSupabase();
+
+    if (!supabase || !designIds?.length) return [];
+
+    const user =
+        await getDesignUser();
+
+    if (!user) return [];
+
+    const { data, error } = await supabase
+        .from("likes")
+        .select("design_id")
+        .eq("user_id", user.id)
+        .in("design_id", designIds);
+
+    if (error) return [];
+
+    return (data || []).map(
+        item => item.design_id
+    );
+};
+
+
+
+/* =========================================================
    CREATE DESIGN RECORD
    ========================================================= */
 
@@ -1981,6 +2155,29 @@ const renderDesignCard = (
     `;
 
 
+    /* Make entire card clickable */
+
+    card.style.cursor = "pointer";
+
+    card.addEventListener(
+        "click",
+        event => {
+
+            /* Don't navigate if clicking
+             * on an inner link or button */
+
+            if (
+                event.target.closest(
+                    "a, button"
+                )
+            ) {
+                return;
+            }
+
+            window.location.href = designUrl;
+        }
+    );
+
     container.appendChild(
         card
     );
@@ -2786,6 +2983,16 @@ window.DVDesigns = {
     deleteDesign,
 
     incrementDesignViews,
+
+    likeDesign,
+
+    unlikeDesign,
+
+    toggleDesignLike,
+
+    getLikeCount,
+
+    getUserLikes,
 
     renderDesignCard,
 

@@ -614,6 +614,26 @@
         }
 
 
+        .sb-button-delete {
+            border-color:
+                rgba(239, 68, 68, 0.35);
+
+            color: #f87171;
+
+            background:
+                rgba(239, 68, 68, 0.06);
+        }
+
+
+        .sb-button-delete:hover:not(:disabled) {
+            background:
+                rgba(239, 68, 68, 0.18);
+
+            border-color:
+                rgba(239, 68, 68, 0.55);
+        }
+
+
         /* =================================================
            STATES
            ================================================= */
@@ -1506,6 +1526,13 @@
                       </button>`
                     : "";
 
+            const deleteButton =
+                `<button type="button" class="sb-button sb-button-delete"
+                      data-sb-action="delete">
+                      <i class="fa-solid fa-trash"></i>
+                      Delete
+                  </button>`;
+
             const thumb = image
                 ? `<img class="sb-thumb" src="${sbEscape(image)}"
                        alt="" loading="lazy">`
@@ -1539,6 +1566,7 @@
                     <div class="sb-actions">
                         ${approveButton}
                         ${rejectButton}
+                        ${deleteButton}
                     </div>
 
                 </article>
@@ -1603,6 +1631,114 @@
                 sbState.busy = false;
             }
         }
+
+    /* =================================================
+       DELETE SUBMISSION
+       ================================================= */
+
+        async function sbDeleteSubmission(submissionId) {
+            if (sbState.busy) return;
+
+            const confirmed = window.confirm(
+                "Permanently delete this submission? This action cannot be undone."
+            );
+
+            if (!confirmed) return;
+
+            const supabase = window.supabaseClient;
+
+            if (!supabase) {
+                sbShowToast("Could not connect to services.", "error");
+                return;
+            }
+
+            sbState.busy = true;
+
+            try {
+
+                const { error } = await supabase
+                    .from("submissions")
+                    .delete()
+                    .eq("id", submissionId);
+
+                if (error) throw error;
+
+                sbState.entries = sbState.entries.filter(
+                    item => item.id !== submissionId
+                );
+
+                sbRender();
+
+                sbShowToast(
+                    "Submission deleted permanently.",
+                    "success"
+                );
+
+            } catch (error) {
+                console.error(
+                    "DESIGNVERSE: submission delete error:",
+                    error
+                );
+                sbShowToast(
+                    error?.message ||
+                        "Could not delete the submission.",
+                    "error"
+                );
+            } finally {
+                sbState.busy = false;
+            }
+        }
+
+
+        /* =================================================
+           EVENT HANDLING
+           ================================================= */
+
+        function sbSetupEvents() {
+
+            const list = $sb("#sbList");
+
+            if (!list) return;
+
+            list.addEventListener("click", event => {
+
+                const button = event.target.closest("[data-sb-action]");
+
+                if (!button) return;
+
+                const card = button.closest("[data-sb-id]");
+
+                if (!card) return;
+
+                const submissionId = card.dataset.sbId;
+                const action = button.dataset.sbAction;
+
+                if (action === "delete") {
+                    sbDeleteSubmission(submissionId);
+                } else {
+                    sbSetStatus(submissionId, action);
+                }
+            });
+        }
+
+
+        /* =================================================
+           INITIALIZE
+           ================================================= */
+
+        async function sbInit() {
+
+            const isAuthorized = await sbWaitForAdmin();
+
+            if (!isAuthorized) return;
+
+            sbSetupEvents();
+            await sbLoad();
+        }
+
+
+        document.addEventListener("DOMContentLoaded", sbInit);
+
 
     /*@@SB-CONT3@@*/
 
