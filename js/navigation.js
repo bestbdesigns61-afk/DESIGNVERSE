@@ -57,14 +57,10 @@ const DVNavigation = {
     setupMobileMenu() {
 
         const toggle =
-            document.querySelector(
-                ".mobile-nav-toggle"
-            );
+            this.getMobileToggle();
 
         const nav =
-            document.querySelector(
-                ".nav-links"
-            );
+            this.getMobileNav();
 
         if (!toggle || !nav) return;
 
@@ -99,17 +95,45 @@ const DVNavigation = {
     },
 
 
+    /* Get the mobile menu toggle, supporting
+       both the new and legacy selector names. */
+
+    getMobileToggle() {
+
+        return (
+            document.querySelector(
+                ".mobile-menu-button"
+            ) ||
+            document.querySelector(
+                ".mobile-nav-toggle"
+            )
+        );
+    },
+
+
+    /* Get the mobile menu container, supporting
+       both the new and legacy selector names. */
+
+    getMobileNav() {
+
+        return (
+            document.querySelector(
+                ".mobile-nav"
+            ) ||
+            document.querySelector(
+                ".nav-links"
+            )
+        );
+    },
+
+
     toggleMobileMenu() {
 
         const nav =
-            document.querySelector(
-                ".nav-links"
-            );
+            this.getMobileNav();
 
         const toggle =
-            document.querySelector(
-                ".mobile-nav-toggle"
-            );
+            this.getMobileToggle();
 
         if (!nav) return;
 
@@ -121,6 +145,14 @@ const DVNavigation = {
         nav.classList.toggle(
             "open",
             this.state.menuOpen
+        );
+
+
+        nav.setAttribute(
+            "aria-hidden",
+            String(
+                !this.state.menuOpen
+            )
         );
 
 
@@ -148,14 +180,10 @@ const DVNavigation = {
     closeMobileMenu() {
 
         const nav =
-            document.querySelector(
-                ".nav-links"
-            );
+            this.getMobileNav();
 
         const toggle =
-            document.querySelector(
-                ".mobile-nav-toggle"
-            );
+            this.getMobileToggle();
 
 
         this.state.menuOpen =
@@ -164,6 +192,11 @@ const DVNavigation = {
 
         nav?.classList.remove(
             "open"
+        );
+
+        nav?.setAttribute(
+            "aria-hidden",
+            "true"
         );
 
         toggle?.classList.remove(
@@ -490,6 +523,7 @@ const DVNavigation = {
             .querySelectorAll(
                 "a[data-nav-link], " +
                 ".nav-links a, " +
+                ".mobile-nav a, " +
                 ".sidebar a, " +
                 ".mobile-bottom-nav a"
             )
@@ -769,12 +803,10 @@ const DVNavigation = {
 
                 if (
                     this.state.menuOpen &&
-                    !target.closest(
-                        ".nav-links"
-                    ) &&
-                    !target.closest(
-                        ".mobile-nav-toggle"
-                    )
+                    !target.closest(".mobile-nav") &&
+                    !target.closest(".nav-links") &&
+                    !target.closest(".mobile-menu-button") &&
+                    !target.closest(".mobile-nav-toggle")
                 ) {
 
                     this.closeMobileMenu();
