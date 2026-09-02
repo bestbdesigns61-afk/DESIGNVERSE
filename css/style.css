@@ -2054,3 +2054,138 @@ p {
         transition-duration: 0.01ms !important;
     }
 }
+/* =========================================================
+   21. DESIGN DETAIL PAGE
+   ========================================================= */
+
+.design-detail-main {
+    padding-top: 100px;
+    padding-bottom: 60px;
+    min-height: 100vh;
+}
+
+.design-detail-section {
+    display: block;
+}
+
+.design-detail-section.hidden {
+    display: none;
+}
+
+.design-detail-layout {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 40px;
+    align-items: start;
+}
+
+.design-detail-visual {
+    position: sticky;
+    top: 100px;
+}
+
+.design-detail-image-wrapper {
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border);
+}
+
+.design-detail-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.design-detail-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.design-detail-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.design-detail-description {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.design-detail-designer {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-secondary);
+    text-decoration: none;
+}
+
+.design-detail-designer:hover {
+    color: white;
+}
+
+.design-detail-stats {
+    display: flex;
+    gap: 24px;
+    padding: 16px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+.design-detail-stat {
+    display: flex;
+    flex-direction: column;
+}
+
+.design-detail-stat strong {
+    font-size: 20px;
+}
+
+.design-detail-stat span {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.design-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.design-action-btn:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-light);
+}
+
+.design-action-btn.liked {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #f87171;
+}
+
+.design-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+    .design-detail-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .design-detail-visual {
+        position: static;
+    }
+}
