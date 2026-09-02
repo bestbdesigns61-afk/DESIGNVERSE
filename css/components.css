@@ -2049,6 +2049,15 @@
     border-radius: 14px;
 }
 
+/* Brand logo (used in footers and some page headers) */
+.brand-logo {
+    display: block;
+    width: auto;
+    max-width: 180px;
+    height: auto;
+    border-radius: 14px;
+}
+
 /* Mobile / Small Screens */
 @media (max-width: 600px) {
 

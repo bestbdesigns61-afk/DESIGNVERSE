@@ -78,6 +78,71 @@
         href="../css/responsive.css"
     >
 
+    <!-- =====================================================
+         DESIGN DETAIL PAGE HEADER STYLES
+         ===================================================== -->
+    <style>
+        /* Header inner layout */
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            min-height: 82px;
+        }
+
+        /* Brand logo sizing */
+        .brand-logo {
+            display: block;
+            width: auto;
+            max-width: 180px;
+            height: auto;
+            border-radius: 14px;
+        }
+
+        /* Main navigation layout */
+        .main-nav {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        /* Navigation links */
+        .main-nav .nav-link {
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+
+        .main-nav .nav-link:hover,
+        .main-nav .nav-link.active {
+            color: var(--text-primary);
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .header-inner {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+                padding: 16px 0;
+            }
+
+            .brand-logo {
+                max-width: 140px;
+            }
+
+            .main-nav {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 16px;
+            }
+        }
+    </style>
+
 </head>
 
 
