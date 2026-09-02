@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050508">
+<meta name="description" content="Browse and manage every member of the DESIGNVERSE community.">
+<title>Users - DESIGNVERSE Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="../../css/style.css">
+<link rel="stylesheet" href="../../css/components.css">
+<link rel="stylesheet" href="../../css/animations.css">
+<link rel="stylesheet" href="../../css/responsive.css">
+<style>
+:root { --asw: 250px; }
+body { margin: 0; min-height: 100vh; }
+.ap { min-height: 100vh; padding-top: 82px; }
+.asb { position: fixed; top: 82px; left: 0; bottom: 0; width: var(--asw); padding: 22px 16px; overflow-y: auto; border-right: 1px solid var(--border); background: rgba(5, 5, 8, 0.90); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); z-index: 900; transition: transform 300ms ease; }
+.ast { padding: 0 12px 10px; color: var(--text-muted); font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; border-bottom: 1px solid var(--border); margin-bottom: 14px; }
+.anav { display: flex; flex-direction: column; gap: 4px; }
+.anav a { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; color: var(--text-muted); font-size: 13px; font-weight: 600; text-decoration: none; transition: background 180ms ease, color 180ms ease, transform 180ms ease; }
+.anav a i { width: 18px; text-align: center; }
+.anav a:hover { color: white; background: rgba(255,255,255,0.05); transform: translateX(2px); }
+.anav a.active { color: white; background: linear-gradient(135deg, rgba(124,58,237,0.19), rgba(37,99,235,0.08)); border: 1px solid rgba(124,58,237,0.24); box-shadow: 0 8px 25px rgba(124,58,237,0.10); }
+.asd { height: 1px; margin: 20px 8px; background: var(--border); }
+.bd { color: #a7f3d0 !important; }
+.bd:hover { background: rgba(34,197,94,0.07) !important; }
+.amain { width: calc(100% - var(--asw)); margin-left: var(--asw); padding: 32px; }
+.acont { width: min(100%, 1320px); margin-inline: auto; }
+.atb { margin-bottom: 28px; }
+.ahl { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px; padding: 6px 14px; border: 1px solid rgba(124, 58, 237, 0.35); border-radius: 999px; background: rgba(124, 58, 237, 0.10); font-size: 10px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: #c4b5fd; }
+.ah1 { margin: 0 0 8px; font-family: "Space Grotesk", sans-serif; font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; color: var(--text-primary); }
+.us-s { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; padding: 12px 16px; border: 1px solid var(--border); border-radius: 12px; background: rgba(255, 255, 255, 0.03); transition: border-color 180ms ease; }
+.us-s:focus-within { border-color: rgba(124, 58, 237, 0.45); }
+.us-s i { color: var(--text-muted); font-size: 14px; }
+.us-s input { flex: 1; border: none; outline: none; background: transparent; font-family: inherit; font-size: 14px; color: var(--text-primary); }
+.us-s input::placeholder { color: var(--text-muted); }
+.us-sc { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+.us-g { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.us-c { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 24px 18px; border: 1px solid var(--border); border-radius: 16px; background: rgba(255, 255, 255, 0.02); text-align: center; transition: border-color 200ms ease, transform 200ms ease; }
+.us-c:hover { border-color: rgba(124, 58, 237, 0.30); transform: translateY(-2px); }
+.us-av { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
+.us-avp { display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--violet), #3b82f6); color: white; font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 22px; }
+.us-un { font-family: "Space Grotesk", sans-serif; font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.us-un a { color: inherit; text-decoration: none; }
+.us-un a:hover { color: var(--violet); }
+.us-dn { font-size: 12px; color: var(--text-muted); }
+.us-rl { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 999px; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.us-ra { background: rgba(251,191,36,0.10); color: #fbbf24; border: 1px solid rgba(251,191,36,0.22); }
+.us-ru { background: rgba(124,58,237,0.10); color: #c4b5fd; border: 1px solid rgba(124,58,237,0.22); }
+.us-st { display: flex; gap: 16px; font-size: 11px; color: var(--text-muted); }
+.us-st span { display: flex; align-items: center; gap: 4px; }
+.us-jd { font-size: 10px; color: var(--text-muted); }
+.us-at { display: flex; gap: 6px; margin-top: 4px; }
+.us-bt { padding: 6px 12px; border: 1px solid var(--border); border-radius: 8px; background: transparent; font-family: inherit; font-size: 11px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: background 160ms ease, color 160ms ease; }
+.us-bt:hover { color: var(--text-primary); background: rgba(124, 58, 237, 0.12); }
+.us-bp { color: #34d399; border-color: rgba(52,211,153,0.25); }
+.us-bp:hover { background: rgba(52,211,153,0.10); }
+.us-bd { color: #fbbf24; border-color: rgba(251,191,36,0.25); }
+.us-bd:hover { background: rgba(251,191,36,0.10); }
+.us-sk { display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 60px 20px; text-align: center; }
+.us-sk.vis { display: flex; }
+.us-si { font-size: 42px; color: var(--text-muted); }
+.us-sk h3 { font-family: "Space Grotesk", sans-serif; color: var(--text-primary); margin: 0; }
+.us-sk p { margin: 0; font-size: 13px; color: var(--text-muted); }
+.us-sie { color: #f87171; }
+.at { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 12px; background: rgba(15, 15, 22, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border); font-size: 13px; font-weight: 600; color: var(--text-primary); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45); opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity 220ms ease, transform 220ms ease; z-index: 10000; }
+.at.show { opacity: 1; transform: translateY(0); }
+.at.ok { border-color: rgba(52, 211, 153, 0.35); color: #34d399; }
+.at.err { border-color: rgba(248, 113, 113, 0.35); color: #f87171; }
+.amt { display: none; position: fixed; left: 16px; bottom: 18px; width: 46px; height: 46px; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: 50%; background: rgba(15, 15, 22, 0.92); color: var(--text-primary); font-size: 1rem; cursor: pointer; z-index: 1000; }
+.ap.denied .asb, .ap.denied .amt { display: none; }
+@media (max-width: 900px) { .asb { transform: translateX(-100%); } .asb.open { transform: translateX(0); } .amain { width: 100%; margin-left: 0; } .amt { display: flex; } }
+</style>
+<header class="site-header" id="site-header">
+<nav class="navbar container">
+<a href="../../index.html" class="brand" aria-label="DESIGNVERSE Home">
+<div class="brand-icon"><span>DV</span></div>
+<div class="brand-text"><span class="brand-name">DESIGNVERSE</span><span class="brand-subtitle">BY BESTB DESIGNS</span></div>
+</a>
+<div class="nav-actions"><span class="admin-badge"><i class="fa-solid fa-crown"></i> ADMIN</span></div>
+</nav>
+</header>
+<style>
+.admin-badge { display: inline-flex; align-items: center; gap: 6px; padding: 8px 11px; border: 1px solid rgba(251,191,36,0.22); border-radius: 999px; background: rgba(251,191,36,0.07); color: #fbbf24; font-size: 9px; font-weight: 800; letter-spacing: 0.08em; }
+.ad { display: none; min-height: 60vh; align-items: center; justify-content: center; text-align: center; }
+.ad.vis { display: flex; }
+.adi { font-size: 42px; color: #f87171; margin-bottom: 14px; }
+.ad h2 { font-family: "Space Grotesk", sans-serif; color: var(--text-primary); margin-bottom: 10px; }
+</style>
+<div class="ap" id="adminPage">
+<aside class="asb" id="adminSidebar" aria-label="Admin navigation">
+<div class="ast">Command Center</div>
+<nav class="anav">
+<a href="index.html"><i class="fa-solid fa-chart-pie"></i> Overview</a>
+<a href="challenges.html"><i class="fa-solid fa-fire"></i> Challenges</a>
+<a href="submissions.html"><i class="fa-solid fa-images"></i> Submissions</a>
+<a href="users.html" class="active"><i class="fa-solid fa-users"></i> Users</a>
+<a href="reports.html"><i class="fa-solid fa-flag"></i> Reports</a>
+</nav>
+<div class="asd"></div>
+<nav class="anav">
+<a href="../dashboard/dashboard.html" class="bd"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+<a href="#" data-logout><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out</a>
+</nav>
+</aside>
+<button type="button" class="amt" id="adminMobileToggle" aria-label="Open admin menu" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+<section class="ad" id="adminDenied">
+<div><div class="adi"><i class="fa-solid fa-shield-halved"></i></div><h2>Access Denied</h2><p style="color: var(--text-muted);">This area is restricted to DESIGNVERSE administrators.</p></div>
+</section>
+<main class="amain" id="adminMain">
+<div class="acont">
+<div class="atb"><div class="ah"><span class="ahl"><i class="fa-solid fa-users"></i> COMMUNITY</span><h1 class="ah1">Users</h1><p class="ahp">Browse every member of DESIGNVERSE, search by name, and manage roles across the community.</p></div></div>
+<label class="us-s" for="usSearchInput"><i class="fa-solid fa-magnifying-glass"></i><input type="search" id="usSearchInput" placeholder="Search by username or display name..." autocomplete="off"><span class="us-sc" id="usSearchCount">0 members</span></label>
+<div class="us-sk vis" id="usLoading"><div class="us-si"><i class="fa-solid fa-spinner fa-spin"></i></div><h3>Loading members...</h3></div>
+<div class="us-sk" id="usError"><div class="us-si us-sie"><i class="fa-solid fa-triangle-exclamation"></i></div><h3>Could not load users</h3><p id="usErrorMessage">Something went wrong while fetching the member list.</p></div>
+<div class="us-sk" id="usEmpty"><div class="us-si"><i class="fa-solid fa-users-slash"></i></div><h3>No members found</h3><p>No users match your search. Try a different term.</p></div>
+<div class="us-g" id="usGrid"></div>
+</div>
+</main>
+<div class="at" id="adminToast" role="status"></div>
+</div>
+<script src="../../js/utils.js"></script>
+<script src="../../js/supabase.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../js/admin.js"></script>
+<script src="../../js/navigation.js"></script>
+<script>
+(function(){
+"use strict";
+function q(s){ return document.querySelector(s); }
+function esc(v){ return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
+function toast(msg,type){ var t=q("#adminToast"); if(!t) return; t.textContent=msg; t.classList.remove("error","success"); if(type) t.classList.add(type); t.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(function(){ t.classList.remove("show"); },3200); }
+function fmtDate(v){ if(!v) return ""; var d=new Date(v); if(Number.isNaN(d.getTime())) return ""; return d.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"}); }
+function initials(v){ var n=String(v||"?").trim(); if(!n) return "?"; var p=n.split(/\s+/); if(p.length>=2) return (p[0][0]+p[1][0]).toUpperCase(); return n[0].toUpperCase(); }
+var S={entries:[],filter:"",busy:false,me:null};
+function waitAdmin(){ return new Promise(function(res){ var a=0; (function chk(){ a++; var st=window.DVAdmin && window.DVAdmin.state; if(st && st.initialized){ S.me=st.profile && st.profile.id || null; res(Boolean(st.authorized && st.profile && st.profile.role==="admin")); return; } if(a>60){ res(false); return; } setTimeout(chk,100); })(); }); }
+async function load(){ var l=q("#usLoading"),g=q("#usGrid"),e=q("#usEmpty"),er=q("#usError"); l.hidden=false; g.hidden=true; e.classList.remove("vis"); er.classList.remove("vis"); var sb=window.supabaseClient; if(!sb){ l.hidden=true; er.classList.add("vis"); return; } try{ var r=await sb.from("profiles").select("id,username,display_name,avatar_url,role,total_points,total_wins,created_at").order("created_at",{ascending:false}).limit(500); if(r.error) throw r.error; S.entries=r.data||[]; render(); }catch(err){ console.error("DV: users load error:",err); l.hidden=true; var m=q("#usErrorMessage"); if(m) m.textContent=err.message||"Something went wrong while fetching the member list."; er.classList.add("vis"); } }
+function matches(e){ var t=S.filter.trim().toLowerCase(); if(!t) return true; return (e.username||"").toLowerCase().includes(t)||(e.display_name||"").toLowerCase().includes(t); }
+function render(){ var g=q("#usGrid"),e=q("#usEmpty"),l=q("#usLoading"),c=q("#usSearchCount"); if(!g) return; var f=S.entries.filter(matches); l.hidden=true; if(c) c.textContent=f.length===1?"1 member":f.length+" members"; if(!f.length){ g.hidden=true; e.classList.add("vis"); return; } e.classList.remove("vis"); g.hidden=false; g.innerHTML=f.map(card).join(""); }
+function card(e){ var isA=e.role==="admin",isS=e.id===S.me; var av=e.avatar_url?"<img class='us-av' src='"+esc(e.avatar_url)+"' alt='' loading='lazy'>":"<div class='us-av us-avp'>"+initials(e.display_name||e.username)+"</div>"; var rc=isA?"us-ra":"us-ru"; var rl=isA?"Admin":"Member"; var pb=isA?"":"<button type='button' class='us-bt us-bp' data-action='promote' data-id='"+esc(e.id)+"' data-name='"+esc(e.username)+"'><i class='fa-solid fa-arrow-up'></i> Make Admin</button>"; var db=(isA&&!isS)?"<button type='button' class='us-bt us-bd' data-action='demote' data-id='"+esc(e.id)+"' data-name='"+esc(e.username)+"'><i class='fa-solid fa-arrow-down'></i> Remove Admin</button>":""; return "<article class='us-c'>"+av+"<div class='us-un'><a href='../designer.html?username="+esc(e.username)+"'>@"+esc(e.username)+"</a></div>"+(e.display_name?"<div class='us-dn'>"+esc(e.display_name)+"</div>":"")+"<span class='us-rl "+rc+"'>"+rl+"</span><div class='us-st'><span><i class='fa-solid fa-star'></i> "+(e.total_points||0)+" XP</span><span><i class='fa-solid fa-trophy'></i> "+(e.total_wins||0)+" wins</span></div><div class='us-jd'>Joined "+fmtDate(e.created_at)+"</div><div class='us-at'>"+pb+db+"</div></article>"; }
+async function setRole(id,name,role){ if(S.busy) return; if(!window.confirm((role==="admin"?"Grant":"Remove")+" admin role for @"+name+"?")) return; var sb=window.supabaseClient; if(!sb){ toast("Could not connect to services.","error"); return; } S.busy=true; try{ var r=await sb.from("profiles").update({role:role}).eq("id",id); if(r.error) throw r.error; (S.entries.filter(function(x){return x.id===id;})[0]||{}).role=role; render(); toast("@"+name+" is now "+(role==="admin"?"an admin":"a member")+".","success"); }catch(err){ console.error("DV: role update error:",err); toast(err.message||"Could not update the user role.","error"); }finally{ S.busy=false; } }
+function bindEvents(){ var g=q("#usGrid"),s=q("#usSearchInput"); if(g) g.addEventListener("click",function(ev){ var b=ev.target.closest("[data-action]"); if(!b) return; var act=b.getAttribute("data-action"),id=b.getAttribute("data-id"),name=b.getAttribute("data-name"); if(!id) return; if(act==="promote") setRole(id,name,"admin"); else if(act==="demote") setRole(id,name,"user"); }); if(s){ var timer; s.addEventListener("input",function(){ clearTimeout(timer); timer=setTimeout(function(){ S.filter=s.value; render(); },200); }); } }
+function bindMobile(){ var t=q("#adminMobileToggle"),sb=q("#adminSidebar"); if(!t||!sb) return; t.addEventListener("click",function(){ var o=sb.classList.toggle("open"); t.setAttribute("aria-expanded",o?"true":"false"); }); }
+async function init(){ bindEvents(); bindMobile(); var ok=await waitAdmin(); if(!ok){ var p=q("#adminPage"),d=q("#adminDenied"),m=q("#adminMain"),l=q("#usLoading"); if(p) p.classList.add("denied"); if(d) d.classList.add("vis"); if(m) m.hidden=true; if(l) l.hidden=true; return; } await load(); }
+if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init); else init();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050508">
+<meta name="description" content="Review and resolve community reports across DESIGNVERSE.">
+<title>Reports - DESIGNVERSE Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="../../css/style.css">
+<link rel="stylesheet" href="../../css/components.css">
+<link rel="stylesheet" href="../../css/animations.css">
+<link rel="stylesheet" href="../../css/responsive.css">
+<style>
+:root { --asw: 250px; }
+body { margin: 0; min-height: 100vh; }
+.ap { min-height: 100vh; padding-top: 82px; }
+.asb { position: fixed; top: 82px; left: 0; bottom: 0; width: var(--asw); padding: 22px 16px; overflow-y: auto; border-right: 1px solid var(--border); background: rgba(5, 5, 8, 0.90); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); z-index: 900; transition: transform 300ms ease; }
+.ast { padding: 0 12px 10px; color: var(--text-muted); font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; border-bottom: 1px solid var(--border); margin-bottom: 14px; }
+.anav { display: flex; flex-direction: column; gap: 4px; }
+.anav a { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; color: var(--text-muted); font-size: 13px; font-weight: 600; text-decoration: none; transition: background 180ms ease, color 180ms ease, transform 180ms ease; }
+.anav a i { width: 18px; text-align: center; }
+.anav a:hover { color: white; background: rgba(255,255,255,0.05); transform: translateX(2px); }
+.anav a.active { color: white; background: linear-gradient(135deg, rgba(124,58,237,0.19), rgba(37,99,235,0.08)); border: 1px solid rgba(124,58,237,0.24); box-shadow: 0 8px 25px rgba(124,58,237,0.10); }
+.asd { height: 1px; margin: 20px 8px; background: var(--border); }
+.bd { color: #a7f3d0 !important; }
+.bd:hover { background: rgba(34,197,94,0.07) !important; }
+.amain { width: calc(100% - var(--asw)); margin-left: var(--asw); padding: 32px; }
+.acont { width: min(100%, 1320px); margin-inline: auto; }
+.atb { margin-bottom: 28px; }
+.ahl { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px; padding: 6px 14px; border: 1px solid rgba(124, 58, 237, 0.35); border-radius: 999px; background: rgba(124, 58, 237, 0.10); font-size: 10px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: #c4b5fd; }
+.ah1 { margin: 0 0 8px; font-family: "Space Grotesk", sans-serif; font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; color: var(--text-primary); }
+.rp-filters { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
+.rp-filter { padding: 8px 16px; border: 1px solid var(--border); border-radius: 999px; background: rgba(255, 255, 255, 0.03); font-family: inherit; font-size: 12px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: background 160ms ease, color 160ms ease; }
+.rp-filter:hover { color: var(--text-primary); background: rgba(124, 58, 237, 0.12); }
+.rp-filter.active { border-color: transparent; background: linear-gradient(90deg, var(--violet), #3b82f6); color: white; }
+.rp-list { display: flex; flex-direction: column; gap: 12px; }
+.rp-card { display: flex; gap: 16px; padding: 18px; border: 1px solid var(--border); border-radius: 14px; background: rgba(255, 255, 255, 0.02); transition: border-color 200ms ease; }
+.rp-card:hover { border-color: rgba(124, 58, 237, 0.30); }
+.rp-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.rp-icon-design { background: rgba(124,58,237,0.15); color: #c4b5fd; }
+.rp-icon-user { background: rgba(37,99,235,0.15); color: #93c5fd; }
+.rp-icon-other { background: rgba(251,191,36,0.12); color: #fbbf24; }
+.rp-body { flex: 1; min-width: 0; }
+.rp-target { font-family: "Space Grotesk", sans-serif; font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+.rp-target a { color: inherit; text-decoration: none; }
+.rp-target a:hover { color: var(--violet); }
+.rp-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+.rp-meta span { display: flex; align-items: center; gap: 4px; }
+.rp-reason { font-size: 13px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 10px; }
+.rp-actions { display: flex; gap: 6px; align-items: center; }
+.rp-button { padding: 6px 12px; border: 1px solid var(--border); border-radius: 8px; background: transparent; font-family: inherit; font-size: 11px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: background 160ms ease, color 160ms ease; }
+.rp-button:hover { color: var(--text-primary); background: rgba(124, 58, 237, 0.12); }
+.rp-button-resolve { color: #34d399; border-color: rgba(52,211,153,0.25); }
+.rp-button-resolve:hover { background: rgba(52,211,153,0.10); }
+.rp-button-dismiss { color: #f87171; border-color: rgba(248,113,113,0.25); }
+.rp-button-dismiss:hover { background: rgba(248,113,113,0.10); }
+.rp-chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 999px; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.rp-chip-open { background: rgba(251,191,36,0.10); color: #fbbf24; border: 1px solid rgba(251,191,36,0.22); }
+.rp-chip-resolved { background: rgba(52,211,153,0.10); color: #34d399; border: 1px solid rgba(52,211,153,0.22); }
+.rp-chip-dismissed { background: rgba(248,113,113,0.10); color: #f87171; border: 1px solid rgba(248,113,113,0.22); }
+.rp-sk { display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 60px 20px; text-align: center; }
+.rp-sk.vis { display: flex; }
+.rp-si { font-size: 42px; color: var(--text-muted); }
+.rp-sk h3 { font-family: "Space Grotesk", sans-serif; color: var(--text-primary); margin: 0; }
+.rp-sk p { margin: 0; font-size: 13px; color: var(--text-muted); }
+.rp-sie { color: #f87171; }
+.at { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 12px; background: rgba(15, 15, 22, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border); font-size: 13px; font-weight: 600; color: var(--text-primary); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45); opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity 220ms ease, transform 220ms ease; z-index: 10000; }
+.at.show { opacity: 1; transform: translateY(0); }
+.at.ok { border-color: rgba(52, 211, 153, 0.35); color: #34d399; }
+.at.err { border-color: rgba(248, 113, 113, 0.35); color: #f87171; }
+.amt { display: none; position: fixed; left: 16px; bottom: 18px; width: 46px; height: 46px; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: 50%; background: rgba(15, 15, 22, 0.92); color: var(--text-primary); font-size: 1rem; cursor: pointer; z-index: 1000; }
+.ap.denied .asb, .ap.denied .amt { display: none; }
+@media (max-width: 900px) { .asb { transform: translateX(-100%); } .asb.open { transform: translateX(0); } .amain { width: 100%; margin-left: 0; } .amt { display: flex; } }
+</style>
+<header class="site-header" id="site-header">
+<nav class="navbar container">
+<a href="../../index.html" class="brand" aria-label="DESIGNVERSE Home">
+<div class="brand-icon"><span>DV</span></div>
+<div class="brand-text"><span class="brand-name">DESIGNVERSE</span><span class="brand-subtitle">BY BESTB DESIGNS</span></div>
+</a>
+<div class="nav-actions"><span class="admin-badge"><i class="fa-solid fa-crown"></i> ADMIN</span></div>
+</nav>
+</header>
+<style>
+.admin-badge { display: inline-flex; align-items: center; gap: 6px; padding: 8px 11px; border: 1px solid rgba(251,191,36,0.22); border-radius: 999px; background: rgba(251,191,36,0.07); color: #fbbf24; font-size: 9px; font-weight: 800; letter-spacing: 0.08em; }
+.ad { display: none; min-height: 60vh; align-items: center; justify-content: center; text-align: center; }
+.ad.vis { display: flex; }
+.adi { font-size: 42px; color: #f87171; margin-bottom: 14px; }
+.ad h2 { font-family: "Space Grotesk", sans-serif; color: var(--text-primary); margin-bottom: 10px; }
+</style>
+<div class="ap" id="adminPage">
+<aside class="asb" id="adminSidebar" aria-label="Admin navigation">
+<div class="ast">Command Center</div>
+<nav class="anav">
+<a href="index.html"><i class="fa-solid fa-chart-pie"></i> Overview</a>
+<a href="challenges.html"><i class="fa-solid fa-fire"></i> Challenges</a>
+<a href="submissions.html"><i class="fa-solid fa-images"></i> Submissions</a>
+<a href="users.html"><i class="fa-solid fa-users"></i> Users</a>
+<a href="reports.html" class="active"><i class="fa-solid fa-flag"></i> Reports</a>
+</nav>
+<div class="asd"></div>
+<nav class="anav">
+<a href="../dashboard/dashboard.html" class="bd"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+<a href="#" data-logout><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out</a>
+</nav>
+</aside>
+<button type="button" class="amt" id="adminMobileToggle" aria-label="Open admin menu" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+<section class="ad" id="adminDenied">
+<div><div class="adi"><i class="fa-solid fa-shield-halved"></i></div><h2>Access Denied</h2><p style="color: var(--text-muted);">This area is restricted to DESIGNVERSE administrators.</p></div>
+</section>
+<main class="amain" id="adminMain">
+<div class="acont">
+<div class="atb"><div class="ah"><span class="ahl"><i class="fa-solid fa-flag"></i> MODERATION</span><h1 class="ah1">Reports</h1><p class="ahp">Review community reports, take action on flagged content, and keep DESIGNVERSE safe.</p></div></div>
+<div class="rp-filters" role="tablist">
+<button type="button" class="rp-filter active" data-filter="all">All</button>
+<button type="button" class="rp-filter" data-filter="open">Open</button>
+<button type="button" class="rp-filter" data-filter="resolved">Resolved</button>
+<button type="button" class="rp-filter" data-filter="dismissed">Dismissed</button>
+</div>
+<div class="rp-sk vis" id="rpLoading"><div class="rp-si"><i class="fa-solid fa-spinner fa-spin"></i></div><h3>Loading reports...</h3></div>
+<div class="rp-sk" id="rpError"><div class="rp-si rp-sie"><i class="fa-solid fa-triangle-exclamation"></i></div><h3>Could not load reports</h3><p id="rpErrorMessage">Something went wrong while fetching reports.</p></div>
+<div class="rp-sk" id="rpEmpty"><div class="rp-si"><i class="fa-solid fa-clipboard-check"></i></div><h3>All clear</h3><p>No reports match this filter.</p></div>
+<div class="rp-list" id="rpList"></div>
+</div>
+</main>
+<div class="at" id="adminToast" role="status"></div>
+</div>
+<script src="../../js/utils.js"></script>
+<script src="../../js/supabase.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../js/admin.js"></script>
+<script src="../../js/navigation.js"></script>
+<script>
+(function(){
+"use strict";
+function q(s){ return document.querySelector(s); }
+function esc(v){ return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
+function toast(msg,type){ var t=q("#adminToast"); if(!t) return; t.textContent=msg; t.classList.remove("error","success"); if(type) t.classList.add(type); t.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(function(){ t.classList.remove("show"); },3200); }
+function fmtDate(v){ if(!v) return ""; var d=new Date(v); if(Number.isNaN(d.getTime())) return ""; return d.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"}); }
+var S={entries:[],filter:"all",busy:false};
+function waitAdmin(){ return new Promise(function(res){ var a=0; (function chk(){ a++; var st=window.DVAdmin && window.DVAdmin.state; if(st && st.initialized){ res(Boolean(st.authorized && st.profile && st.profile.role==="admin")); return; } if(a>60){ res(false); return; } setTimeout(chk,100); })(); }); }
+async function load(){ var l=q("#rpLoading"),lst=q("#rpList"),e=q("#rpEmpty"),er=q("#rpError"); l.hidden=false; lst.hidden=true; e.classList.remove("vis"); er.classList.remove("vis"); var sb=window.supabaseClient; if(!sb){ l.hidden=true; er.classList.add("vis"); return; } try{ var r=await sb.from("reports").select("id,target_type,target_id,reason,reporter,status,created_at").order("created_at",{ascending:false}).limit(200); if(r.error) throw r.error; S.entries=r.data||[]; render(); }catch(err){ console.error("DV: reports load error:",err); l.hidden=true; var m=q("#rpErrorMessage"); if(m) m.textContent=err.message||"Something went wrong while fetching reports."; er.classList.add("vis"); } }
+function matches(e){ if(S.filter==="all") return true; return (e.status||"open").toLowerCase()===S.filter; }
+function render(){ var lst=q("#rpList"),e=q("#rpEmpty"),l=q("#rpLoading"); if(!lst) return; var f=S.entries.filter(matches); l.hidden=true; if(!f.length){ lst.hidden=true; e.classList.add("vis"); return; } e.classList.remove("vis"); lst.hidden=false; lst.innerHTML=f.map(card).join(""); }
+function card(e){ var tp=(e.target_type||"other").toLowerCase(); var ic=tp==="design"?"rp-icon-design":tp==="user"?"rp-icon-user":"rp-icon-other"; var ico=tp==="design"?"fa-image":tp==="user"?"fa-user":"fa-flag"; var st=(e.status||"open").toLowerCase(); var sc=st==="resolved"?"rp-chip-resolved":st==="dismissed"?"rp-chip-dismissed":"rp-chip-open"; var sl=st==="resolved"?"Resolved":st==="dismissed"?"Dismissed":"Open"; var targetLink=e.target_id?("<a href='"+esc(tp==="design"?"../design.html?id=":"../designer.html?username=")+esc(e.target_id)+"'>"+esc(e.target_id)+"</a>"):"<span>"+esc(e.target_id||"unknown")+"</span>"; var resolveBtn=st!=="resolved"?"<button type='button' class='rp-button rp-button-resolve' data-action='resolve' data-id='"+esc(e.id)+"'><i class='fa-solid fa-check'></i> Resolve</button>":""; var dismissBtn=st!=="dismissed"?"<button type='button' class='rp-button rp-button-dismiss' data-action='dismiss' data-id='"+esc(e.id)+"'><i class='fa-solid fa-xmark'></i> Dismiss</button>":""; return "<article class='rp-card'><div class='rp-icon "+ic+"'><i class='fa-solid "+ico+"'></i></div><div class='rp-body'><div class='rp-target'>"+esc(tp)+": "+targetLink+"</div><div class='rp-meta'><span><i class='fa-regular fa-calendar'></i> "+fmtDate(e.created_at)+"</span><span><i class='fa-solid fa-user-shield'></i> by "+esc(e.reporter||"anonymous")+"</span></div><p class='rp-reason'>"+esc(e.reason||"No reason provided.")+"</p><div class='rp-actions'><span class='rp-chip "+sc+"'>"+sl+"</span>"+resolveBtn+dismissBtn+"</div></div></article>"; }
+async function setStatus(id,status){ if(S.busy) return; if(!window.confirm((status==="resolved"?"Resolve":"Dismiss")+" this report?")) return; var sb=window.supabaseClient; if(!sb){ toast("Could not connect to services.","error"); return; } S.busy=true; try{ var r=await sb.from("reports").update({status:status}).eq("id",id); if(r.error) throw r.error; (S.entries.filter(function(x){return x.id===id;})[0]||{}).status=status; render(); toast("Report "+(status==="resolved"?"resolved":"dismissed")+".","success"); }catch(err){ console.error("DV: report update error:",err); toast(err.message||"Could not update the report.","error"); }finally{ S.busy=false; } }
+function bindEvents(){ var lst=q("#rpList"),filters=q(".rp-filters"); if(lst) lst.addEventListener("click",function(ev){ var b=ev.target.closest("[data-action]"); if(!b) return; var act=b.getAttribute("data-action"),id=b.getAttribute("data-id"); if(!id) return; if(act==="resolve") setStatus(id,"resolved"); else if(act==="dismiss") setStatus(id,"dismissed"); }); if(filters) filters.addEventListener("click",function(ev){ var b=ev.target.closest("[data-filter]"); if(!b) return; var f=b.getAttribute("data-filter"); S.filter=f; var all=filters.querySelectorAll("[data-filter]"); all.forEach(function(x){ x.classList.toggle("active",x===b); }); render(); }); }
+function bindMobile(){ var t=q("#adminMobileToggle"),sb=q("#adminSidebar"); if(!t||!sb) return; t.addEventListener("click",function(){ var o=sb.classList.toggle("open"); t.setAttribute("aria-expanded",o?"true":"false"); }); }
+async function init(){ bindEvents(); bindMobile(); var ok=await waitAdmin(); if(!ok){ var p=q("#adminPage"),d=q("#adminDenied"),m=q("#adminMain"),l=q("#rpLoading"); if(p) p.classList.add("denied"); if(d) d.classList.add("vis"); if(m) m.hidden=true; if(l) l.hidden=true; return; } await load(); }
+if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init); else init();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#050508"
+    >
+
+    <meta
+        name="description"
+        content="Review, approve or reject challenge submissions across DESIGNVERSE."
+    >
+
+    <title>Submissions — DESIGNVERSE Admin</title>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../../css/components.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../../css/animations.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../../css/responsive.css"
+    >
+
+    <style>
+
+        :root {
+            --admin-sidebar-width: 250px;
+        }
+
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+        }
+
+
+        .admin-page {
+            min-height: 100vh;
+            padding-top: 82px;
+        }
+
+
+        .admin-sidebar {
+            position: fixed;
+
+            top: 82px;
+            left: 0;
+            bottom: 0;
+
+            width: var(--admin-sidebar-width);
+
+            padding: 22px 16px;
+
+            overflow-y: auto;
+
+            border-right:
+                1px solid var(--border);
+
+            background:
+                rgba(5, 5, 8, 0.90);
+
+            backdrop-filter:
+                blur(22px);
+
+            -webkit-backdrop-filter:
+                blur(22px);
+
+            z-index: 900;
+
+            transition:
+                transform 300ms ease;
+        }
+
+
+        .admin-sidebar-title {
+            padding:
+                0 12px 10px;
+
+            color:
+                var(--text-muted);
+
+            font-size: 9px;
+            font-weight: 800;
+
+            letter-spacing: 0.15em;
+
+            text-transform:
+                uppercase;
+        }
+
+
+        .admin-nav {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 5px;
+        }
+
+
+        .admin-nav a {
+            min-height: 44px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 11px;
+
+            padding:
+                0 12px;
+
+            border-radius: 11px;
+
+            color:
+                var(--text-muted);
+
+            font-size: 12px;
+            font-weight: 600;
+
+            text-decoration: none;
+
+            transition:
+                background 180ms ease,
+                color 180ms ease,
+                transform 180ms ease;
+        }
+
+
+        .admin-nav a i {
+            width: 18px;
+            text-align: center;
+        }
+
+
+        .admin-nav a:hover {
+            color: white;
+
+            background:
+                rgba(255,255,255,0.05);
+
+            transform:
+                translateX(2px);
+        }
+
+
+        .admin-nav a.active {
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(124,58,237,0.19),
+                    rgba(37,99,235,0.08)
+                );
+
+            border:
+                1px solid
+                rgba(124,58,237,0.24);
+
+            box-shadow:
+                0 8px 25px
+                rgba(124,58,237,0.10);
+        }
+
+
+        .admin-sidebar-divider {
+            height: 1px;
+
+            margin:
+                20px 8px;
+
+            background:
+                var(--border);
+        }
+
+
+        .back-dashboard {
+            color:
+                #a7f3d0 !important;
+        }
+
+
+        .back-dashboard:hover {
+            background:
+                rgba(34,197,94,0.07) !important;
+        }
+
+
+        .admin-main {
+            width:
+                calc(
+                    100% -
+                    var(--admin-sidebar-width)
+                );
+
+            margin-left:
+                var(--admin-sidebar-width);
+
+            padding: 32px;
+        }
+
+
+        .admin-container {
+            width:
+                min(
+                    100%,
+                    1320px
+                );
+
+            margin-inline: auto;
+        }
+
+
+        /* =================================================
+           TOPBAR
+           ================================================= */
+
+        .admin-topbar {
+            margin-bottom: 28px;
+        }
+
+
+        .admin-heading-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            margin-bottom: 12px;
+
+            padding: 6px 14px;
+
+            border: 1px solid
+                rgba(124, 58, 237, 0.35);
+
+            border-radius: 999px;
+
+            background:
+                rgba(124, 58, 237, 0.10);
+
+            font-size: 10px;
+            font-weight: 800;
+
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+
+            color: #c4b5fd;
+        }
+
+
+        .admin-heading h1 {
+            margin: 0 0 8px;
+
+            font-family: "Space Grotesk", sans-serif;
+            font-size: clamp(1.6rem, 3vw, 2.2rem);
+            font-weight: 700;
+
+            color: var(--text-primary);
+        }
+
+
+        .admin-heading p {
+            margin: 0;
+
+            max-width: 560px;
+
+            font-size: 14px;
+            line-height: 1.6;
+
+            color: var(--text-muted);
+        }
+
+
+        /* =================================================
+           FILTERS
+           ================================================= */
+
+        .sb-filters {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            flex-wrap: wrap;
+
+            margin-bottom: 22px;
+        }
+
+
+        .sb-filter {
+            padding: 8px 16px;
+
+            border: 1px solid var(--border);
+            border-radius: 999px;
+
+            background:
+                rgba(255, 255, 255, 0.03);
+
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+
+            color: var(--text-muted);
+
+            cursor: pointer;
+
+            transition:
+                background 160ms ease,
+                color 160ms ease;
+        }
+
+
+        .sb-filter:hover {
+            color: var(--text-primary);
+
+            background:
+                rgba(124, 58, 237, 0.12);
+        }
+
+
+        .sb-filter.active {
+            border-color: transparent;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    var(--violet),
+                    #3b82f6
+                );
+
+            color: #fff;
+        }
+
+
+        /* =================================================
+           SUBMISSION CARDS
+           ================================================= */
+
+        .sb-list {
+            display: grid;
+            gap: 14px;
+        }
+
+
+        .sb-card {
+            display: grid;
+
+            grid-template-columns:
+                96px
+                minmax(0, 1fr)
+                auto;
+
+            gap: 16px;
+
+            padding: 18px;
+
+            border: 1px solid var(--border);
+            border-radius: 16px;
+
+            background:
+                linear-gradient(
+                    165deg,
+                    rgba(255, 255, 255, 0.045),
+                    rgba(255, 255, 255, 0.015)
+                );
+
+            transition:
+                border-color 200ms ease;
+        }
+
+
+        .sb-card:hover {
+            border-color:
+                rgba(124, 58, 237, 0.35);
+        }
+
+
+        .sb-thumb {
+            width: 96px;
+            height: 96px;
+
+            border-radius: 12px;
+
+            object-fit: cover;
+
+            border: 1px solid var(--border);
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(124, 58, 237, 0.25),
+                    rgba(59, 130, 246, 0.18)
+                );
+
+            display: grid;
+
+            place-items: center;
+
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+
+        .sb-card-body {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+
+            min-width: 0;
+        }
+
+
+        .sb-card-title {
+            margin: 0;
+
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+
+            color: var(--text-primary);
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+
+        .sb-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            flex-wrap: wrap;
+
+            font-size: 12px;
+
+            color: var(--text-muted);
+        }
+
+
+        .sb-card-meta i {
+            color: #c4b5fd;
+
+            margin-right: 4px;
+        }
+
+
+        .sb-card-meta a {
+            color: var(--text-secondary);
+
+            text-decoration: none;
+        }
+
+
+        .sb-card-meta a:hover {
+            color: var(--text-primary);
+        }
+
+
+        .sb-chip {
+            width: fit-content;
+
+            padding: 4px 12px;
+
+            border-radius: 999px;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+
+        .sb-chip-pending {
+            background:
+                rgba(251, 191, 36, 0.12);
+
+            color: #fbbf24;
+        }
+
+
+        .sb-chip-approved {
+            background:
+                rgba(34, 197, 94, 0.12);
+
+            color: #4ade80;
+        }
+
+
+        .sb-chip-rejected {
+            background:
+                rgba(239, 68, 68, 0.12);
+
+            color: #f87171;
+        }
+
+
+        /* =================================================
+           ACTIONS
+           ================================================= */
+
+        .sb-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            justify-content: center;
+        }
+
+
+        .sb-button {
+            padding: 9px 18px;
+
+            border: 1px solid var(--border);
+            border-radius: 10px;
+
+            background:
+                rgba(255, 255, 255, 0.03);
+
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+
+            color: var(--text-primary);
+
+            cursor: pointer;
+
+            white-space: nowrap;
+
+            transition:
+                background 160ms ease,
+                border-color 160ms ease;
+        }
+
+
+        .sb-button:hover:not(:disabled) {
+            background:
+                rgba(124, 58, 237, 0.14);
+        }
+
+
+        .sb-button:disabled {
+            opacity: 0.5;
+
+            cursor: not-allowed;
+        }
+
+
+        .sb-button-approve {
+            border-color:
+                rgba(34, 197, 94, 0.35);
+
+            color: #4ade80;
+        }
+
+
+        .sb-button-approve:hover:not(:disabled) {
+            background:
+                rgba(34, 197, 94, 0.10);
+        }
+
+
+        .sb-button-reject {
+            border-color:
+                rgba(239, 68, 68, 0.35);
+
+            color: #f87171;
+        }
+
+
+        .sb-button-reject:hover:not(:disabled) {
+            background:
+                rgba(239, 68, 68, 0.10);
+        }
+
+
+        /* =================================================
+           STATES
+           ================================================= */
+
+        .sb-state {
+            display: none;
+
+            padding: 60px 24px;
+
+            border: 1px dashed var(--border);
+            border-radius: 16px;
+
+            text-align: center;
+
+            color: var(--text-muted);
+        }
+
+
+        .sb-state.visible {
+            display: block;
+        }
+
+
+        .sb-loading {
+            display: grid;
+
+            place-items: center;
+
+            gap: 12px;
+
+            padding: 60px 24px;
+        }
+
+
+        /* =================================================
+           TOAST
+           ================================================= */
+
+        .admin-toast {
+            position: fixed;
+
+            right: 20px;
+            bottom: 20px;
+
+            max-width: 360px;
+
+            padding: 13px 18px;
+
+            border: 1px solid var(--border);
+            border-radius: 12px;
+
+            background:
+                rgba(15, 15, 22, 0.96);
+
+            font-size: 13px;
+
+            color: var(--text-primary);
+
+            opacity: 0;
+
+            transform: translateY(12px);
+
+            pointer-events: none;
+
+            transition:
+                opacity 240ms ease,
+                transform 240ms ease;
+
+            z-index: 2000;
+        }
+
+
+        .admin-toast.show {
+            opacity: 1;
+
+            transform: translateY(0);
+        }
+
+
+        .admin-toast.error {
+            border-color:
+                rgba(248, 113, 113, 0.5);
+        }
+
+
+        .admin-toast.success {
+            border-color:
+                rgba(34, 197, 94, 0.5);
+        }
+
+
+        /* =================================================
+           MOBILE
+           ================================================= */
+
+        @media (max-width: 850px) {
+
+            .admin-sidebar {
+                transform: translateX(-105%);
+            }
+
+
+            .admin-sidebar.open {
+                transform: translateX(0);
+            }
+
+
+            .admin-main {
+                width: 100%;
+
+                margin-left: 0;
+
+                padding: 24px 16px 90px;
+            }
+
+
+            .admin-mobile-toggle {
+                display: flex;
+            }
+
+
+            .sb-card {
+                grid-template-columns: 1fr;
+            }
+
+
+            .sb-thumb {
+                width: 100%;
+
+                height: 160px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body data-protected>
+
+
+    <style>
+
+        /* =================================================
+           MOBILE TOGGLE (BASE)
+           ================================================= */
+
+        .admin-mobile-toggle {
+            display: none;
+
+            position: fixed;
+
+            left: 16px;
+            bottom: 18px;
+
+            width: 46px;
+            height: 46px;
+
+            align-items: center;
+            justify-content: center;
+
+            border: 1px solid var(--border);
+            border-radius: 50%;
+
+            background:
+                rgba(15, 15, 22, 0.92);
+
+            color: var(--text-primary);
+
+            font-size: 1rem;
+
+            cursor: pointer;
+
+            z-index: 1000;
+        }
+
+
+        .admin-page.admin-access-denied .admin-sidebar,
+        .admin-page.admin-access-denied .admin-mobile-toggle {
+            display: none;
+        }
+
+    </style>
+
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <header class="site-header" id="site-header">
+
+        <nav class="navbar container">
+
+            <a
+                href="../../index.html"
+                class="brand"
+                aria-label="DESIGNVERSE Home"
+            >
+
+                <div class="brand-icon">
+                    <span>DV</span>
+                </div>
+
+                <div class="brand-text">
+
+                    <span class="brand-name">
+                        DESIGNVERSE
+                    </span>
+
+                    <span class="brand-subtitle">
+                        BY BESTB DESIGNS
+                    </span>
+
+                </div>
+
+            </a>
+
+            <div class="nav-actions">
+
+                <span class="admin-badge">
+
+                    <i class="fa-solid fa-crown"></i>
+
+                    ADMIN
+
+                </span>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+
+    <style>
+
+        .admin-badge {
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 6px;
+
+            padding: 8px 11px;
+
+            border:
+                1px solid
+                rgba(251,191,36,0.22);
+
+            border-radius:
+                999px;
+
+            background:
+                rgba(251,191,36,0.07);
+
+            color:
+                #fbbf24;
+
+            font-size: 9px;
+            font-weight: 800;
+
+            letter-spacing:
+                0.08em;
+        }
+
+
+        .admin-denied {
+            display: none;
+
+            min-height: 60vh;
+
+            align-items: center;
+
+            justify-content: center;
+
+            text-align: center;
+        }
+
+
+        .admin-denied.visible {
+            display: flex;
+        }
+
+
+        .admin-denied-icon {
+            font-size: 42px;
+
+            color: #f87171;
+
+            margin-bottom: 14px;
+        }
+
+
+        .admin-denied h2 {
+            font-family: "Space Grotesk", sans-serif;
+
+            color: var(--text-primary);
+
+            margin-bottom: 10px;
+        }
+
+    </style>
+
+
+    <!-- =====================================================
+         ADMIN PAGE
+         ===================================================== -->
+
+    <div class="admin-page" id="adminPage">
+
+
+        <!-- =================================================
+             SIDEBAR
+             ================================================= -->
+
+        <aside
+            class="admin-sidebar"
+            id="adminSidebar"
+            aria-label="Admin navigation"
+        >
+
+            <div class="admin-sidebar-title">
+                Command Center
+            </div>
+
+
+            <nav class="admin-nav">
+
+                <a href="index.html">
+
+                    <i class="fa-solid fa-chart-pie"></i>
+
+                    Overview
+
+                </a>
+
+
+                <a href="challenges.html">
+
+                    <i class="fa-solid fa-fire"></i>
+
+                    Challenges
+
+                </a>
+
+
+                <a href="submissions.html" class="active">
+
+                    <i class="fa-solid fa-images"></i>
+
+                    Submissions
+
+                </a>
+
+
+                <a href="users.html">
+
+                    <i class="fa-solid fa-users"></i>
+
+                    Users
+
+                </a>
+
+
+                <a href="reports.html">
+
+                    <i class="fa-solid fa-flag"></i>
+
+                    Reports
+
+                </a>
+
+            </nav>
+
+
+            <div class="admin-sidebar-divider"></div>
+
+
+            <nav class="admin-nav">
+
+                <a href="../dashboard/dashboard.html" class="back-dashboard">
+
+                    <i class="fa-solid fa-arrow-left"></i>
+
+                    Back to Dashboard
+
+                </a>
+
+
+                <a href="#" data-logout>
+
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+
+                    Sign Out
+
+                </a>
+
+            </nav>
+
+        </aside>
+
+
+        <!-- =================================================
+             MOBILE MENU BUTTON
+             ================================================= -->
+
+        <button
+            type="button"
+            class="admin-mobile-toggle"
+            id="adminMobileToggle"
+            aria-label="Open admin menu"
+            aria-expanded="false"
+        >
+
+            <i class="fa-solid fa-bars"></i>
+
+        </button>
+
+
+        <!-- =================================================
+             ACCESS DENIED
+             ================================================= -->
+
+        <section class="admin-denied" id="adminDenied">
+
+            <div>
+
+                <div class="admin-denied-icon">
+
+                    <i class="fa-solid fa-shield-halved"></i>
+
+                </div>
+
+                <h2>
+                    Access Denied
+                </h2>
+
+                <p style="color: var(--text-muted);">
+                    This area is restricted to
+                    DESIGNVERSE administrators.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             MAIN
+             ================================================= -->
+
+        <main class="admin-main" id="adminMain">
+
+            <div class="admin-container">
+
+
+                <!-- =========================================
+                     TOPBAR
+                     ========================================= -->
+
+                <div class="admin-topbar">
+
+                    <div class="admin-heading">
+
+                        <span class="admin-heading-label">
+
+                            <i class="fa-solid fa-images"></i>
+
+                            MODERATION
+
+                        </span>
+
+
+                        <h1>
+                            Submissions
+                        </h1>
+
+
+                        <p>
+
+                            Review every design submitted
+                            to DESIGNVERSE challenges and
+                            keep the competition fair.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================================
+                     FILTERS
+                     ========================================= -->
+
+                <div class="sb-filters" role="tablist">
+
+                    <button
+                        type="button"
+                        class="sb-filter active"
+                        data-sb-filter="all"
+                    >
+                        All
+                    </button>
+
+                    <button
+                        type="button"
+                        class="sb-filter"
+                        data-sb-filter="pending"
+                    >
+                        Pending
+                    </button>
+
+                    <button
+                        type="button"
+                        class="sb-filter"
+                        data-sb-filter="approved"
+                    >
+                        Approved
+                    </button>
+
+                    <button
+                        type="button"
+                        class="sb-filter"
+                        data-sb-filter="rejected"
+                    >
+                        Rejected
+                    </button>
+
+                </div>
+
+
+                <!-- =========================================
+                     LOADING / LIST / EMPTY / ERROR
+                     ========================================= -->
+
+                <div class="sb-loading" id="sbLoading">
+
+                    <i
+                        class="fa-solid fa-circle-notch fa-spin"
+                        style="font-size: 24px; color: #c4b5fd;"
+                    ></i>
+
+                    <span style="color: var(--text-muted); font-size: 13px;">
+                        Loading submissions...
+                    </span>
+
+                </div>
+
+
+                <div class="sb-list" id="sbList" hidden></div>
+
+
+                <div class="sb-state" id="sbEmpty">
+
+                    No submissions found for this filter.
+
+                </div>
+
+
+                <div class="sb-state" id="sbError">
+
+                    Could not load submissions.
+                    Please try again later.
+
+                </div>
+
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <!-- =====================================================
+         TOAST
+         ===================================================== -->
+
+    <div
+        class="admin-toast"
+        id="adminToast"
+        role="status"
+        aria-live="polite"
+    ></div>
+
+
+    <!-- =====================================================
+         SUPABASE + DESIGNVERSE JS
+         ===================================================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+
+    <script
+        src="../../js/utils.js"
+    ></script>
+
+
+    <script
+        src="../../js/supabase.js"
+    ></script>
+
+
+    <script
+        src="../../js/auth.js"
+    ></script>
+
+
+    <script
+        src="../../js/admin.js"
+    ></script>
+
+
+    <script
+        src="../../js/navigation.js"
+    ></script>
+
+
+    <!-- =====================================================
+         PAGE INTERACTIONS
+         ===================================================== -->
+
+    <script>
+
+        "use strict";
+
+
+        /* =================================================
+           HELPERS
+           ================================================= */
+
+        function $sb(selector) {
+            return document.querySelector(selector);
+        }
+
+
+        function sbEscape(value) {
+            return String(value ?? "")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#39;");
+        }
+
+
+        function sbShowToast(message, type) {
+            const toast = $sb("#adminToast");
+            if (!toast) return;
+            toast.textContent = message;
+            toast.classList.remove("error", "success");
+            if (type) toast.classList.add(type);
+            toast.classList.add("show");
+            clearTimeout(sbShowToast._timer);
+            sbShowToast._timer = setTimeout(
+                () => toast.classList.remove("show"),
+                3200
+            );
+        }
+
+
+        function sbFormatDate(value) {
+            if (!value) return "";
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return "";
+            return date.toLocaleDateString(
+                undefined,
+                { month: "short", day: "numeric", year: "numeric" }
+            );
+        }
+
+
+        /* =================================================
+           STATE
+           ================================================= */
+
+        const sbState = {
+            entries: [],
+            filter: "all",
+            busy: false
+        };
+
+
+        /* =================================================
+           WAIT FOR ADMIN GATE
+           ================================================= */
+
+        function sbWaitForAdmin() {
+            return new Promise(resolve => {
+                let attempts = 0;
+
+                const check = () => {
+                    attempts += 1;
+
+                    const state = window.DVAdmin?.state;
+
+                    if (state?.initialized) {
+                        resolve(Boolean(
+                            state.authorized &&
+                            state.profile?.role === "admin"
+                        ));
+                        return;
+                    }
+
+                    if (attempts > 60) {
+                        resolve(false);
+                        return;
+                    }
+
+                    setTimeout(check, 100);
+                };
+
+                check();
+            });
+        }
+
+
+        /* =================================================
+           LOAD SUBMISSIONS
+           ================================================= */
+
+        async function sbLoadSubmissions() {
+            const loading = $sb("#sbLoading");
+            const list = $sb("#sbList");
+            const empty = $sb("#sbEmpty");
+            const errorState = $sb("#sbError");
+
+            loading.hidden = false;
+            list.hidden = true;
+            empty.classList.remove("visible");
+            errorState.classList.remove("visible");
+
+            const supabase = window.supabaseClient;
+
+            if (!supabase) {
+                loading.hidden = true;
+                errorState.classList.add("visible");
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from("submissions")
+                    .select(`
+                        id,
+                        status,
+                        score,
+                        rank,
+                        created_at,
+                        design:designs (
+                            id,
+                            title,
+                            thumbnail_url,
+                            image_url
+                        ),
+                        challenge:challenges (
+                            id,
+                            title,
+                            slug
+                        ),
+                        designer:profiles (
+                            id,
+                            username,
+                            display_name,
+                            avatar_url
+                        )
+                    `)
+                    .order("created_at", { ascending: false })
+                    .limit(200);
+
+                if (error) throw error;
+
+                sbState.entries = data || [];
+
+                sbRender();
+
+            } catch (error) {
+                console.error(
+                    "DESIGNVERSE: admin submissions load error:",
+                    error
+                );
+                loading.hidden = true;
+                errorState.classList.add("visible");
+            }
+        }
+
+
+        /* =================================================
+           RENDER
+           ================================================= */
+
+        function sbStatusClass(status) {
+            const value = String(status || "pending").toLowerCase();
+            if (value === "approved") return "approved";
+            if (value === "rejected") return "rejected";
+            return "pending";
+        }
+
+
+        function sbRender() {
+            const list = $sb("#sbList");
+            const empty = $sb("#sbEmpty");
+            const loading = $sb("#sbLoading");
+
+            if (!list) return;
+
+            const filtered =
+                sbState.filter === "all"
+                    ? sbState.entries
+                    : sbState.entries.filter(entry =>
+                        String(entry.status || "pending").toLowerCase() ===
+                        sbState.filter
+                    );
+
+            loading.hidden = true;
+
+            if (!filtered.length) {
+                list.hidden = true;
+                empty.classList.add("visible");
+                return;
+            }
+
+            empty.classList.remove("visible");
+            list.hidden = false;
+
+            list.innerHTML = filtered.map(sbRenderCard).join("");
+        }
+
+
+        function sbRenderCard(entry) {
+            const design = entry.design || {};
+            const challenge = entry.challenge || {};
+            const designer = entry.designer || {};
+
+            const image =
+                design.thumbnail_url ||
+                design.image_url ||
+                "";
+
+            const status =
+                String(entry.status || "pending").toLowerCase();
+
+            const challengeLink =
+                challenge.id
+                    ? `<span>
+                          <i class="fa-solid fa-fire"></i>
+                          <a href="challenge.html?id=${sbEscape(challenge.id)}">
+                              ${sbEscape(challenge.title || "Challenge")}
+                          </a>
+                      </span>`
+                    : "";
+
+            const designerLink =
+                designer.username
+                    ? `<span>
+                          <i class="fa-solid fa-user"></i>
+                          <a href="../designer.html?username=${sbEscape(designer.username)}">
+                              ${sbEscape(designer.display_name || designer.username)}
+                          </a>
+                      </span>`
+                    : "";
+
+            const dateHtml =
+                entry.created_at
+                    ? `<span>
+                          <i class="fa-regular fa-calendar"></i>
+                          ${sbFormatDate(entry.created_at)}
+                      </span>`
+                    : "";
+
+            const approveButton =
+                status !== "approved"
+                    ? `<button type="button" class="sb-button sb-button-approve"
+                          data-sb-action="approved">
+                          <i class="fa-solid fa-check"></i>
+                          Approve
+                      </button>`
+                    : "";
+
+            const rejectButton =
+                status !== "rejected"
+                    ? `<button type="button" class="sb-button sb-button-reject"
+                          data-sb-action="rejected">
+                          <i class="fa-solid fa-ban"></i>
+                          Reject
+                      </button>`
+                    : "";
+
+            const thumb = image
+                ? `<img class="sb-thumb" src="${sbEscape(image)}"
+                       alt="" loading="lazy">`
+                : `<div class="sb-thumb">
+                       <i class="fa-solid fa-image"></i>
+                   </div>`;
+
+            return `
+                <article class="sb-card" data-sb-id="${sbEscape(entry.id)}">
+
+                    ${thumb}
+
+                    <div class="sb-card-body">
+
+                        <h2 class="sb-card-title">
+                            ${sbEscape(design.title || "Untitled design")}
+                        </h2>
+
+                        <div class="sb-card-meta">
+                            ${challengeLink}
+                            ${designerLink}
+                            ${dateHtml}
+                        </div>
+
+                        <span class="sb-chip sb-chip-${sbStatusClass(status)}">
+                            ${sbEscape(status)}
+                        </span>
+
+                    </div>
+
+                    <div class="sb-actions">
+                        ${approveButton}
+                        ${rejectButton}
+                    </div>
+
+                </article>
+            `;
+        }
+
+
+        /* =================================================
+           STATUS UPDATE
+           ================================================= */
+
+        async function sbSetStatus(submissionId, status) {
+            if (sbState.busy) return;
+
+            const confirmed = window.confirm(
+                "Mark this submission as " + status + "?"
+            );
+
+            if (!confirmed) return;
+
+            const supabase = window.supabaseClient;
+
+            if (!supabase) {
+                sbShowToast("Could not connect to services.", "error");
+                return;
+            }
+
+            sbState.busy = true;
+
+            try {
+                const { error } = await supabase
+                    .from("submissions")
+                    .update({ status: status })
+                    .eq("id", submissionId);
+
+                if (error) throw error;
+
+                const entry = sbState.entries.find(
+                    item => item.id === submissionId
+                );
+
+                if (entry) entry.status = status;
+
+                sbRender();
+
+                sbShowToast(
+                    "Submission marked as " + status + ".",
+                    "success"
+                );
+
+            } catch (error) {
+                console.error(
+                    "DESIGNVERSE: submission status update error:",
+                    error
+                );
+                sbShowToast(
+                    error?.message ||
+                        "Could not update the submission status.",
+                    "error"
+                );
+            } finally {
+                sbState.busy = false;
+            }
+        }
+
+    /*@@SB-CONT3@@*/
+
+
+
+    </script>
+
+
+
+
+
+
+
+    </style>
+
+</head>
+</body>
+</html>

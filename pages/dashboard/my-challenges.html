@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#050508">
+    <meta name="description" content="Track every DESIGNVERSE challenge you have entered, follow live deadlines and review your scores.">
+    <title>My Challenges — DESIGNVERSE</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/animations.css">
+    <link rel="stylesheet" href="../../css/responsive.css">
+
+    <style>
+
+        .mc-page {
+            display: flex;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding-top: 82px;
+        }
+
+        .mc-main {
+            flex: 1;
+            min-width: 0;
+            padding: 40px clamp(20px, 4vw, 56px) 96px;
+        }
+
+        .mc-container {
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        /* SIDEBAR */
+
+        .dashboard-sidebar {
+            position: fixed;
+            top: 82px;
+            left: 0;
+            bottom: 0;
+            width: 250px;
+            padding: 22px 16px;
+            overflow-y: auto;
+            border-right: 1px solid var(--border);
+            background: rgba(5, 5, 8, 0.90);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            z-index: 900;
+            transition: transform 300ms ease;
+        }
+
+        .dashboard-sidebar-title {
+            padding: 0 12px;
+            margin-bottom: 10px;
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .dashboard-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .dashboard-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: background 180ms ease, color 180ms ease;
+        }
+
+        .dashboard-nav a i {
+            width: 18px;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        .dashboard-nav a:hover {
+            background: rgba(124, 58, 237, 0.10);
+            color: var(--text-primary);
+        }
+
+        .dashboard-nav a.active {
+            background: linear-gradient(90deg, rgba(124, 58, 237, 0.22), rgba(124, 58, 237, 0.06));
+            color: var(--text-primary);
+            box-shadow: inset 2px 0 0 var(--violet);
+        }
+
+        .dashboard-sidebar-divider {
+            height: 1px;
+            margin: 14px 12px;
+            background: var(--border);
+        }
+
+        .dashboard-logout {
+            color: #f87171 !important;
+        }
+
+        .dashboard-logout:hover {
+            background: rgba(248, 113, 113, 0.10) !important;
+        }
+
+        .dashboard-mobile-toggle {
+            display: none;
+            position: fixed;
+            left: 16px;
+            bottom: 18px;
+            width: 46px;
+            height: 46px;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            background: rgba(15, 15, 22, 0.92);
+            color: var(--text-primary);
+            font-size: 1rem;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        /* HEADER PROFILE CHIP */
+
+        .dashboard-profile-chip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 14px 6px 6px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .dashboard-profile-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .dashboard-profile-info {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .dashboard-profile-info strong {
+            font-size: 0.82rem;
+            color: var(--text-primary);
+        }
+
+        .dashboard-profile-info span {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        /* PAGE HEADER */
+
+        .mc-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .mc-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+            padding: 6px 14px;
+            border: 1px solid rgba(124, 58, 237, 0.35);
+            border-radius: 999px;
+            background: rgba(124, 58, 237, 0.10);
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #c4b5fd;
+        }
+
+        .mc-header h1 {
+            margin: 0 0 10px;
+            font-family: "Space Grotesk", sans-serif;
+            font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .mc-header p {
+            margin: 0;
+            max-width: 560px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        /* STATS */
+
+        .mc-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 30px;
+        }
+
+        .mc-stat {
+            padding: 18px 20px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: linear-gradient(160deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.015));
+        }
+
+        .mc-stat-value {
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .mc-stat-label {
+            margin-top: 4px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        /* TOOLBAR */
+
+        .mc-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .mc-toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .mc-search {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            max-width: 380px;
+            padding: 11px 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-muted);
+        }
+
+        .mc-search input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .mc-filter {
+            padding: 11px 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            font-size: 0.88rem;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        /* CARDS */
+
+        .mc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 18px;
+        }
+
+        .mc-card {
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            overflow: hidden;
+            background: linear-gradient(165deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+            transition: transform 200ms ease, border-color 200ms ease;
+        }
+
+        .mc-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(124, 58, 237, 0.45);
+        }
+
+        .mc-card-cover {
+            position: relative;
+            aspect-ratio: 16 / 10;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.35), rgba(59, 130, 246, 0.25));
+            overflow: hidden;
+        }
+
+        .mc-card-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .mc-cover-fallback {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.55);
+        }
+
+        .mc-phase {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 0.66rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            backdrop-filter: blur(8px);
+        }
+
+        .mc-phase-upcoming {
+            background: rgba(59, 130, 246, 0.85);
+            color: #fff;
+        }
+
+        .mc-phase-live {
+            background: rgba(34, 197, 94, 0.85);
+            color: #04120a;
+        }
+
+        .mc-phase-ended {
+            background: rgba(255, 255, 255, 0.16);
+            color: #e5e7eb;
+        }
+
+        .mc-card-body {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+            padding: 16px 18px 18px;
+        }
+
+        .mc-card-title {
+            margin: 0;
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .mc-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .mc-chip {
+            padding: 4px 10px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.04);
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .mc-my-design {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(124, 58, 237, 0.08);
+        }
+
+        .mc-my-design img {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .mc-my-design span {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .mc-score-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .mc-score {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .mc-score i {
+            color: #c4b5fd;
+        }
+
+        .mc-card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .mc-button {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: background 180ms ease;
+        }
+
+        .mc-button:hover {
+            background: rgba(124, 58, 237, 0.14);
+        }
+
+        .mc-button-primary {
+            border-color: transparent;
+            background: linear-gradient(90deg, var(--violet), #3b82f6);
+            color: #fff;
+        }
+
+        .mc-button-primary:hover {
+            background: linear-gradient(90deg, #8b5cf6, #60a5fa);
+        }
+
+        /* STATES */
+
+        .mc-state {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 70px 24px;
+            border: 1px dashed var(--border);
+            border-radius: 18px;
+            text-align: center;
+        }
+
+        .mc-state.visible {
+            display: flex;
+        }
+
+        .mc-state-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(124, 58, 237, 0.12);
+            font-size: 1.5rem;
+            color: #c4b5fd;
+        }
+
+        .mc-state h2 {
+            margin: 0;
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+        }
+
+        .mc-state p {
+            margin: 0;
+            max-width: 420px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .mc-loading {
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 18px;
+        }
+
+        .mc-loading.visible {
+            display: grid;
+        }
+
+        .mc-skeleton {
+            height: 300px;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: linear-gradient(100deg, rgba(255, 255, 255, 0.03) 40%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.03) 60%);
+            background-size: 200% 100%;
+            animation: mc-shimmer 1.4s infinite;
+        }
+
+        @keyframes mc-shimmer {
+            from { background-position: 200% 0; }
+            to { background-position: -200% 0; }
+        }
+
+        /* TOAST */
+
+        .mc-toast {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            max-width: 340px;
+            padding: 13px 18px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(15, 15, 22, 0.96);
+            font-size: 0.86rem;
+            color: var(--text-primary);
+            opacity: 0;
+            transform: translateY(12px);
+            pointer-events: none;
+            transition: opacity 240ms ease, transform 240ms ease;
+            z-index: 2000;
+        }
+
+        .mc-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .mc-toast.error {
+            border-color: rgba(248, 113, 113, 0.5);
+        }
+
+        .mc-toast.success {
+            border-color: rgba(34, 197, 94, 0.5);
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 850px) {
+
+            .dashboard-sidebar {
+                transform: translateX(-105%);
+            }
+
+            .dashboard-sidebar.open {
+                transform: translateX(0);
+            }
+
+            .dashboard-mobile-toggle {
+                display: flex;
+            }
+
+            .mc-page {
+                padding-top: 74px;
+            }
+
+            .mc-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .mc-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .mc-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .mc-search {
+                max-width: none;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body data-protected>
+
+    <!-- HEADER -->
+
+    <header class="site-header" id="site-header">
+
+        <nav class="navbar container">
+
+            <a href="../../index.html" class="brand" aria-label="DESIGNVERSE Home">
+
+                <div class="brand-icon">
+                    <span>DV</span>
+                </div>
+
+                <div class="brand-text">
+                    <span class="brand-name">
+                        DESIGNVERSE
+                    </span>
+                    <span class="brand-subtitle">
+                        BY BESTB DESIGNS
+                    </span>
+                </div>
+
+            </a>
+
+            <div class="desktop-nav">
+
+                <a href="../explore.html">
+                    Explore
+                </a>
+
+                <a href="../challenges.html">
+                    Challenges
+                </a>
+
+                <a href="../leaderboard.html">
+                    Leaderboard
+                </a>
+
+                <a href="../designers.html">
+                    Designers
+                </a>
+
+            </div>
+
+            <div class="nav-actions">
+
+                <div class="dashboard-profile-chip">
+
+                    <img
+                        src="../../assets/logo/dv-icon.svg"
+                        alt="Profile"
+                        class="dashboard-profile-avatar"
+                        data-profile="avatar"
+                    >
+
+                    <div class="dashboard-profile-info">
+
+                        <strong data-profile="display-name">
+                            Designer
+                        </strong>
+
+                        <span data-profile="username">
+                            @designer
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+    <!-- PAGE -->
+
+    <div class="mc-page">
+
+        <!-- SIDEBAR -->
+
+        <aside class="dashboard-sidebar" id="dashboardSidebar" aria-label="Dashboard navigation">
+
+            <div class="dashboard-sidebar-title">
+                Workspace
+            </div>
+
+            <nav class="dashboard-nav">
+
+                <a href="my-designs.html">
+                    <i class="fa-solid fa-palette"></i>
+                    My Designs
+                </a>
+
+                <a href="my-challenges.html" class="active">
+                    <i class="fa-solid fa-bolt"></i>
+                    My Challenges
+                </a>
+
+                <a href="../submit.html">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    Upload Design
+                </a>
+
+            </nav>
+
+            <div class="dashboard-sidebar-divider"></div>
+
+            <div class="dashboard-sidebar-title">
+                Discover
+            </div>
+
+            <nav class="dashboard-nav">
+
+                <a href="../explore.html">
+                    <i class="fa-solid fa-compass"></i>
+                    Explore
+                </a>
+
+                <a href="../challenges.html">
+                    <i class="fa-solid fa-fire"></i>
+                    Challenges
+                </a>
+
+                <a href="../leaderboard.html">
+                    <i class="fa-solid fa-trophy"></i>
+                    Leaderboard
+                </a>
+
+                <a href="../designers.html">
+                    <i class="fa-solid fa-users"></i>
+                    Designers
+                </a>
+
+            </nav>
+
+            <div class="dashboard-sidebar-divider"></div>
+
+            <nav class="dashboard-nav">
+
+                <a href="notifications.html">
+                    <i class="fa-regular fa-bell"></i>
+                    Notifications
+                </a>
+
+                <a href="settings.html">
+                    <i class="fa-solid fa-gear"></i>
+                    Settings
+                </a>
+
+                <a href="#" class="dashboard-logout" data-logout>
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    Sign Out
+                </a>
+
+            </nav>
+
+        </aside>
+
+        <!-- MOBILE MENU BUTTON -->
+
+        <button
+            type="button"
+            class="dashboard-mobile-toggle"
+            id="dashboardMobileToggle"
+            aria-label="Open dashboard menu"
+            aria-expanded="false"
+        >
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <!-- MAIN -->
+
+        <main class="mc-main">
+
+            <div class="mc-container">
+
+                <!-- PAGE HEADER -->
+
+                <header class="mc-header">
+
+                    <div>
+
+                        <div class="mc-eyebrow">
+                            <i class="fa-solid fa-bolt"></i>
+                            MY CHALLENGE ENTRIES
+                        </div>
+
+                        <h1>
+                            My Challenges
+                        </h1>
+
+                        <p>
+                            Every challenge you have entered,
+                            with live phases, deadlines and
+                            how your work is performing.
+                        </p>
+
+                    </div>
+
+                    <div class="mc-header-actions">
+
+                        <a href="../challenges.html" class="btn btn-primary">
+
+                            <i class="fa-solid fa-fire"></i>
+                            Browse Challenges
+
+                        </a>
+
+                    </div>
+
+                </header>
+
+                <!-- STATS -->
+
+                <section class="mc-stats" aria-label="Entry statistics">
+
+                    <div class="mc-stat">
+                        <div class="mc-stat-value" id="mcTotalEntries">
+                            0
+                        </div>
+                        <div class="mc-stat-label">
+                            Entries
+                        </div>
+                    </div>
+
+                    <div class="mc-stat">
+                        <div class="mc-stat-value" id="mcActiveEntries">
+                            0
+                        </div>
+                        <div class="mc-stat-label">
+                            Active
+                        </div>
+                    </div>
+
+                    <div class="mc-stat">
+                        <div class="mc-stat-value" id="mcTotalVotes">
+                            0
+                        </div>
+                        <div class="mc-stat-label">
+                            Votes Received
+                        </div>
+                    </div>
+
+                    <div class="mc-stat">
+                        <div class="mc-stat-value" id="mcBestRank">
+                            —
+                        </div>
+                        <div class="mc-stat-label">
+                            Best Rank
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- TOOLBAR -->
+
+                <section class="mc-toolbar">
+
+                    <div class="mc-toolbar-left">
+
+                        <div class="mc-search">
+
+                            <i class="fa-solid fa-magnifying-glass"></i>
+
+                            <input
+                                type="search"
+                                id="mcSearchInput"
+                                placeholder="Search your entries..."
+                                autocomplete="off"
+                            >
+
+                        </div>
+
+                        <select class="mc-filter" id="mcPhaseFilter" aria-label="Filter entries by phase">
+
+                            <option value="all">
+                                All Phases
+                            </option>
+
+                            <option value="live">
+                                Submission Open
+                            </option>
+
+                            <option value="voting">
+                                Voting
+                            </option>
+
+                            <option value="ended">
+                                Ended
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </section>
+
+                <!-- LOADING SKELETON -->
+
+                <section class="mc-loading visible" id="mcLoading" aria-label="Loading entries">
+
+                    <div class="mc-skeleton"></div>
+                    <div class="mc-skeleton"></div>
+                    <div class="mc-skeleton"></div>
+
+                </section>
+
+                <!-- ENTRIES GRID -->
+
+                <section class="mc-grid" id="mcGrid" hidden></section>
+
+                <!-- EMPTY STATE -->
+
+                <section class="mc-state" id="mcEmpty">
+
+                    <div class="mc-state-icon">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+
+                    <h2>
+                        No challenge entries yet
+                    </h2>
+
+                    <p>
+                        Join a live challenge, submit one of
+                        your designs and your entries will
+                        appear here automatically.
+                    </p>
+
+                    <a href="../challenges.html" class="btn btn-primary">
+
+                        <i class="fa-solid fa-compass"></i>
+                        Explore Challenges
+
+                    </a>
+
+                </section>
+
+                <!-- ERROR STATE -->
+
+                <section class="mc-state" id="mcError">
+
+                    <div class="mc-state-icon">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+
+                    <h2>
+                        Something went wrong
+                    </h2>
+
+                    <p id="mcErrorMessage">
+                        We could not load your challenge entries.
+                    </p>
+
+                    <button type="button" class="btn btn-primary" id="mcRetryButton">
+
+                        <i class="fa-solid fa-rotate-right"></i>
+                        Try Again
+
+                    </button>
+
+                </section>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- TOAST -->
+
+    <div class="mc-toast" id="mcToast" role="status" aria-live="polite"></div>
+
+    <!-- =====================================================
+         SUPABASE + DESIGNVERSE JS
+         ===================================================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../../js/utils.js"></script>
+
+    <script src="../../js/supabase.js"></script>
+
+    <script src="../../js/auth.js"></script>
+
+    <script src="../../js/navigation.js"></script>
+
+    <!-- =====================================================
+         PAGE INTERACTIONS
+         ===================================================== -->
+
+    <script>
+
+        "use strict";
+
+
+        /* =================================================
+           HELPERS
+           ================================================= */
+
+        function $mc(selector) {
+            return document.querySelector(selector);
+        }
+
+
+        function escapeMcHtml(value) {
+            return String(value ?? "")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#39;");
+        }
+
+
+        function mcFormatDate(value) {
+            if (!value) return "—";
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return "—";
+            return date.toLocaleDateString(
+                undefined,
+                { month: "short", day: "numeric", year: "numeric" }
+            );
+        }
+
+
+        const MC_CATEGORY_LABELS = {
+            branding: "Branding",
+            poster: "Poster",
+            "ui-ux": "UI / UX",
+            illustration: "Illustration",
+            logo: "Logo",
+            motion: "Motion",
+            other: "Other"
+        };
+
+
+        function mcFormatCategory(value) {
+            return (
+                MC_CATEGORY_LABELS[value] ||
+                "Other"
+            );
+        }
+
+
+        function mcShowToast(message, type) {
+            const toast = $mc("#mcToast");
+            if (!toast) return;
+            toast.textContent = message;
+            toast.classList.remove("error", "success");
+            if (type) toast.classList.add(type);
+            toast.classList.add("show");
+            clearTimeout(mcShowToast._timer);
+            mcShowToast._timer = setTimeout(
+                () => toast.classList.remove("show"),
+                3200
+            );
+        }
+
+
+        /* =================================================
+           PHASE DETECTION
+           ================================================= */
+
+        function mcGetPhase(challenge) {
+            const now = Date.now();
+            const start = challenge.starts_at ? new Date(challenge.starts_at).getTime() : 0;
+            const end = challenge.ends_at ? new Date(challenge.ends_at).getTime() : 0;
+            const voting = challenge.voting_ends_at ? new Date(challenge.voting_ends_at).getTime() : 0;
+            if (start && now < start) return "upcoming";
+            if (end && now <= end) return "live";
+            if (voting && now <= voting) return "voting";
+            return "ended";
+        }
+
+
+        /* =================================================
+           STATE
+           ================================================= */
+
+        const mcState = {
+            user: null,
+            entries: [],
+            filtered: []
+        };
+
+
+        /* =================================================
+           SIDEBAR (MOBILE)
+           ================================================= */
+
+        function mcSetupSidebar() {
+            const sidebar = $mc("#dashboardSidebar");
+            const toggle = $mc("#dashboardMobileToggle");
+            if (!sidebar || !toggle) return;
+
+            toggle.addEventListener("click", () => {
+                const open = sidebar.classList.toggle("open");
+                toggle.setAttribute("aria-expanded", String(open));
+                toggle.innerHTML = open
+                    ? '<i class="fa-solid fa-xmark"></i>'
+                    : '<i class="fa-solid fa-bars"></i>';
+            });
+
+            sidebar.querySelectorAll("a").forEach(link => {
+                link.addEventListener("click", () => {
+                    if (window.innerWidth <= 850) {
+                        sidebar.classList.remove("open");
+                        toggle.setAttribute("aria-expanded", "false");
+                        toggle.innerHTML = '<i class="fa-solid fa-bars"></i>';
+                    }
+                });
+            });
+        }
+
+
+        /* =================================================
+           LOAD ENTRIES
+           ================================================= */
+
+        async function mcLoadEntries() {
+            const loading = $mc("#mcLoading");
+            const grid = $mc("#mcGrid");
+            const empty = $mc("#mcEmpty");
+            const errorState = $mc("#mcError");
+
+            loading?.classList.add("visible");
+            grid?.setAttribute("hidden", "");
+            empty?.classList.remove("visible");
+            errorState?.classList.remove("visible");
+
+            try {
+                const user = await window.DVAuth?.getCurrentUser?.();
+
+                if (!user) {
+                    throw new Error("Please sign in to view your challenge entries.");
+                }
+
+                mcState.user = user;
+
+                const supabase = window.supabaseClient;
+
+                if (!supabase) {
+                    throw new Error("Could not connect to DESIGNVERSE services.");
+                }
+
+                const { data, error } = await supabase
+                    .from("submissions")
+                    .select(`
+                        id,
+                        status,
+                        score,
+                        rank,
+                        created_at,
+                        challenge:challenges (
+                            id,
+                            title,
+                            slug,
+                            category,
+                            starts_at,
+                            ends_at,
+                            voting_ends_at,
+                            status,
+                            cover_image_url
+                        ),
+                        design:designs (
+                            id,
+                            title,
+                            thumbnail_url,
+                            image_url,
+                            votes_count
+                        )
+                    `)
+                    .eq("designer_id", user.id)
+                    .order("created_at", { ascending: false });
+
+                if (error) throw error;
+
+                mcState.entries = (data || []).filter(
+                    entry => entry.challenge
+                );
+
+                mcApplyFilters();
+
+            } catch (err) {
+                console.error("DESIGNVERSE: my-challenges load error:", err);
+
+                loading?.classList.remove("visible");
+
+                const messageBox = $mc("#mcErrorMessage");
+                if (messageBox) {
+                    messageBox.textContent =
+                        err?.message ||
+                        "We could not load your challenge entries.";
+                }
+
+                errorState?.classList.add("visible");
+
+                mcShowToast(
+                    err?.message || "Failed to load your entries.",
+                    "error"
+                );
+            }
+        }
+
+    </script>
+
+</body>
+</html>

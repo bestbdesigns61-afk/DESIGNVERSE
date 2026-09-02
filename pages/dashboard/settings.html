@@ -1,0 +1,2068 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#050508"
+    >
+
+    <meta
+        name="description"
+        content="Manage your DESIGNVERSE profile, avatar and account details."
+    >
+
+    <title>Settings — DESIGNVERSE</title>
+
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+
+    <link
+        rel="stylesheet"
+        href="../../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../../css/components.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../../css/animations.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../../css/responsive.css"
+    >
+
+
+    <style>
+
+        :root {
+            --st-sidebar-width: 250px;
+        }
+
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+        }
+
+
+        .st-page {
+            display: flex;
+            align-items: flex-start;
+
+            min-height: 100vh;
+            padding-top: 82px;
+        }
+
+
+        .st-main {
+            flex: 1;
+
+            min-width: 0;
+
+            padding: 40px clamp(20px, 4vw, 56px) 96px;
+        }
+
+
+        .st-container {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+
+        .dashboard-sidebar {
+            position: fixed;
+
+            top: 82px;
+            left: 0;
+            bottom: 0;
+
+            width: var(--st-sidebar-width);
+
+            padding: 22px 16px;
+
+            overflow-y: auto;
+
+            border-right:
+                1px solid var(--border);
+
+            background:
+                rgba(5, 5, 8, 0.90);
+
+            backdrop-filter:
+                blur(22px);
+
+            -webkit-backdrop-filter:
+                blur(22px);
+
+            z-index: 900;
+
+            transition:
+                transform 300ms ease;
+        }
+
+
+        .dashboard-sidebar-title {
+            padding: 0 12px;
+
+            margin-bottom: 10px;
+
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+
+            color: var(--text-muted);
+        }
+
+
+        .dashboard-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+
+        .dashboard-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            padding: 10px 12px;
+
+            border-radius: 10px;
+
+            font-size: 0.9rem;
+            font-weight: 500;
+
+            color: var(--text-secondary);
+
+            text-decoration: none;
+
+            transition:
+                background 180ms ease,
+                color 180ms ease;
+        }
+
+
+        .dashboard-nav a i {
+            width: 18px;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+
+        .dashboard-nav a:hover {
+            background:
+                rgba(124, 58, 237, 0.10);
+
+            color: var(--text-primary);
+        }
+
+
+        .dashboard-nav a.active {
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(124, 58, 237, 0.22),
+                    rgba(124, 58, 237, 0.06)
+                );
+
+            color: var(--text-primary);
+
+            box-shadow:
+                inset 2px 0 0 var(--violet);
+        }
+
+
+        .dashboard-sidebar-divider {
+            height: 1px;
+
+            margin: 14px 12px;
+
+            background: var(--border);
+        }
+
+
+        .dashboard-logout {
+            color: #f87171 !important;
+        }
+
+
+        .dashboard-logout:hover {
+            background:
+                rgba(248, 113, 113, 0.10) !important;
+        }
+
+
+        .dashboard-mobile-toggle {
+            display: none;
+
+            position: fixed;
+
+            left: 16px;
+            bottom: 18px;
+
+            width: 46px;
+            height: 46px;
+
+            align-items: center;
+            justify-content: center;
+
+            border: 1px solid var(--border);
+            border-radius: 50%;
+
+            background:
+                rgba(15, 15, 22, 0.92);
+
+            color: var(--text-primary);
+
+            font-size: 1rem;
+
+            cursor: pointer;
+
+            z-index: 1000;
+        }
+
+
+
+        /* =================================================
+           HEADER PROFILE CHIP
+           ================================================= */
+
+        .dashboard-profile-chip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            padding: 6px 14px 6px 6px;
+
+            border: 1px solid var(--border);
+            border-radius: 999px;
+
+            background:
+                rgba(255, 255, 255, 0.03);
+        }
+
+
+        .dashboard-profile-avatar {
+            width: 34px;
+            height: 34px;
+
+            border-radius: 50%;
+
+            object-fit: cover;
+        }
+
+
+        .dashboard-profile-info {
+            display: flex;
+            flex-direction: column;
+
+            line-height: 1.2;
+        }
+
+
+        .dashboard-profile-info strong {
+            font-size: 0.82rem;
+
+            color: var(--text-primary);
+        }
+
+
+        .dashboard-profile-info span {
+            font-size: 0.72rem;
+
+            color: var(--text-muted);
+        }
+
+
+        /* =================================================
+           PAGE HEADER
+           ================================================= */
+
+        .st-header {
+            margin-bottom: 30px;
+        }
+
+
+        .st-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            margin-bottom: 14px;
+
+            padding: 6px 14px;
+
+            border: 1px solid rgba(124, 58, 237, 0.35);
+            border-radius: 999px;
+
+            background:
+                rgba(124, 58, 237, 0.10);
+
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+
+            color: #c4b5fd;
+        }
+
+
+        .st-header h1 {
+            margin: 0 0 10px;
+
+            font-family: "Space Grotesk", sans-serif;
+            font-size: clamp(1.8rem, 3.4vw, 2.4rem);
+            font-weight: 700;
+
+            color: var(--text-primary);
+        }
+
+
+        .st-header p {
+            margin: 0;
+
+            max-width: 560px;
+
+            font-size: 0.95rem;
+            line-height: 1.6;
+
+            color: var(--text-secondary);
+        }
+
+
+        /* =================================================
+           PANELS
+           ================================================= */
+
+        .st-panel {
+            margin-bottom: 22px;
+
+            padding: 26px;
+
+            border: 1px solid var(--border);
+            border-radius: 18px;
+
+            background:
+                linear-gradient(
+                    165deg,
+                    rgba(255, 255, 255, 0.045),
+                    rgba(255, 255, 255, 0.015)
+                );
+        }
+
+
+        .st-panel-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            margin: 0 0 6px;
+
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+
+            color: var(--text-primary);
+        }
+
+
+        .st-panel-title i {
+            color: #c4b5fd;
+        }
+
+
+        .st-panel-sub {
+            margin: 0 0 22px;
+
+            font-size: 0.86rem;
+            line-height: 1.55;
+
+            color: var(--text-secondary);
+        }
+
+
+
+        /* =================================================
+           AVATAR UPLOADER
+           ================================================= */
+
+        .st-avatar-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+
+        #profileAvatar {
+            width: 84px;
+            height: 84px;
+
+            border-radius: 50%;
+
+            object-fit: cover;
+
+            border: 2px solid
+                rgba(124, 58, 237, 0.5);
+        }
+
+
+        .st-avatar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .st-avatar-hint {
+            width: 100%;
+
+            margin: 0;
+
+            font-size: 0.78rem;
+
+            color: var(--text-muted);
+        }
+
+
+        .st-file-input {
+            position: absolute;
+
+            width: 1px;
+            height: 1px;
+
+            opacity: 0;
+
+            pointer-events: none;
+        }
+
+
+        /* =================================================
+           FORM FIELDS
+           ================================================= */
+
+        .st-form {
+            display: grid;
+            gap: 18px;
+        }
+
+
+        .st-form-row {
+            display: grid;
+            grid-template-columns:
+                repeat(2, 1fr);
+            gap: 18px;
+        }
+
+
+        .st-field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+
+        .st-field label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+
+            color: var(--text-muted);
+        }
+
+
+        .st-field input,
+        .st-field textarea {
+            width: 100%;
+
+            padding: 12px 14px;
+
+            border: 1px solid var(--border);
+            border-radius: 12px;
+
+            background:
+                rgba(255, 255, 255, 0.03);
+
+            font-family: inherit;
+            font-size: 0.92rem;
+
+            color: var(--text-primary);
+
+            outline: none;
+
+            transition:
+                border-color 160ms ease;
+        }
+
+
+        .st-field input:focus,
+        .st-field textarea:focus {
+            border-color:
+                rgba(124, 58, 237, 0.55);
+        }
+
+
+        .st-field input[readonly] {
+            color: var(--text-muted);
+
+            cursor: not-allowed;
+        }
+
+
+        .st-field textarea {
+            min-height: 110px;
+
+            resize: vertical;
+        }
+
+
+        .st-field small {
+            font-size: 0.74rem;
+
+            color: var(--text-muted);
+        }
+
+
+        /* =================================================
+           BUTTONS
+           ================================================= */
+
+        .st-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .st-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+
+            padding: 11px 20px;
+
+            border: 1px solid var(--border);
+            border-radius: 12px;
+
+            background:
+                rgba(255, 255, 255, 0.03);
+
+            font-family: inherit;
+            font-size: 0.88rem;
+            font-weight: 600;
+
+            color: var(--text-primary);
+
+            cursor: pointer;
+
+            text-decoration: none;
+
+            transition:
+                background 180ms ease,
+                transform 180ms ease;
+        }
+
+
+        .st-button:hover {
+            background:
+                rgba(124, 58, 237, 0.14);
+        }
+
+
+        .st-button:active {
+            transform: scale(0.98);
+        }
+
+
+        .st-button-primary {
+            border-color: transparent;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    var(--violet),
+                    #3b82f6
+                );
+
+            color: #fff;
+        }
+
+
+        .st-button-primary:hover {
+            background:
+                linear-gradient(
+                    90deg,
+                    #8b5cf6,
+                    #60a5fa
+                );
+        }
+
+
+        .st-button-danger {
+            border-color:
+                rgba(248, 113, 113, 0.45);
+
+            color: #f87171;
+        }
+
+
+        .st-button-danger:hover {
+            background:
+                rgba(248, 113, 113, 0.10);
+        }
+
+
+        .st-button:disabled {
+            opacity: 0.6;
+
+            cursor: not-allowed;
+        }
+
+
+
+        /* =================================================
+           ACCOUNT INFO LIST
+           ================================================= */
+
+        .st-info-list {
+            display: grid;
+            gap: 14px;
+
+            margin: 0;
+        }
+
+
+        .st-info-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+
+            padding: 13px 16px;
+
+            border: 1px solid var(--border);
+            border-radius: 12px;
+
+            background:
+                rgba(255, 255, 255, 0.02);
+        }
+
+
+        .st-info-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            font-size: 0.82rem;
+            font-weight: 600;
+
+            color: var(--text-muted);
+        }
+
+
+        .st-info-label i {
+            width: 16px;
+
+            color: #c4b5fd;
+        }
+
+
+        .st-info-value {
+            font-size: 0.88rem;
+
+            color: var(--text-primary);
+
+            word-break: break-all;
+
+            text-align: right;
+        }
+
+
+        /* =================================================
+           TOAST
+           ================================================= */
+
+        .st-toast {
+            position: fixed;
+
+            right: 20px;
+            bottom: 20px;
+
+            max-width: 340px;
+
+            padding: 13px 18px;
+
+            border: 1px solid var(--border);
+            border-radius: 12px;
+
+            background:
+                rgba(15, 15, 22, 0.96);
+
+            font-size: 0.86rem;
+
+            color: var(--text-primary);
+
+            opacity: 0;
+
+            transform: translateY(12px);
+
+            pointer-events: none;
+
+            transition:
+                opacity 240ms ease,
+                transform 240ms ease;
+
+            z-index: 2000;
+        }
+
+
+        .st-toast.show {
+            opacity: 1;
+
+            transform: translateY(0);
+        }
+
+
+        .st-toast.error {
+            border-color:
+                rgba(248, 113, 113, 0.5);
+        }
+
+
+        .st-toast.success {
+            border-color:
+                rgba(34, 197, 94, 0.5);
+        }
+
+
+        /* =================================================
+           RESPONSIVE
+           ================================================= */
+
+        @media (max-width: 850px) {
+
+            .dashboard-sidebar {
+                transform: translateX(-105%);
+            }
+
+
+            .dashboard-sidebar.open {
+                transform: translateX(0);
+            }
+
+
+            .dashboard-mobile-toggle {
+                display: flex;
+            }
+
+
+            .st-page {
+                padding-top: 74px;
+            }
+
+
+            .st-panel {
+                padding: 20px;
+            }
+
+
+            .st-form-row {
+                grid-template-columns:
+                    1fr;
+            }
+
+
+            .st-avatar-row {
+                flex-direction: column;
+
+                align-items: flex-start;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body data-protected>
+
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <header
+        class="site-header"
+        id="site-header"
+    >
+
+        <nav class="navbar container">
+
+
+            <!-- BRAND -->
+
+            <a
+                href="../../index.html"
+                class="brand"
+                aria-label="DESIGNVERSE Home"
+            >
+
+                <div class="brand-icon">
+
+                    <span>DV</span>
+
+                </div>
+
+
+                <div class="brand-text">
+
+                    <span class="brand-name">
+                        DESIGNVERSE
+                    </span>
+
+                    <span class="brand-subtitle">
+                        BY BESTB DESIGNS
+                    </span>
+
+                </div>
+
+            </a>
+
+
+            <!-- DESKTOP NAV -->
+
+            <div class="desktop-nav">
+
+                <a href="../explore.html">
+                    Explore
+                </a>
+
+                <a href="../challenges.html">
+                    Challenges
+                </a>
+
+                <a href="../leaderboard.html">
+                    Leaderboard
+                </a>
+
+                <a href="../designers.html">
+                    Designers
+                </a>
+
+            </div>
+
+
+            <!-- USER -->
+
+            <div class="nav-actions">
+
+                <div
+                    class="dashboard-profile-chip"
+                >
+
+                    <img
+                        src="../../assets/logo/dv-icon.svg"
+                        alt="Profile"
+                        class="dashboard-profile-avatar"
+                        data-profile="avatar"
+                    >
+
+
+                    <div
+                        class="dashboard-profile-info"
+                    >
+
+                        <strong
+                            data-profile="display-name"
+                        >
+                            Designer
+                        </strong>
+
+                        <span
+                            data-profile="username"
+                        >
+                            @designer
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+
+    <!-- =====================================================
+         PAGE
+         ===================================================== -->
+
+    <div class="st-page">
+
+
+
+        <!-- =================================================
+             SIDEBAR
+             ================================================= -->
+
+        <aside
+            class="dashboard-sidebar"
+            id="dashboardSidebar"
+            aria-label="Dashboard navigation"
+        >
+
+            <div
+                class="dashboard-sidebar-title"
+            >
+                Workspace
+            </div>
+
+
+            <nav class="dashboard-nav">
+
+                <a
+                    href="my-designs.html"
+                >
+
+                    <i
+                        class="fa-solid fa-palette"
+                    ></i>
+
+                    My Designs
+
+                </a>
+
+
+                <a
+                    href="my-challenges.html"
+                >
+
+                    <i
+                        class="fa-solid fa-bolt"
+                    ></i>
+
+                    My Challenges
+
+                </a>
+
+
+                <a
+                    href="../submit.html"
+                >
+
+                    <i
+                        class="fa-solid fa-cloud-arrow-up"
+                    ></i>
+
+                    Upload Design
+
+                </a>
+
+            </nav>
+
+
+            <div
+                class="dashboard-sidebar-divider"
+            ></div>
+
+
+            <div
+                class="dashboard-sidebar-title"
+            >
+                Discover
+            </div>
+
+
+            <nav class="dashboard-nav">
+
+                <a
+                    href="../explore.html"
+                >
+
+                    <i
+                        class="fa-solid fa-compass"
+                    ></i>
+
+                    Explore
+
+                </a>
+
+
+                <a
+                    submissions
+                    href="../challenges.html"
+                >
+
+                    <i
+                        class="fa-solid fa-fire"
+                    ></i>
+
+                    Challenges
+
+                </a>
+
+
+                <a
+                    href="../leaderboard.html"
+                >
+
+                    <i
+                        class="fa-solid fa-trophy"
+                    ></i>
+
+                    Leaderboard
+
+                </a>
+
+
+                <a
+                    href="../designers.html"
+                >
+
+                    <i
+                        class="fa-solid fa-users"
+                    ></i>
+
+                    Designers
+
+                </a>
+
+            </nav>
+
+
+            <div
+                class="dashboard-sidebar-divider"
+            ></div>
+
+
+            <nav class="dashboard-nav">
+
+                <a
+                    href="notifications.html"
+                >
+
+                    <i
+                        class="fa-regular fa-bell"
+                    ></i>
+
+                    Notifications
+
+                </a>
+
+
+                <a
+                    href="settings.html"
+                    class="active"
+                >
+
+                    <i
+                        class="fa-solid fa-gear"
+                    ></i>
+
+                    Settings
+
+                </a>
+
+
+                <a
+                    href="#"
+                    class="dashboard-logout"
+                    data-logout
+                >
+
+                    <i
+                        class="fa-solid fa-arrow-right-from-bracket"
+                    ></i>
+
+                    Sign Out
+
+                </a>
+
+            </nav>
+
+        </aside>
+
+
+        <!-- =================================================
+             MOBILE MENU BUTTON
+             ================================================= -->
+
+        <button
+            type="button"
+            class="dashboard-mobile-toggle"
+            id="dashboardMobileToggle"
+            aria-label="Open dashboard menu"
+            aria-expanded="false"
+        >
+
+            <i
+                class="fa-solid fa-bars"
+            ></i>
+
+        </button>
+
+
+        <!-- =================================================
+             MAIN
+             ================================================= -->
+
+        <main class="st-main">
+
+            <div class="st-container">
+
+
+                <!-- =========================================
+                     PAGE HEADER
+                     ========================================= -->
+
+                <header class="st-header">
+
+                    <div class="st-eyebrow">
+
+                        <i
+                            class="fa-solid fa-sliders"
+                        ></i>
+
+                        ACCOUNT
+
+                    </div>
+
+
+                    <h1>
+                        Settings
+                    </h1>
+
+
+                    <p>
+
+                        Manage your public identity,
+                        avatar and account details.
+                        Everything here shapes how the
+                        DESIGNVERSE community sees you.
+
+                    </p>
+
+                </header>
+
+
+                <!-- =========================================
+                      PROFILE PANEL
+                      ========================================= -->
+
+                <section
+                    class="st-panel"
+                    aria-labelledby="profilePanelTitle"
+                >
+
+                    <h2
+                        class="st-panel-title"
+                        id="profilePanelTitle"
+                    >
+
+                        <i
+                            class="fa-solid fa-id-badge"
+                        ></i>
+
+                        Profile
+
+                    </h2>
+
+
+                    <p class="st-panel-sub">
+
+                        This information appears on your
+                        public designer profile.
+
+                    </p>
+
+
+                    <div class="st-avatar-row">
+
+                        <img
+                            id="profileAvatar"
+                            src="../../assets/logo/dv-icon.svg"
+                            alt="Your avatar"
+                        >
+
+
+                        <div class="st-avatar-actions">
+
+                            <button
+                                type="button"
+                                class="st-button"
+                                id="avatarPickButton"
+                            >
+
+                                <i
+                                    class="fa-solid fa-camera"
+                                ></i>
+
+                                Change Avatar
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="st-button st-button-danger"
+                                id="removeAvatarButton"
+                            >
+
+                                <i
+                                    class="fa-solid fa-trash-can"
+                                ></i>
+
+                                Remove
+
+                            </button>
+
+
+                            <input
+                                type="file"
+                                id="avatarInput"
+                                class="st-file-input"
+                                accept="image/jpeg,image/png,image/webp"
+                                aria-label="Upload avatar image"
+                            >
+
+
+                            <p class="st-avatar-hint">
+
+                                JPG, PNG or WEBP &middot;
+                                up to 5 MB &middot; square
+                                images look best.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <form
+                        class="st-form"
+                        id="profileForm"
+                        novalidate
+                    >
+
+
+                        <div class="st-form-row">
+
+                            <div class="st-field">
+
+                                <label
+                                    for="displayName"
+                                >
+                                    Display Name
+                                </label>
+
+
+                                <input
+                                    type="text"
+                                    id="displayName"
+                                    name="displayName"
+                                    maxlength="50"
+                                    placeholder="e.g. BestB Designs"
+                                    autocomplete="name"
+                                >
+
+                            </div>
+
+
+                            <div class="st-field">
+
+                                <label
+                                    for="username"
+                                >
+                                    Username
+                                </label>
+
+
+                                <input
+                                    type="text"
+                                    id="username"
+                                    name="username"
+                                    maxlength="30"
+                                    placeholder="e.g. bestb"
+                                    autocomplete="username"
+                                >
+
+
+                                <small>
+
+                                    Letters, numbers and
+                                    underscores only.
+
+                                </small>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="st-field">
+
+                            <label for="bio">
+                                Bio
+                            </label>
+
+
+                            <textarea
+                                id="bio"
+                                name="bio"
+                                maxlength="280"
+                                placeholder="Tell the Verse who you are and what you design..."
+                            ></textarea>
+
+
+                            <small>
+
+                                Up to 280 characters.
+
+                            </small>
+
+                        </div>
+
+
+                        <div class="st-form-row">
+
+                            <div class="st-field">
+
+                                <label
+                                    for="websiteUrl"
+                                >
+                                    Website
+                                </label>
+
+
+                                <input
+                                    type="url"
+                                    id="websiteUrl"
+                                    name="websiteUrl"
+                                    maxlength="200"
+                                    placeholder="https://yourportfolio.com"
+                                >
+
+                            </div>
+
+
+                            <div class="st-field">
+
+                                <label
+                                    for="location"
+                                >
+                                    Location
+                                </label>
+
+
+                                <input
+                                    type="text"
+                                    id="location"
+                                    name="location"
+                                    maxlength="80"
+                                    placeholder="e.g. Lagos, Nigeria"
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="st-actions">
+
+                            <button
+                                type="submit"
+                                class="st-button st-button-primary"
+                            >
+
+                                <i
+                                    class="fa-solid fa-floppy-disk"
+                                ></i>
+
+                                Save Changes
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+
+                </section>
+
+
+                <!-- =========================================
+                      ACCOUNT PANEL
+                      ========================================= -->
+
+                <section
+                    class="st-panel"
+                    aria-labelledby="accountPanelTitle"
+                >
+
+                    <h2
+                        class="st-panel-title"
+                        id="accountPanelTitle"
+                    >
+
+                        <i
+                            class="fa-solid fa-shield-halved"
+                        ></i>
+
+                        Account
+
+                    </h2>
+
+
+                    <p class="st-panel-sub">
+
+                        Core account details for your
+                        DESIGNVERSE identity.
+
+                    </p>
+
+
+                    <div class="st-info-list">
+
+                        <div class="st-info-row">
+
+                            <span
+                                class="st-info-label"
+                            >
+
+                                <i
+                                    class="fa-regular fa-envelope"
+                                ></i>
+
+                                Email
+
+                            </span>
+
+
+                            <span
+                                class="st-info-value"
+                                id="accountEmail"
+                            >
+
+                                —
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="st-info-row">
+
+                            <span
+                                class="st-info-label"
+                            >
+
+                                <i
+                                    class="fa-regular fa-calendar"
+                                ></i>
+
+                                Member Since
+
+                            </span>
+
+
+                            <span
+                                class="st-info-value"
+                                id="memberSince"
+                            >
+
+                                —
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="st-info-row">
+
+                            <span
+                                class="st-info-label"
+                            >
+
+                                <i
+                                    class="fa-solid fa-crown"
+                                ></i>
+
+                                Role
+
+                            </span>
+
+
+                            <span
+                                class="st-info-value"
+                                id="accountRole"
+                            >
+
+                                Designer
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <!-- =====================================================
+         TOAST
+         ===================================================== -->
+
+    <div
+        class="st-toast"
+        id="settingsToast"
+        role="status"
+        aria-live="polite"
+    ></div>
+
+
+    <!-- =====================================================
+         SUPABASE + DESIGNVERSE JS
+         ===================================================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+
+    <script
+        src="../../js/utils.js"
+    ></script>
+
+
+    <script
+        src="../../js/supabase.js"
+    ></script>
+
+
+    <script
+        src="../../js/auth.js"
+    ></script>
+
+
+    <script
+        src="../../js/navigation.js"
+    ></script>
+
+
+    <!-- =====================================================
+         PAGE INTERACTIONS
+         ===================================================== -->
+
+    <script>
+
+        "use strict";
+
+
+        /* =================================================
+           HELPERS
+           ================================================= */
+
+        function $st(selector) {
+            return document.querySelector(selector);
+        }
+
+
+        function stEscape(value) {
+            return String(value ?? "")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#39;");
+        }
+
+
+        function stShowToast(message, type) {
+            const toast = $st("#settingsToast");
+            if (!toast) return;
+            toast.textContent = message;
+            toast.classList.remove("error", "success");
+            if (type) toast.classList.add(type);
+            toast.classList.add("show");
+            clearTimeout(stShowToast._timer);
+            stShowToast._timer = setTimeout(
+                () => toast.classList.remove("show"),
+                3200
+            );
+        }
+
+
+        function stFriendlyError(error) {
+            const raw = String(error?.message || error || "").toLowerCase();
+            if (raw.includes("duplicate") && raw.includes("username")) {
+                return "That username is already taken.";
+            }
+            if (raw.includes("row-level security")) {
+                return "You don't have permission to update this profile.";
+            }
+            if (raw.includes("failed to fetch")) {
+                return "Network error. Check your connection and try again.";
+            }
+            return error?.message || "Something went wrong. Please try again.";
+        }
+
+
+        /* =================================================
+           STATE
+           ================================================= */
+
+        const stState = {
+            user: null,
+            profile: null,
+            saving: false
+        };
+
+
+        /* =================================================
+           SIDEBAR (MOBILE)
+           ================================================= */
+
+        function stSetupSidebar() {
+            const sidebar = $st("#dashboardSidebar");
+            const toggle = $st("#dashboardMobileToggle");
+            if (!sidebar || !toggle) return;
+
+            toggle.addEventListener("click", () => {
+                const open = sidebar.classList.toggle("open");
+                toggle.setAttribute("aria-expanded", String(open));
+                toggle.innerHTML = open
+                    ? '<i class="fa-solid fa-xmark"></i>'
+                    : '<i class="fa-solid fa-bars"></i>';
+            });
+
+            sidebar.querySelectorAll("a").forEach(link => {
+                link.addEventListener("click", () => {
+                    if (window.innerWidth <= 850) {
+                        sidebar.classList.remove("open");
+                        toggle.setAttribute("aria-expanded", "false");
+                        toggle.innerHTML = '<i class="fa-solid fa-bars"></i>';
+                    }
+                });
+            });
+        }
+
+
+        /* =================================================
+           LOAD PROFILE
+           ================================================= */
+
+        async function stLoadProfile() {
+            try {
+                const user = await window.DVAuth?.getCurrentUser?.();
+
+                if (!user) {
+                    throw new Error("Please sign in to manage your settings.");
+                }
+
+                stState.user = user;
+
+                const supabase = window.supabaseClient;
+
+                if (!supabase) {
+                    throw new Error("Could not connect to DESIGNVERSE services.");
+                }
+
+                const { data: profile, error } = await supabase
+                    .from("profiles")
+                    .select(`
+                        id,
+                        username,
+                        display_name,
+                        bio,
+                        avatar_url,
+                        website_url,
+                        location,
+                        role,
+                        created_at
+                    `)
+                    .eq("id", user.id)
+                    .single();
+
+                if (error) throw error;
+
+                stState.profile = profile;
+
+                stFillProfile(profile);
+
+            } catch (error) {
+                console.error("DESIGNVERSE: settings load error:", error);
+                stShowToast(stFriendlyError(error), "error");
+            }
+        }
+
+
+        function stFillProfile(profile) {
+            if (!profile) return;
+
+            const set = (id, value) => {
+                const element = $st(id);
+                if (element) element.value = value ?? "";
+            };
+
+            set("#displayName", profile.display_name);
+            set("#username", profile.username);
+            set("#bio", profile.bio);
+            set("#websiteUrl", profile.website_url);
+            set("#location", profile.location);
+
+            const avatar = $st("#profileAvatar");
+            if (avatar) {
+                if (profile.avatar_url) {
+                    avatar.src = profile.avatar_url;
+                }
+            }
+
+            const email = stState.user?.email;
+            if (email) {
+                const el = $st("#accountEmail");
+                if (el) el.textContent = email;
+            }
+
+            if (profile.created_at) {
+                const joined = new Date(profile.created_at);
+                const el = $st("#memberSince");
+                if (el && !Number.isNaN(joined.getTime())) {
+                    el.textContent = joined.toLocaleDateString(
+                        undefined,
+                        { month: "long", year: "numeric" }
+                    );
+                }
+            }
+
+            const roleEl = $st("#accountRole");
+            if (roleEl) {
+                roleEl.textContent =
+                    profile.role === "admin"
+                        ? "Administrator"
+                        : "Designer";
+            }
+
+            document.querySelectorAll('[data-profile="display-name"]')
+                .forEach(el => { el.textContent = profile.display_name || "Designer"; });
+
+            document.querySelectorAll('[data-profile="username"]')
+                .forEach(el => {
+                    el.textContent = profile.username
+                        ? "@" + profile.username
+                        : "@designer";
+                });
+
+            document.querySelectorAll('[data-profile="avatar"]')
+                .forEach(el => {
+                    if (profile.avatar_url) el.src = profile.avatar_url;
+                });
+        }
+
+
+        /* =================================================
+           SAVE PROFILE
+           ================================================= */
+
+        async function stSaveProfile(event) {
+            event.preventDefault();
+
+            if (stState.saving) return;
+
+            const supabase = window.supabaseClient;
+            const user = stState.user;
+
+            if (!supabase || !user) {
+                stShowToast("Please sign in first.", "error");
+                return;
+            }
+
+            const displayName = $st("#displayName")?.value.trim() || "";
+            const username = $st("#username")?.value.trim().toLowerCase() || "";
+            const bio = $st("#bio")?.value.trim() || "";
+            const websiteUrl = $st("#websiteUrl")?.value.trim() || "";
+            const location = $st("#location")?.value.trim() || "";
+
+            if (!displayName) {
+                stShowToast("Display name is required.", "error");
+                return;
+            }
+
+            if (!/^[a-z0-9_]{3,30}$/.test(username)) {
+                stShowToast(
+                    "Username must be 3-30 characters: letters, numbers or underscores.",
+                    "error"
+                );
+                return;
+            }
+
+            stState.saving = true;
+
+            const button = $st("#profileForm")?.querySelector('[type="submit"]');
+            const original = button?.innerHTML;
+            if (button) {
+                button.disabled = true;
+                button.innerHTML =
+                    '<i class="fa-solid fa-circle-notch fa-spin"></i> Saving...';
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from("profiles")
+                    .update({
+                        display_name: displayName,
+                        username: username,
+                        bio: bio || null,
+                        website_url: websiteUrl || null,
+                        location: location || null,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq("id", user.id)
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                stState.profile = data;
+                stFillProfile(data);
+
+                stShowToast("Profile updated successfully.", "success");
+
+            } catch (error) {
+                console.error("DESIGNVERSE: profile save error:", error);
+                stShowToast(stFriendlyError(error), "error");
+            } finally {
+                stState.saving = false;
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = original;
+                }
+            }
+        }
+
+
+        /* =================================================
+           AVATAR
+           ================================================= */
+
+        function stValidateAvatar(file) {
+            const allowed = ["image/jpeg", "image/png", "image/webp"];
+
+            if (!allowed.includes(file.type)) {
+                throw new Error("Avatar must be JPG, PNG or WEBP.");
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                throw new Error("Avatar must be 5 MB or smaller.");
+            }
+        }
+
+
+        async function stUploadAvatar(file) {
+            const supabase = window.supabaseClient;
+            const user = stState.user;
+
+            if (!supabase || !user) {
+                throw new Error("Please sign in first.");
+            }
+
+            stValidateAvatar(file);
+
+            const extension = file.name.split(".").pop().toLowerCase();
+            const path = user.id + "/avatar." + extension;
+
+            const { error: uploadError } = await supabase
+                .storage
+                .from("avatars")
+                .upload(path, file, { upsert: true });
+
+            if (uploadError) throw uploadError;
+
+            const { data } = supabase
+                .storage
+                .from("avatars")
+                .getPublicUrl(path);
+
+            const publicUrl = data?.publicUrl;
+
+            if (!publicUrl) {
+                throw new Error("Could not generate the avatar URL.");
+            }
+
+            const cacheBusted = publicUrl + "?t=" + Date.now();
+
+            const { error: updateError } = await supabase
+                .from("profiles")
+                .update({ avatar_url: cacheBusted })
+                .eq("id", user.id);
+
+            if (updateError) throw updateError;
+
+            stState.profile = {
+                ...(stState.profile || {}),
+                avatar_url: cacheBusted
+            };
+
+            stFillProfile(stState.profile);
+        }
+
+
+        async function stRemoveAvatar() {
+            const supabase = window.supabaseClient;
+            const user = stState.user;
+
+            if (!supabase || !user) {
+                throw new Error("Please sign in first.");
+            }
+
+            try {
+                await supabase
+                    .storage
+                    .from("avatars")
+                    .remove([
+                        user.id + "/avatar.jpg",
+                        user.id + "/avatar.jpeg",
+                        user.id + "/avatar.png",
+                        user.id + "/avatar.webp"
+                    ]);
+            } catch (storageError) {
+                console.warn(
+                    "DESIGNVERSE: avatar storage cleanup warning:",
+                    storageError
+                );
+            }
+
+            const { error } = await supabase
+                .from("profiles")
+                .update({ avatar_url: null })
+                .eq("id", user.id);
+
+            if (error) throw error;
+
+            stState.profile = {
+                ...(stState.profile || {}),
+                avatar_url: null
+            };
+
+            const avatar = $st("#profileAvatar");
+            if (avatar) {
+                avatar.src = "../../assets/logo/dv-icon.svg";
+            }
+        }
+
+
+        /* =================================================
+           INIT
+           ================================================= */
+
+        function stInit() {
+            stSetupSidebar();
+
+            $st("#profileForm")
+                ?.addEventListener("submit", stSaveProfile);
+
+            $st("#avatarPickButton")
+                ?.addEventListener("click", () => {
+                    $st("#avatarInput")?.click();
+                });
+
+            $st("#avatarInput")
+                ?.addEventListener("change", async event => {
+                    const file = event.target.files?.[0];
+                    if (!file) return;
+
+                    try {
+                        await stUploadAvatar(file);
+                        stShowToast("Avatar updated successfully.", "success");
+                    } catch (error) {
+                        console.error(
+                            "DESIGNVERSE: avatar upload error:",
+                            error
+                        );
+                        stShowToast(stFriendlyError(error), "error");
+                    } finally {
+                        event.target.value = "";
+                    }
+                });
+
+            $st("#removeAvatarButton")
+                ?.addEventListener("click", async () => {
+                    try {
+                        await stRemoveAvatar();
+                        stShowToast("Avatar removed.", "success");
+                    } catch (error) {
+                        console.error(
+                            "DESIGNVERSE: avatar remove error:",
+                            error
+                        );
+                        stShowToast(stFriendlyError(error), "error");
+                    }
+                });
+
+            stLoadProfile();
+        }
+
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            stInit
+        );
+
+
+
+    </script>
+</body>
+</html>
