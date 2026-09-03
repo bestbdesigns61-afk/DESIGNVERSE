@@ -80,11 +80,19 @@ select {
         display: block !important;
     }
 
-    .mobile-nav-toggle {
+        .mobile-menu-button {
         display: grid !important;
     }
 
-    .nav-links {
+    .desktop-nav {
+        display: none !important;
+    }
+
+    .nav-actions > *:not(.mobile-menu-button) {
+        display: none !important;
+    }
+
+    .mobile-nav {
         position: fixed;
 
         top: 70px;
@@ -94,6 +102,8 @@ select {
         display: none;
 
         flex-direction: column;
+
+        gap: 8px;
 
         padding: 12px;
 
@@ -113,16 +123,48 @@ select {
         z-index: 1000;
     }
 
-    .nav-links.open {
+    .mobile-nav.open {
         display: flex;
     }
 
-    .nav-links a {
+    .mobile-nav a {
         width: 100%;
 
         padding: 12px;
 
         border-radius: 10px;
+
+        color: var(--text-secondary);
+
+        font-size: 15px;
+
+        font-weight: 500;
+
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        transition:
+            color var(--transition-fast),
+            background var(--transition-fast);
+    }
+
+    .mobile-nav a:hover {
+        color: var(--text-primary);
+
+        background: var(--surface-hover);
+    }
+
+    .mobile-nav-divider {
+        height: 1px;
+
+        margin: 8px 0;
+
+        background: var(--border);
+    }
+
+    .mobile-join-button {
+        margin-top: 6px;
     }
 
 
@@ -485,8 +527,20 @@ select {
         padding-right: 24px;
     }
 
-    .nav-links {
-        gap: 6px;
+        .desktop-nav {
+        display: none !important;
+    }
+
+    .nav-actions > *:not(.mobile-menu-button) {
+        display: none !important;
+    }
+
+    .mobile-menu-button {
+        display: grid !important;
+    }
+
+    .mobile-nav {
+        display: none !important;
     }
 
     .hero {
@@ -539,19 +593,22 @@ select {
     }
 
 
-    /* ---------- Navigation ---------- */
+        /* ---------- Navigation ---------- */
 
-    .mobile-only,
-    .mobile-nav-toggle {
+    .desktop-nav {
         display: none !important;
     }
 
-    .nav-links {
-        display: flex !important;
+    .nav-actions > *:not(.mobile-menu-button) {
+        display: none !important;
+    }
 
-        align-items: center;
+    .mobile-menu-button {
+        display: grid !important;
+    }
 
-        gap: 5px;
+    .mobile-nav {
+        display: none !important;
     }
 
 
@@ -654,13 +711,11 @@ select {
     /* ---------- Navigation ---------- */
 
     .mobile-only,
-    .mobile-nav-toggle {
+    .mobile-menu-button {
         display: none !important;
     }
 
-    .nav-links {
-        display: flex !important;
-    }
+    .mobile-nav { display: none !important; }
 
 
     /* ---------- Hero ---------- */
@@ -721,13 +776,11 @@ select {
 
 
     .mobile-only,
-    .mobile-nav-toggle {
+    .mobile-menu-button {
         display: none !important;
     }
 
-    .nav-links {
-        display: flex !important;
-    }
+    .mobile-nav { display: none !important; }
 
 
     /* ---------- Hero ---------- */
@@ -775,13 +828,11 @@ select {
 
 
     .mobile-only,
-    .mobile-nav-toggle {
+    .mobile-menu-button {
         display: none !important;
     }
 
-    .nav-links {
-        display: flex !important;
-    }
+    .mobile-nav { display: none !important; }
 
 
     /* ---------- Typography ---------- */
@@ -1028,6 +1079,126 @@ select {
 
 
 /* =========================================================
+   14.5 MOBILE MENU OVERLAY & ANIMATION
+ ========================================================= */
+
+.mobile-nav-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 999;
+}
+
+body.menu-open .mobile-nav-overlay {
+    display: block;
+}
+
+@media (max-width: 991px) {
+
+    /* ---------- Mobile Navigation Visibility ---------- */
+
+    .desktop-only {
+        display: none !important;
+    }
+
+    .mobile-only {
+        display: block !important;
+    }
+
+    .mobile-menu-button {
+        display: grid !important;
+    }
+
+    .desktop-nav {
+        display: none !important;
+    }
+
+    .nav-actions > *:not(.mobile-menu-button) {
+        display: none !important;
+    }
+
+    /* ---------- Mobile Nav Drawer ---------- */
+
+    .mobile-nav-overlay {
+        display: block;
+    }
+
+    body.menu-open .mobile-nav-overlay {
+        display: block;
+    }
+
+    .mobile-nav {
+        display: none;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition:
+            opacity 0.25s ease,
+            visibility 0.25s ease,
+            transform 0.25s ease;
+    }
+
+    .mobile-nav.open {
+        display: flex;
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .mobile-nav a {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        color: var(--text-secondary);
+        font-size: 15px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition:
+            color var(--transition-fast),
+            background var(--transition-fast);
+    }
+
+    .mobile-nav a:hover {
+        color: var(--text-primary);
+        background: var(--surface-hover);
+    }
+
+    .mobile-nav-divider {
+        height: 1px;
+        margin: 8px 0;
+        background: var(--border);
+    }
+
+    .mobile-join-button {
+        margin-top: 6px;
+    }
+
+    /* ---------- Hamburger Button Animation ---------- */
+
+    .mobile-menu-button.active i {
+        transform: rotate(90deg);
+    }
+
+    .mobile-menu-button i {
+        transition: transform 0.2s ease;
+    }
+
+    /* ---------- Prevent Body Scroll When Menu Open ---------- */
+
+    body.menu-open {
+        overflow: hidden;
+    }
+}
+
+
+/* =========================================================
    15. PRINT
    ========================================================= */
 
@@ -1038,7 +1209,7 @@ select {
     .mobile-bottom-nav,
     .toast-container,
     .modal,
-    .mobile-nav-toggle,
+    .mobile-menu-button,
     .hero-actions {
         display: none !important;
     }

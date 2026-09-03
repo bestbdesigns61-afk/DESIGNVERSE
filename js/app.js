@@ -191,14 +191,23 @@ const DesignVerse = {
 
     closeOpenElements() {
 
-        /* Mobile navigation */
+                /* Mobile navigation */
 
         const nav =
+            document.querySelector(".mobile-nav") ||
             document.querySelector(".nav-links");
 
         if (nav) {
             nav.classList.remove("open");
         }
+
+        /* Mobile nav overlay */
+
+        document
+            .querySelectorAll(".mobile-nav-overlay")
+            .forEach(overlay => {
+                overlay.remove();
+            });
 
 
         /* Sidebar */

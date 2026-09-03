@@ -17,12 +17,15 @@ const DVNavigation = {
        STATE
        ===================================================== */
 
-    state: {
+        state: {
         initialized: false,
         menuOpen: false,
         sidebarOpen: false,
         activeDropdown: null
     },
+
+    overlay: null,
+
 
 
     /* =====================================================
@@ -31,8 +34,9 @@ const DVNavigation = {
 
     init() {
 
-        if (this.state.initialized) return;
+                if (this.state.initialized) return;
 
+        this.ensureMobileNav();
         this.setupMobileMenu();
         this.setupSidebar();
         this.setupDropdowns();
@@ -47,6 +51,150 @@ const DVNavigation = {
         console.log(
             "🧭 DESIGNVERSE navigation initialized."
         );
+        },
+
+
+    /* =====================================================
+       1.5 ENSURE MOBILE NAV
+       Dynamically create the hamburger button and mobile
+       nav drawer for pages that don't have them in their HTML.
+       ===================================================== */
+
+    ensureMobileNav() {
+
+        /* Create mobile menu button if missing */
+        if (!this.getMobileToggle()) {
+
+            const navActions =
+                document.querySelector(".nav-actions");
+
+            if (navActions) {
+
+                const button =
+                    document.createElement("button");
+
+                button.type = "button";
+                button.className = "mobile-menu-button";
+                button.id = "mobile-menu-button";
+                button.setAttribute(
+                    "aria-label",
+                    "Open navigation menu"
+                );
+                button.setAttribute(
+                    "aria-expanded",
+                    "false"
+                );
+                button.innerHTML =
+                    '<i class="fa-solid fa-bars"></i>';
+
+                navActions.appendChild(button);
+            }
+        }
+
+        /* Create mobile nav drawer if missing */
+        if (!this.getMobileNav()) {
+
+            const desktopNav =
+                document.querySelector(".desktop-nav");
+
+            if (!desktopNav) return;
+
+            const header =
+                document.querySelector(".site-header");
+
+            if (!header) return;
+
+            const mobileNav =
+                document.createElement("div");
+
+            mobileNav.className = "mobile-nav";
+            mobileNav.id = "mobile-nav";
+            mobileNav.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+            /* Icon mapping for nav links */
+            const iconMap = {
+                "Explore": "fa-compass",
+                "Challenges": "fa-fire",
+                "Leaderboard": "fa-trophy",
+                "Designers": "fa-users",
+                "Dashboard": "fa-table-columns",
+                "Sign In": "fa-right-to-bracket",
+                "Join DESIGNVERSE": "fa-rocket",
+                "My Designs": "fa-paint-brush",
+                "My Challenges": "fa-list",
+                "Notifications": "fa-bell",
+                "Settings": "fa-cog",
+                "Profile": "fa-user"
+            };
+
+            /* Clone desktop nav links into mobile nav */
+            desktopNav
+                .querySelectorAll("a")
+                .forEach(link => {
+
+                    const href =
+                        link.getAttribute("href") || "#";
+
+                    const text =
+                        link.textContent.trim();
+
+                    const icon =
+                        iconMap[text] ||
+                        "fa-chevron-right";
+
+                    const mobileLink =
+                        document.createElement("a");
+
+                    mobileLink.href = href;
+                    mobileLink.innerHTML =
+                        `<i class="fa-solid ${icon}"></i> ${text}`;
+
+                    mobileNav.appendChild(mobileLink);
+                });
+
+            /* Clone auth/action links from nav-actions */
+            const navActions =
+                document.querySelector(".nav-actions");
+
+            if (navActions) {
+
+                const divider =
+                    document.createElement("div");
+
+                divider.className =
+                    "mobile-nav-divider";
+
+                mobileNav.appendChild(divider);
+
+                navActions
+                    .querySelectorAll("a")
+                    .forEach(link => {
+
+                        const href =
+                            link.getAttribute("href") || "#";
+
+                        const text = link.textContent.trim();
+                        const icon =
+                            iconMap[text] ||
+                            "fa-chevron-right";
+
+                        const mobileLink =
+                            document.createElement("a");
+
+                        mobileLink.href = href;
+                        mobileLink.innerHTML =
+                            `<i class="fa-solid ${icon}"></i> ${text}`;
+
+                        mobileNav.appendChild(mobileLink);
+                    });
+            }
+
+            /* Insert mobile nav after the navbar */
+            header.appendChild(mobileNav);
+        }
     },
 
 
@@ -170,10 +318,53 @@ const DVNavigation = {
         );
 
 
-        document.body.classList.toggle(
+                document.body.classList.toggle(
             "menu-open",
             this.state.menuOpen
         );
+
+        /* Toggle backdrop overlay */
+
+        if (
+            !this.overlay &&
+            this.state.menuOpen
+        ) {
+
+            const overlay =
+                document.createElement(
+                    "div"
+                );
+
+            overlay.className =
+                "mobile-nav-overlay";
+
+            overlay.addEventListener(
+                "click",
+                () => {
+
+                    this.closeMobileMenu();
+
+                }
+            );
+
+            document.body.appendChild(
+                overlay
+            );
+
+            this.overlay =
+                overlay;
+
+        } else if (
+            this.overlay &&
+            !this.state.menuOpen
+        ) {
+
+            this.overlay.remove();
+
+            this.overlay =
+                null;
+
+        }
     },
 
 
@@ -209,9 +400,16 @@ const DVNavigation = {
         );
 
 
-        document.body.classList.remove(
+                document.body.classList.remove(
             "menu-open"
         );
+
+        /* Clean up overlay */
+
+        if (this.overlay) {
+            this.overlay.remove();
+            this.overlay = null;
+        }
     },
 
 
@@ -799,14 +997,15 @@ const DVNavigation = {
                 }
 
 
-                /* Mobile nav */
+                                /* Mobile nav */
 
                 if (
                     this.state.menuOpen &&
                     !target.closest(".mobile-nav") &&
                     !target.closest(".nav-links") &&
                     !target.closest(".mobile-menu-button") &&
-                    !target.closest(".mobile-nav-toggle")
+                    !target.closest(".mobile-nav-toggle") &&
+                    !target.closest(".mobile-nav-overlay")
                 ) {
 
                     this.closeMobileMenu();
