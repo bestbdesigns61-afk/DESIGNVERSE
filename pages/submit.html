@@ -1259,7 +1259,11 @@
 
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
 
-                    THE CREATIVE ARENA
+                    <span id="editModeBadge" hidden>
+                        EDITING DESIGN
+                    </span>
+
+                    <span id="editModeTitle"></span>
 
                 </div>
 
@@ -1784,7 +1788,7 @@
                                         class="fa-solid fa-rocket"
                                     ></i>
 
-                                    Publish Design
+                                    <span>Publish Design</span>
 
                                 </button>
 
@@ -2383,6 +2387,12 @@
             "submit",
             event => {
 
+                // Check if we're in edit mode
+                if (currentEditDesignId) {
+                    updateExistingDesign(event);
+                    return;
+                }
+
                 /*
                  * designs.js already owns
                  * the actual submit handler.
@@ -2463,6 +2473,74 @@
             }
         );
 
+        // Update design instead of creating new one
+        async function updateExistingDesign(event) {
+            event.preventDefault();
+
+            if (!currentEditDesignId) {
+                return false;
+            }
+
+            hideMessage();
+
+            const file = fileInput?.files?.[0];
+            const title = document.getElementById("designTitle")?.value?.trim();
+            const category = document.getElementById("designCategory")?.value?.trim();
+            const description = document.getElementById("designDescription")?.value?.trim();
+            const tags = document.getElementById("designTags")?.value?.trim();
+            const visibility = document.getElementById("designVisibility")?.value;
+
+            if (!title) {
+                showMessage("Please enter a design title.", "error");
+                return;
+            }
+
+            if (!category) {
+                showMessage("Please select a category.", "error");
+                return;
+            }
+
+            // Parse tags
+            let tagsArray = [];
+            if (tags) {
+                tagsArray = tags.split(",").map(t => t.trim()).filter(t => t);
+            }
+
+            const updates = {
+                title,
+                description,
+                category,
+                tags: tagsArray,
+                is_public: visibility ? visibility !== "private" : true
+            };
+
+            try {
+                if (!window.DVDesigns || typeof window.DVDesigns.updateDesign !== "function") {
+                    showMessage("Design system unavailable.", "error");
+                    return;
+                }
+
+                // Update design data
+                await window.DVDesigns.updateDesign(currentEditDesignId, updates);
+
+                // If a new file is provided, replace the image
+                if (file) {
+                    await window.DVDesigns.replaceDesignImage(currentEditDesignId, file);
+                }
+
+                showMessage("Design updated successfully! Redirecting...", "success");
+
+                // Redirect to design page
+                setTimeout(() => {
+                    window.location.href = `/design?id=${encodeURIComponent(currentEditDesignId)}`;
+                }, 900);
+
+            } catch (error) {
+                console.error("DESIGNVERSE: Error updating design:", error);
+                showMessage(error.message || "Unable to update design.", "error");
+            }
+        }
+
 
         /* =================================================
            LISTEN FOR SUCCESS
@@ -2536,6 +2614,91 @@
 
 
         /* =================================================
+           EDIT MODE
+           ================================================= */
+
+        const editModeTitle =
+            document.getElementById(
+                "editModeTitle"
+            );
+        const editModeBadge =
+            document.getElementById(
+                "editModeBadge"
+            );
+        const pageTitle =
+            document.querySelector(
+                ".submit-header h1"
+            );
+        const publishButtonLabel =
+            document.querySelector(
+                "#publishDesignBtn span"
+            );
+
+        let currentEditDesignId = null;
+
+        // Get edit design ID from URL
+        function getEditDesignId() {
+            const params =
+                new URLSearchParams(
+                    window.location.search
+                );
+            return params.get("edit");
+        }
+
+        // Load existing design for editing
+        async function loadDesignForEdit(designId) {
+            try {
+                if (!window.DVDesigns || typeof window.DVDesigns.getDesign !== "function") {
+                    showMessage("Design system unavailable.", "error");
+                    return;
+                }
+
+                const design = await window.DVDesigns.getDesign(designId);
+
+                if (!design) {
+                    showMessage("Design not found.", "error");
+                    return;
+                }
+
+                // Pre-fill form fields
+                const titleInput = document.getElementById("designTitle");
+                const descriptionInput = document.getElementById("designDescription");
+                const categoryInput = document.getElementById("designCategory");
+                const tagsInput = document.getElementById("designTags");
+                const visibilityInput = document.getElementById("designVisibility");
+
+                if (titleInput) titleInput.value = design.title || "";
+                if (descriptionInput) descriptionInput.value = design.description || "";
+                if (categoryInput) categoryInput.value = design.category || "";
+                if (tagsInput) tagsInput.value = Array.isArray(design.tags) ? design.tags.join(", ") : (design.tags || "");
+                if (visibilityInput && design.is_public !== undefined) {
+                    visibilityInput.value = design.is_public !== false ? "public" : "private";
+                }
+
+                // Show preview if image exists
+                if (design.image_url) {
+                    previewImage.src = design.image_url;
+                    preview.classList.add("show");
+                }
+
+                // Update UI for edit mode
+                currentEditDesignId = designId;
+                if (editModeTitle) editModeTitle.textContent = `Edit: ${design.title || "Design"}`;
+                if (editModeBadge) editModeBadge.hidden = false;
+                if (pageTitle) pageTitle.textContent = "Edit Design";
+                if (publishButtonLabel) publishButtonLabel.textContent = "Update Design";
+
+                // Update form to handle edit
+                form?.setAttribute("data-edit-mode", designId);
+
+            } catch (error) {
+                console.error("DESIGNVERSE: Error loading design for edit:", error);
+                showMessage(error.message || "Unable to load design for editing.", "error");
+            }
+        }
+
+
+        /* =================================================
            INITIALIZE
            ================================================= */
 
@@ -2561,6 +2724,12 @@
                 console.log(
                     "DESIGNVERSE submit page ready."
                 );
+
+                // Check for edit mode
+                const editDesignId = getEditDesignId();
+                if (editDesignId) {
+                    await loadDesignForEdit(editDesignId);
+                }
 
             }
         );
